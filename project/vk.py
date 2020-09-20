@@ -27,7 +27,8 @@ class VK:
                 print(await resp.text())
 
     async def send_message(self, user_ids: Union[List[int], int],
-                           text: str, attachment: Optional[str]) -> None:
+                           text: str, attachment: Optional[str],
+                           payload: str) -> None:
         if isinstance(user_ids, list):
             user_ids = ", ".join(map(str, user_ids))
 
@@ -39,5 +40,8 @@ class VK:
 
         if attachment:
             params["attachment"] = attachment
+
+        if payload:
+            params["payload"] = payload
 
         await self._make_request(method_name="messages.send?", params=params)
