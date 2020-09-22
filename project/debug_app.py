@@ -28,21 +28,19 @@ class WebApp:
     async def _update_ts(self, new_ts):
         self.ts = new_ts
 
-    async def _get_updates(self) -> list:
+    async def _get_updates(self, wait_time: int,) -> list:
         params = {
             "ts": self.ts,
             "key": self.key,
-            "wait": 25
+            "wait": wait_time
         }
         async with self.session.get(self.request_address, params=params) as resp:
             response = await resp.json()
-            print(response)
-            print(self.key)
-            #await self._update_ts(response["ts"])
-            #return response["updates"]
+            await self._update_ts(response["ts"])
+            return response["updates"]
 
     async def _update_request_address(self):
-        self.request_address = f"{self.server}?act_a_check"
+        self.request_address = f"{self.server}?act=a_check"
 
     async def _get_long_poll_server(self):
         response = await self._make_request("groups.getLongPollServer?", {"group_id": DEBUG_GROUP_ID})
@@ -50,31 +48,31 @@ class WebApp:
         self.server = response["server"]
         self.key = response["key"]
         self.ts = response["ts"]
-        print(self.key)
         await self._update_request_address()
 
+    async def _process_updates(self, updates: list):
+        for update in updates:
+            print(update)
 
-    async def set_long_poll(self):
-        params = {
-            "key": self.key,
-            "ts": self.ts,
-            "wait": 25
-        }
+    async def _start_polling(self,  wait_time: int):
+        while True:
+            updates = await self._get_updates(wait_time=wait_time)
+            if updates:
+                await self._process_updates(updates)
 
     async def clean_up(self):
         await self.session.close()
 
-    async def test(self):
+    async def _run_app(self, wait_time: int):
         try:
             await self._get_long_poll_server()
-            updates = await self._get_updates()
-            print(updates)
+            await self._start_polling(wait_time=wait_time)
         finally:
             await self.clean_up()
 
-    def run_app(self):
+    def run_app(self, wait_time: int = 25):
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.test())
+        loop.run_until_complete(self._run_app(wait_time=wait_time))
 
 
 if __name__ == "__main__":
