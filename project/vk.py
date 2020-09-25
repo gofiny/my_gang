@@ -8,7 +8,30 @@ class Message:
         self.id = message_json["id"]
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]
-        self.text = message_json["text"]
+        self.text = message_json.get("payload")
+        self.payload = message_json.get("payload")
+
+
+class Button:
+    def __init__(self, b_type: str, color: str = "secondary", **kwargs):
+        self.button = {"action": {"type": b_type}}
+        params = {**kwargs}
+        self.button["type"]["label"] = params["label"]
+        if params.get("payload"):
+            self.button["type"]["payload"] = params["payload"]
+
+        if b_type == "text" or b_type == "callback":
+            self.button["color"] = color
+        elif b_type == "open_link":
+            self.button["type"]["link"] = params["link"]
+        else:
+            raise TypeError(f"Button type {b_type} is not support")
+
+
+class Keyboard:
+    def __init__(self, one_time: bool, inline: bool):
+        self.one_time = one_time
+        self.inline = inline
 
 
 class VK:
@@ -18,10 +41,16 @@ class VK:
         self._API_KEY = api_key
         self._API_VER = api_ver
 
-    def _register_handler(self, text, func):
+    def _make_filter(self, **params):
+        params = {**params}
+        if params.get("text") and params.get("payload"):
+            pass
+
+    def _register_handler(self, func, **kwargs):
+        filters = {**kwargs}
         self.handlers[text] = func
 
-    def message_handler(self, text: str):
+    def message_handler(self, text: Optional[str] = None, payload: Optional[str] = None):
         def decorator(func):
             self._register_handler(text, func)
         return decorator
