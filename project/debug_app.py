@@ -1,11 +1,14 @@
 import asyncio
 from aiohttp import ClientSession
 from config import DEBUG_API_KEY, API_VER, DEBUG_GROUP_ID
+from vk import VK, Message
 from typing import Optional
+from bot import bot
 
 
 class WebApp:
-    def __init__(self):
+    def __init__(self, vk: VK):
+        self._vk_worker = vk
         self.session = ClientSession()
         self.ts = ""
         self.server = ""
@@ -27,6 +30,10 @@ class WebApp:
 
     async def _update_ts(self, new_ts):
         self.ts = new_ts
+
+    @staticmethod
+    async def _create_message(message_object: dict):
+        return Message(message_object)
 
     async def _get_updates(self, wait_time: int,) -> list:
         params = {
@@ -53,6 +60,11 @@ class WebApp:
     async def _process_updates(self, updates: list):
         for update in updates:
             print(update)
+            if update["type"] == "message_new":
+                message = await self._create_message(update["object"]["message"])
+                func = self._vk_worker.handlers.get(message.text)
+                if func:
+                    await func(message)
 
     async def _start_polling(self,  wait_time: int):
         while True:
@@ -76,5 +88,5 @@ class WebApp:
 
 
 if __name__ == "__main__":
-    app = WebApp()
+    app = WebApp(bot)
     app.run_app()
