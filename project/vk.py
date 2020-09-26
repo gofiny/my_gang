@@ -1,6 +1,7 @@
 from aiohttp import ClientSession
 from typing import Union, Optional, List
 from random import getrandbits, choice
+import json
 
 
 class Message:
@@ -8,7 +9,7 @@ class Message:
         self.id = message_json["id"]
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]
-        self.text = message_json.get("payload")
+        self.text = message_json.get("text")
         self.payload = message_json.get("payload")
 
 
@@ -16,22 +17,45 @@ class Button:
     def __init__(self, b_type: str, color: str = "secondary", **kwargs):
         self.button = {"action": {"type": b_type}}
         params = {**kwargs}
-        self.button["type"]["label"] = params["label"]
+        self.button["action"]["label"] = params["label"]
         if params.get("payload"):
-            self.button["type"]["payload"] = params["payload"]
+            self.button["action"]["payload"] = params["payload"]
 
         if b_type == "text" or b_type == "callback":
             self.button["color"] = color
         elif b_type == "open_link":
-            self.button["type"]["link"] = params["link"]
+            self.button["action"]["link"] = params["link"]
         else:
             raise TypeError(f"Button type {b_type} is not support")
 
 
 class Keyboard:
-    def __init__(self, one_time: bool, inline: bool):
+    def __init__(self, one_time: bool = False, inline: bool = False):
         self.one_time = one_time
         self.inline = inline
+        self.buttons = []
+
+    def add_empty_row(self):
+        self.buttons.append([])
+
+    def add_buttons_row(self, buttons: List[Button]):
+        self.buttons.append([_button.button for _button in buttons])
+
+    def add_button(self, button: Button):
+        try:
+            if len(self.buttons[-1]) == 5:
+                self.add_empty_row()
+        except IndexError:
+            self.add_empty_row()
+        self.buttons[-1].append(button.button)
+
+    def get_keyboard(self):
+        _keyboard = {
+            "one_time": self.one_time,
+            "inline": self.inline,
+            "buttons": self.buttons
+        }
+        return json.dumps(_keyboard)
 
 
 class VK:
@@ -46,13 +70,13 @@ class VK:
         if params.get("text") and params.get("payload"):
             pass
 
-    def _register_handler(self, func, **kwargs):
+    def _register_handler(self, func, text, **kwargs):
         filters = {**kwargs}
         self.handlers[text] = func
 
-    def message_handler(self, text: Optional[str] = None, payload: Optional[str] = None):
+    def message_handler(self, text: Optional[str] = None, payload: Optional[dict] = None):
         def decorator(func):
-            self._register_handler(text, func)
+            self._register_handler(func, text)
         return decorator
 
     @staticmethod
@@ -70,12 +94,13 @@ class VK:
             "v": self._API_VER
         }
         async with self._session.get(_BASE_URL % method_name, params=params) as resp:
-            if resp.status != 200:
-                print(await resp.text())
+            #if resp.status != 200:
+            print(await resp.text())
 
     async def send_message(self, user_ids: Union[List[int], int],
                            text: str, attachment: Optional[str] = None,
-                           payload: Optional[str] = None) -> None:
+                           payload: Optional[str] = None,
+                           keyboard: Optional[Keyboard] = None) -> None:
         if isinstance(user_ids, list):
             user_ids = ", ".join(map(str, user_ids))
 
@@ -91,4 +116,18 @@ class VK:
         if payload:
             params["payload"] = payload
 
+        if keyboard:
+            params["keyboard"] = keyboard.get_keyboard()
+
         await self._make_request(method_name="messages.send?", params=params)
+
+
+if __name__ == "__main__":
+    keyboard = Keyboard()
+    button = Button("text", label="button", payload="test_button")
+    button2 = Button("text", label="buttons2", payload="fsdfsd")
+    keyboard.add_buttons_row([button, button2])
+    keyboard.add_empty_row()
+    keyboard.add_button(button)
+    keyboard = keyboard.get_keyboard()
+    print(keyboard)

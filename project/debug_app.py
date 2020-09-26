@@ -63,6 +63,7 @@ class WebApp:
             if update["type"] == "message_new":
                 message = await self._create_message(update["object"]["message"])
                 func = self._vk_worker.handlers.get(message.text)
+                print(message.text)
                 if func:
                     await func(message)
 
