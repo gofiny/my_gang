@@ -13,4 +13,4 @@ if __name__ == "__main__":
         returning_callback_str=DEBUG_RETURING_CALLBACK_STR
     )
 
-    app.start_app(socket_path=args)
+    app.start_app(socket_path=args.path)
