@@ -31,9 +31,8 @@ class WebApp:
     def _update_ts(self, new_ts):
         self.ts = new_ts
 
-    @staticmethod
-    def _create_message(message_object: dict):
-        return Message(message_object)
+    def _create_message(self, message_object: dict):
+        return Message(message_object, self._vk_worker)
 
     async def _get_updates(self, wait_time: int,) -> list:
         params = {

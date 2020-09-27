@@ -5,14 +5,24 @@ import json
 
 
 class Message:
-    def __init__(self, message_json: dict):
+    def __init__(self, message_json: dict, bot: "VK"):
         self.id = message_json["id"]
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]
         self.text = message_json.get("text")
         self.payload = message_json.get("payload")
+        self.bot = bot
         if self.payload:
             self.payload = json.loads(self.payload)
+
+    async def answer(self, text: str, attachment: Optional[str] = None,
+                     payload: Optional[str] = None,
+                     keyboard: Optional["Keyboard"] = None):
+        await self.bot.send_message(
+            user_ids=self.from_id, text=text,
+            attachment=attachment, payload=payload,
+            keyboard=keyboard
+        )
 
 
 class Button:
@@ -107,7 +117,7 @@ class VK:
             "v": self._API_VER
         }
         async with self._session.get(_BASE_URL % method_name, params=params) as resp:
-            #if resp.status != 200:
+            # if resp.status != 200:
             print(await resp.text())
 
     async def send_message(self, user_ids: Union[List[int], int],

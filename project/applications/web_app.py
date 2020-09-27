@@ -45,9 +45,8 @@ class WebApp:
         if func:
             await func(message)
 
-    @staticmethod
-    def _create_message(message_object: dict):
-        return Message(message_object)
+    def _create_message(self, message_object: dict):
+        return Message(bot=self.bot, message_json=message_object)
 
     def start_app(self, socket_path=None):
         run_app(self.app, path=socket_path)
