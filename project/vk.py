@@ -133,14 +133,3 @@ class VK:
             params["keyboard"] = keyboard.get_keyboard()
 
         await self._make_request(method_name="messages.send?", params=params)
-
-
-if __name__ == "__main__":
-    keyboard = Keyboard()
-    button = Button("text", label="button", payload="test_button")
-    button2 = Button("text", label="buttons2", payload="fsdfsd")
-    keyboard.add_buttons_row([button, button2])
-    keyboard.add_empty_row()
-    keyboard.add_button(button)
-    keyboard = keyboard.get_keyboard()
-    print(keyboard)
