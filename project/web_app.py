@@ -10,7 +10,7 @@ class WebApp:
         self._set_base_handler(address_prefix=address_prefix)
 
     def _set_base_handler(self, address_prefix: str):
-        self.app.add_routes([post(f"{address_prefix}/", self._base_handler)])
+        self.app.add_routes([post(f"/{address_prefix}/", self._base_handler)])
 
     async def _base_handler(self, request: Request) -> Response:
         request_json = await request.json()
