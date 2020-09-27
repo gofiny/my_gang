@@ -1,7 +1,7 @@
 import argparse
 from handlers import bot
 from web_app import WebApp
-from config import DEBUG_SECRET_STR, DEBUG_RETURING_CALLBACK_STR, ADDRESS_PREFIX
+from config import ADDRESS_PREFIX, SECRET_STR, RETURING_CALLBACK_STR
 
 
 if __name__ == "__main__":
@@ -10,8 +10,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     app = WebApp(
         address_prefix=ADDRESS_PREFIX,
-        secret_str=DEBUG_SECRET_STR,
-        returning_callback_str=DEBUG_RETURING_CALLBACK_STR,
+        secret_str=SECRET_STR,
+        returning_callback_str=RETURING_CALLBACK_STR,
         bot=bot
     )
     app.start_app(socket_path=args.path)

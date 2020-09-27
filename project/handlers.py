@@ -1,8 +1,8 @@
 from vk import Message, VK
-from config import DEBUG_API_KEY, API_VER
+from config import API_KEY, API_VER
 import keyboards
 
-bot = VK(DEBUG_API_KEY, API_VER)
+bot = VK(API_KEY, API_VER)
 
 
 @bot.message_handler(payload={"command": "start"})

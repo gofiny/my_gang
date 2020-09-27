@@ -1,6 +1,6 @@
 import asyncio
 from aiohttp import ClientSession
-from config import DEBUG_API_KEY, API_VER, DEBUG_GROUP_ID
+from config import API_KEY, API_VER, GROUP_ID
 from vk import VK, Message
 from typing import Optional
 from handlers import bot
@@ -19,7 +19,7 @@ class WebApp:
         _BASE_URL = "https://api.vk.com/method/%s"
         params = {
             **params,
-            "access_token": DEBUG_API_KEY,
+            "access_token": API_KEY,
             "v": API_VER
         }
         async with self.session.get(_BASE_URL % method_name, params=params) as resp:
@@ -50,7 +50,7 @@ class WebApp:
         self.request_address = f"{self.server}?act=a_check"
 
     async def _get_long_poll_server(self):
-        response = await self._make_request("groups.getLongPollServer?", {"group_id": DEBUG_GROUP_ID})
+        response = await self._make_request("groups.getLongPollServer?", {"group_id": GROUP_ID})
         response = response["response"]
         self.server = response["server"]
         self.key = response["key"]
