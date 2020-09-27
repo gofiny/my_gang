@@ -28,11 +28,11 @@ class WebApp:
             else:
                 print(await resp.text())
 
-    async def _update_ts(self, new_ts):
+    def _update_ts(self, new_ts):
         self.ts = new_ts
 
     @staticmethod
-    async def _create_message(message_object: dict):
+    def _create_message(message_object: dict):
         return Message(message_object)
 
     async def _get_updates(self, wait_time: int,) -> list:
@@ -43,10 +43,10 @@ class WebApp:
         }
         async with self.session.get(self.request_address, params=params) as resp:
             response = await resp.json()
-            await self._update_ts(response["ts"])
+            self._update_ts(response["ts"])
             return response["updates"]
 
-    async def _update_request_address(self):
+    def _update_request_address(self):
         self.request_address = f"{self.server}?act=a_check"
 
     async def _get_long_poll_server(self):
@@ -55,15 +55,28 @@ class WebApp:
         self.server = response["server"]
         self.key = response["key"]
         self.ts = response["ts"]
-        await self._update_request_address()
+        self._update_request_address()
+
+    @staticmethod
+    def _call_filter(message: Message) -> str:
+        if message.payload:
+            payload = message.payload
+            if payload.get("command"):
+                _filter = f'payload_{payload["command"]}'
+            else:
+                _filter = f'text_{message.text}'
+        else:
+            _filter = f'text_{message.text}'
+
+        return _filter
 
     async def _process_updates(self, updates: list):
         for update in updates:
             print(update)
             if update["type"] == "message_new":
-                message = await self._create_message(update["object"]["message"])
-                func = self._vk_worker.handlers.get(message.text)
-                print(message.text)
+                message = self._create_message(update["object"]["message"])
+                _filter = self._call_filter(message)
+                func = self._vk_worker.handlers.get(_filter)
                 if func:
                     await func(message)
 

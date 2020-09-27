@@ -1,5 +1,5 @@
 from aiohttp import ClientSession
-from typing import Union, Optional, List
+from typing import Union, Optional, List, Callable
 from random import getrandbits, choice
 import json
 
@@ -10,11 +10,11 @@ class Message:
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]
         self.text = message_json.get("text")
-        self.payload = message_json.get("payload")
+        self.payload = json.loads(message_json.get("payload"))
 
 
 class Button:
-    def __init__(self, b_type: str, color: str = "secondary", **kwargs):
+    def __init__(self, b_type: str = "text", color: str = "secondary", **kwargs):
         self.button = {"action": {"type": b_type}}
         params = {**kwargs}
         self.button["action"]["label"] = params["label"]
@@ -61,29 +61,40 @@ class Keyboard:
 class VK:
     def __init__(self, api_key, api_ver):
         self._session = ClientSession()
-        self.handlers = {}
+        self.handlers = {}  # {"text_some_text": func} or {"payload_payload_command": func}
         self._API_KEY = api_key
         self._API_VER = api_ver
 
-    def _make_filter(self, **params):
+    @staticmethod
+    def _make_filter(**params) -> str:
         params = {**params}
-        if params.get("text") and params.get("payload"):
-            pass
+        _filter = ""
+        text = params.get("text")
+        payload = params.get("payload")
+        if payload:
+            if payload.get("command"):
+                _filter = f'payload_{payload["command"]}'
+            elif payload.get("info"):
+                _filter = f'text_{text}'
+        elif text:
+            _filter = f'text_{text}'
 
-    def _register_handler(self, func, text, **kwargs):
-        filters = {**kwargs}
-        self.handlers[text] = func
+        return _filter
 
-    def message_handler(self, text: Optional[str] = None, payload: Optional[dict] = None):
+    def _register_handler(self, func, text: Optional[str] = None, payload: Optional[dict] = None) -> None:
+        _filter = self._make_filter(text=text, payload=payload)
+        self.handlers[_filter] = func
+
+    def message_handler(self, text: Optional[str] = None, payload: Optional[dict] = None) -> Callable:
         def decorator(func):
-            self._register_handler(func, text)
+            self._register_handler(func, text, payload)
         return decorator
 
     @staticmethod
     def _get_random_id() -> int:
         return getrandbits(31) * choice([-1, 1])
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         await self._session.close()
 
     async def _make_request(self, method_name: str, params: dict) -> None:
