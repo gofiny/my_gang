@@ -10,7 +10,9 @@ class Message:
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]
         self.text = message_json.get("text")
-        self.payload = json.loads(message_json.get("payload"))
+        self.payload = message_json.get("payload")
+        if self.payload:
+            self.payload = json.loads(self.payload)
 
 
 class Button:

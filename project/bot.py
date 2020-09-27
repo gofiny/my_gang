@@ -20,3 +20,9 @@ async def text_test(message: Message):
 async def test_payload_info(message: Message):
     info = message.payload["info"]
     await bot.send_message(user_ids=message.from_id, text=f"payload info: {info}")
+
+
+@bot.message_handler(text="test keyboard")
+async def test_keyboard(message: Message):
+    keyboard = keyboards.test_count_buttons(41)
+    await bot.send_message(user_ids=message.from_id, text="see:", keyboard=keyboard)
