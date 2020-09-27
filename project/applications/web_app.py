@@ -1,5 +1,5 @@
 from aiohttp.web import Application, Response, Request, post, run_app
-from vk import VK, Message
+from vk_api.vk import VK, Message
 
 
 class WebApp:

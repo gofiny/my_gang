@@ -1,6 +1,6 @@
 import argparse
-from handlers import bot
-from web_app import WebApp
+from bot_utils.handlers import bot
+from applications.web_app import WebApp
 from config import ADDRESS_PREFIX, SECRET_STR, RETURING_CALLBACK_STR
 
 

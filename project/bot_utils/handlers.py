@@ -1,6 +1,6 @@
-from vk import Message, VK
+from vk_api.vk import Message, VK
 from config import API_KEY, API_VER
-import keyboards
+from bot_utils import keyboards
 
 bot = VK(API_KEY, API_VER)
 

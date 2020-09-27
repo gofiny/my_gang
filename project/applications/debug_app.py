@@ -1,9 +1,9 @@
 import asyncio
 from aiohttp import ClientSession
 from config import API_KEY, API_VER, GROUP_ID
-from vk import VK, Message
+from vk_api.vk import VK, Message
 from typing import Optional
-from handlers import bot
+from bot_utils.handlers import bot
 
 
 class WebApp:

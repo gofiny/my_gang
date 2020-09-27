@@ -1,4 +1,4 @@
-from vk import Keyboard, Button
+from vk_api.vk import Keyboard, Button
 
 
 def payload_start() -> Keyboard:
