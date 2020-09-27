@@ -76,7 +76,7 @@ class WebApp:
             if update["type"] == "message_new":
                 message = self._create_message(update["object"]["message"])
                 _filter = self._call_filter(message)
-                func = self._vk_worker.handlers.get(_filter)
+                func = self._vk_worker.handlers.get(_filter, self._vk_worker.handlers.get("text_*"))
                 if func:
                     await func(message)
 

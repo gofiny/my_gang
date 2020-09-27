@@ -26,3 +26,8 @@ async def test_payload_info(message: Message):
 async def test_keyboard(message: Message):
     keyboard = keyboards.test_count_buttons(41)
     await bot.send_message(user_ids=message.from_id, text="see:", keyboard=keyboard)
+
+
+@bot.message_handler(text="*")
+async def other(message: Message):
+    await bot.send_message(user_ids=message.from_id, text="Не знаю что ответить")
