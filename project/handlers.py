@@ -1,7 +1,6 @@
-from config import API_VER, API_KEY, DEBUG_API_KEY
-from vk import VK, Message
+from vk import Message, VK
+from config import DEBUG_API_KEY, API_VER
 import keyboards
-
 
 bot = VK(DEBUG_API_KEY, API_VER)
 

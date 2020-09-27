@@ -3,7 +3,7 @@ from aiohttp import ClientSession
 from config import DEBUG_API_KEY, API_VER, DEBUG_GROUP_ID
 from vk import VK, Message
 from typing import Optional
-from bot import bot
+from handlers import bot
 
 
 class WebApp:
