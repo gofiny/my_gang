@@ -8,7 +8,7 @@ if __name__ == "__main__":
     parser.add_argument("--path")
     args = parser.parse_args()
     app = WebApp(
-        address_prefix="my_gang",
+        address_prefix="my_gang_debug",
         secret_str=DEBUG_SECRET_STR,
         returning_callback_str=DEBUG_RETURING_CALLBACK_STR
     )
