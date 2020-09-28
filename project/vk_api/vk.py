@@ -1,23 +1,26 @@
 from aiohttp import ClientSession
+from db_utils.models import User
 from typing import Union, Optional, List, Callable
 from random import getrandbits, choice
 import json
 
 
 class Message:
-    def __init__(self, message_json: dict, bot: "VK"):
+    def __init__(self, message_json: dict, bot: "VK", user: User):
         self.id = message_json["id"]
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]
         self.text = message_json.get("text")
         self.payload = message_json.get("payload")
         self.bot = bot
+        self.user = user
+
         if self.payload:
             self.payload = json.loads(self.payload)
 
     async def answer(self, text: str, attachment: Optional[str] = None,
                      payload: Optional[str] = None,
-                     keyboard: Optional["Keyboard"] = None):
+                     keyboard: Optional["Keyboard"] = None) -> None:
         await self.bot.send_message(
             user_ids=self.from_id, text=text,
             attachment=attachment, payload=payload,

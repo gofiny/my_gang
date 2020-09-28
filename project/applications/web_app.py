@@ -1,3 +1,7 @@
+import asyncpg
+import aioredis
+from db_utils.models import User
+from db_utils import redis_queries
 from aiohttp.web import Application, Response, Request, post, run_app
 from vk_api.vk import VK, Message
 
@@ -7,11 +11,16 @@ class WebApp:
         self.bot = bot
         self.secret_str = secret_str
         self.app = Application()
+        self.app.on_shutdown.append(self._on_shutdown)
         self.returning_callback_str = returning_callback_str
         self._set_base_handler(address_prefix=address_prefix)
 
     def _set_base_handler(self, address_prefix: str):
         self.app.add_routes([post(f"/{address_prefix}/", self._base_handler)])
+
+    @staticmethod
+    def _prepare_initial_user(user_id: int) -> User:
+        return User({"user_id": user_id})
 
     async def _base_handler(self, request: Request) -> Response:
         request_json = await request.json()
@@ -38,15 +47,23 @@ class WebApp:
 
         return _filter
 
-    async def _process_new_message(self, data: dict):
+    async def _process_new_message(self, data: dict) -> None:
         message = self._create_message(data["object"]["message"])
         _filter = self._call_filter(message)
         func = self.bot.handlers.get(_filter, self.bot.handlers.get("text_*"))
         if func:
             await func(message)
 
-    def _create_message(self, message_object: dict):
-        return Message(bot=self.bot, message_json=message_object)
+    async def prepare(self, postgres_dsn: str, redis_address: str) -> None:
+        self.app["pq_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
+        self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address)
+
+    async def _on_shutdown(self) -> None:
+        await self.app.get("pg_pool").close()
+        await self.app.get("redis_pool").close()
+
+    def _create_message(self, message_object: dict, user: User) -> Message:
+        return Message(bot=self.bot, message_json=message_object, user=user)
 
     def start_app(self, socket_path=None):
         run_app(self.app, path=socket_path)
