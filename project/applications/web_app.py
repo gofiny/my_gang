@@ -18,10 +18,6 @@ class WebApp:
     def _set_base_handler(self, address_prefix: str):
         self.app.add_routes([post(f"/{address_prefix}/", self._base_handler)])
 
-    @staticmethod
-    def _prepare_initial_user(user_id: int) -> User:
-        return User({"user_id": user_id})
-
     async def _base_handler(self, request: Request) -> Response:
         request_json = await request.json()
         if request_json.get("secret") != self.secret_str:
@@ -30,7 +26,8 @@ class WebApp:
         if request_type == "confirmation":
             return Response(body=self.returning_callback_str)
         elif request_type == "message_new":
-            await self._process_new_message(request_json)
+            message_object = self._get_message_object(request_json)
+            await self._process_new_message(message_object)
 
         return Response(body="ok")
 
@@ -47,8 +44,13 @@ class WebApp:
 
         return _filter
 
-    async def _process_new_message(self, data: dict) -> None:
-        message = self._create_message(data["object"]["message"])
+    @staticmethod
+    def _get_message_object(request_object: dict) -> dict:
+        return request_object["object"]["message"]
+
+    async def _process_new_message(self, message_object: dict) -> None:
+        user = await redis_queries.return_or_create_user(pool=self.app["redis_pool"], user_id=message_object["from_id"])
+        message = self._create_message(message_object, user=user)
         _filter = self._call_filter(message)
         func = self.bot.handlers.get(_filter, self.bot.handlers.get("text_*"))
         if func:
