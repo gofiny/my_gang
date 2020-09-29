@@ -7,6 +7,6 @@ async def return_or_create_user(pool: Redis, user_id: int) -> User:
     if is_exist:
         user = await pool.hgetall(key=f"users:{user_id}", encoding="utf-8")
     else:
-        user = {"user_id": user_id, "if_followed": False}
+        user = {"user_id": user_id, "if_followed": 0}
         await pool.hmset_dict(f"users:{user['user_id']}", user)
     return User(user)
