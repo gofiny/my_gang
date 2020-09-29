@@ -11,7 +11,6 @@ class WebApp:
         self.bot = bot
         self.secret_str = secret_str
         self.app = Application()
-        self.app.on_shutdown.append(self._on_shutdown)
         self.returning_callback_str = returning_callback_str
         self._set_base_handler(address_prefix=address_prefix)
 
@@ -68,4 +67,5 @@ class WebApp:
         return Message(bot=self.bot, message_json=message_object, user=user)
 
     def start_app(self, socket_path=None):
+        self.app.on_shutdown.append(self._on_shutdown)
         run_app(self.app, path=socket_path)
