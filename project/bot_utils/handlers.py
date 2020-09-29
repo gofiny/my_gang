@@ -7,7 +7,8 @@ bot = VK(API_KEY, API_VER)
 
 @bot.message_handler(payload={"command": "start"})
 async def start_message(message: Message):
-    await message.answer(text="payload work", keyboard=keyboards.info_payload())
+    user = message.user
+    await message.answer(text=f"user: {user.user_id} if_followed: {user.is_followed}", keyboard=keyboards.info_payload())
 
 
 @bot.message_handler(text="test")
