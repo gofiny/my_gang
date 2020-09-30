@@ -68,5 +68,5 @@ class WebApp:
         return Message(bot=self.bot, message_json=message_object, user=user)
 
     def start_app(self, socket_path=None):
-        self.app.on_cleanup.append(self._on_clean_up)
+        self.app.on_shutdown.append(self._on_clean_up)
         run_app(self.app, path=socket_path)
