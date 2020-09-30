@@ -59,7 +59,7 @@ class WebApp:
         #self.app["pq_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
         self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address)
 
-    async def _on_shutdown(self) -> None:
+    async def _on_clean_up(self) -> None:
         await self.app.get("pg_pool").close()
         #await self.app.get("redis_pool").close()
 
@@ -67,5 +67,5 @@ class WebApp:
         return Message(bot=self.bot, message_json=message_object, user=user)
 
     def start_app(self, socket_path=None):
-        self.app.on_shutdown.append(self._on_shutdown)
+        self.app.on_cleanup.append(self._on_clean_up)
         run_app(self.app, path=socket_path)
