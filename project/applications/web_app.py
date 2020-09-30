@@ -59,9 +59,10 @@ class WebApp:
         #self.app["pq_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
         self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address)
 
-    async def _on_clean_up(self) -> None:
-        await self.app.get("pg_pool").close()
-        #await self.app.get("redis_pool").close()
+    @staticmethod
+    async def _on_clean_up(app: Application) -> None:
+        #await app.get("pg_pool").close()
+        await app.get("redis_pool").close()
 
     def _create_message(self, message_object: dict, user: User) -> Message:
         return Message(bot=self.bot, message_json=message_object, user=user)
