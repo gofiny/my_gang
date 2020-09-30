@@ -62,7 +62,7 @@ class WebApp:
     @staticmethod
     async def _on_clean_up(app: Application) -> None:
         #await app.get("pg_pool").close()
-        await app.get("redis_pool").close()
+        await app["redis_pool"].close()
 
     def _create_message(self, message_object: dict, user: User) -> Message:
         return Message(bot=self.bot, message_json=message_object, user=user)
