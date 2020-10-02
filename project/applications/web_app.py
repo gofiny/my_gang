@@ -56,13 +56,12 @@ class WebApp:
     async def _check_user_exists(self, user_id: int):
         pool = self._get_pg_pool()
         async with pool.acquire() as connection:
-            user_obj = await pg_queries.get_user(connection=connection, user_id=user_id)
-            return user_obj
+            user = await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
+            return user
 
     async def _process_new_message(self, message_object: dict) -> None:
         #user = await redis_queries.return_or_create_user(pool=self.app["redis_pool"], user_id=message_object["from_id"])
         user = await self._check_user_exists(user_id=message_object["from_id"])
-        user = User({"user_id": user["user_id"], "is_followed": None})
         message = self._create_message(message_object, user=user)
         _filter = self._call_filter(message)
         func = self.bot.handlers.get(_filter, self.bot.handlers.get("text_*"))

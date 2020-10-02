@@ -7,3 +7,12 @@ create_users_table = '''CREATE TABLE IF NOT EXISTS users
                         "user_id" int NOT NULL UNIQUE,
                         "is_followed" bool NOT NULL DEFAULT false
                     )'''
+
+create_new_user = '''INSERT INTO users
+                    (
+                        "uuid",
+                        "user_id",
+                    ) VALUES (
+                        "$1",
+                        "$2"
+                    ) RETURNING *'''
