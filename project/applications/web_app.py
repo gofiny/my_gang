@@ -1,7 +1,8 @@
 import asyncpg
+from asyncpg import Connection
 import aioredis
 from db_utils.models import User
-from db_utils import redis_queries
+from db_utils import redis_queries, pg_queries
 from aiohttp.web import Application, Response, Request, post, run_app
 from vk_api.vk import VK, Message
 
@@ -47,8 +48,22 @@ class WebApp:
     def _get_message_object(request_object: dict) -> dict:
         return request_object["object"]["message"]
 
+    async def _get_pg_connection(self) -> Connection:
+        return await self.app["pg_pool"].acquire()
+
+    async def _release_pg_connection(self, connection: Connection) -> None:
+        await self.app["pg_pool"].release(connection)
+
+    async def _check_user_exists(self, user_id: int):
+        _connection = await self._get_pg_connection()
+        user_obj = await pg_queries.get_user(connection=_connection, user_id=user_id)
+        await self._release_pg_connection(_connection)
+        return user_obj
+
     async def _process_new_message(self, message_object: dict) -> None:
-        user = await redis_queries.return_or_create_user(pool=self.app["redis_pool"], user_id=message_object["from_id"])
+        #user = await redis_queries.return_or_create_user(pool=self.app["redis_pool"], user_id=message_object["from_id"])
+        user = await self._check_user_exists(user_id=message_object["from_id"])
+        user = User({"user_id": user["user_id"], "is_followed": None})
         message = self._create_message(message_object, user=user)
         _filter = self._call_filter(message)
         func = self.bot.handlers.get(_filter, self.bot.handlers.get("text_*"))
@@ -56,12 +71,12 @@ class WebApp:
             await func(message)
 
     async def prepare(self, postgres_dsn: str, redis_address: str) -> None:
-        #self.app["pq_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
+        self.app["pq_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
         self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address)
 
     @staticmethod
     async def _on_clean_up(app: Application) -> None:
-        #await app.get("pg_pool").close()
+        await app["pg_pool"].close()
         await app["redis_pool"].close()
 
     def _create_message(self, message_object: dict, user: User) -> Message:
