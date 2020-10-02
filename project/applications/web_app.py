@@ -1,5 +1,6 @@
 import asyncpg
 from asyncpg import Connection
+from asyncpg.pool import Pool
 import aioredis
 from typing import Coroutine
 from db_utils.models import User
@@ -49,11 +50,12 @@ class WebApp:
     def _get_message_object(request_object: dict) -> dict:
         return request_object["object"]["message"]
 
-    def _get_pg_connection(self) -> Coroutine:
-        return self.app["pg_pool"].acquire
+    def _get_pg_pool(self) -> Pool:
+        return self.app["pg_pool"]
 
     async def _check_user_exists(self, user_id: int):
-        async with self._get_pg_connection() as connection:
+        pool = self._get_pg_pool()
+        async with pool.acquire() as connection:
             user_obj = await pg_queries.get_user(connection=connection, user_id=user_id)
             return user_obj
 
@@ -68,7 +70,8 @@ class WebApp:
             await func(message)
 
     async def _create_pg_tables(self) -> None:
-        async with self._get_pg_connection() as connection:
+        pool = self._get_pg_pool()
+        async with pool.acquire() as connection:
             await pg_queries.preparing_db(connection=connection)
 
     async def prepare(self, postgres_dsn: str, redis_address: str) -> None:
