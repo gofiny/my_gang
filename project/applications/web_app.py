@@ -1,6 +1,7 @@
 import asyncpg
 from asyncpg import Connection
 import aioredis
+from typing import Coroutine
 from db_utils.models import User
 from db_utils import redis_queries, pg_queries
 from aiohttp.web import Application, Response, Request, post, run_app
@@ -48,8 +49,8 @@ class WebApp:
     def _get_message_object(request_object: dict) -> dict:
         return request_object["object"]["message"]
 
-    async def _get_pg_connection(self) -> Connection:
-        return await self.app["pg_pool"].acquire()
+    def _get_pg_connection(self) -> Coroutine:
+        return self.app["pg_pool"].acquire
 
     async def _check_user_exists(self, user_id: int):
         async with self._get_pg_connection() as connection:
