@@ -13,6 +13,6 @@ create_new_user = '''INSERT INTO users
                         "uuid",
                         "user_id"
                     ) VALUES (
-                        "$1",
+                        $1,
                         $2
                     ) RETURNING *'''
