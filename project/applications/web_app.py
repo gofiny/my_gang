@@ -71,7 +71,7 @@ class WebApp:
             await func(message)
 
     async def prepare(self, postgres_dsn: str, redis_address: str) -> None:
-        self.app["pq_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
+        self.app["pg_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
         self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address)
 
     @staticmethod
