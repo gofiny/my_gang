@@ -1,4 +1,4 @@
-select_user_by_user_id = 'SELECT * FROM users WHERE user_id = $1'
+select_user_by_user_id = 'SELECT * FROM users WHERE user_id=$1'
 
 
 create_users_table = '''CREATE TABLE IF NOT EXISTS users

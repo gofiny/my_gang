@@ -8,7 +8,7 @@ def transaction(func):
         params = {**kwargs}
         connection = params["connection"]
         async with connection.transaction():
-            result = await func(*args, **kwargs)
+            result = await func(**params)
         return result
     return wrapper
 
