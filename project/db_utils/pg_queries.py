@@ -4,7 +4,9 @@ from db_utils import sql
 
 
 def transaction(func):
-    async def wrapper(connection: Connection, *args, **kwargs):
+    async def wrapper(*args, **kwargs):
+        params = {**kwargs}
+        connection = params["connection"]
         async with connection.transaction():
             result = await func(*args, **kwargs)
         return result
