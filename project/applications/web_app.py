@@ -53,7 +53,8 @@ class WebApp:
     def _get_pg_pool(self) -> Pool:
         return self.app["pg_pool"]
 
-    async def _check_user_exists(self, user_id: int):
+    async def _check_user_exists(self, user_id: int) -> User:
+
         pool = self._get_pg_pool()
         async with pool.acquire() as connection:
             user = await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
