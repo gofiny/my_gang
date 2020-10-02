@@ -14,5 +14,10 @@ def transaction(func):
 
 
 @transaction
+async def preparing_db(connection: Connection):
+    await connection.execute(sql.create_users_table)
+
+
+@transaction
 async def get_user(connection: Connection, user_id: int) -> Optional[Record]:
-    return await connection.fetchrow(sql.select_user_by_user_id(user_id))
+    return await connection.fetchrow(sql.select_user_by_user_id % user_id)

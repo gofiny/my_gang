@@ -51,14 +51,10 @@ class WebApp:
     async def _get_pg_connection(self) -> Connection:
         return await self.app["pg_pool"].acquire()
 
-    async def _release_pg_connection(self, connection: Connection) -> None:
-        await self.app["pg_pool"].release(connection)
-
     async def _check_user_exists(self, user_id: int):
-        _connection = await self._get_pg_connection()
-        user_obj = await pg_queries.get_user(connection=_connection, user_id=user_id)
-        await self._release_pg_connection(_connection)
-        return user_obj
+        async with self._get_pg_connection() as connection:
+            user_obj = await pg_queries.get_user(connection=connection, user_id=user_id)
+            return user_obj
 
     async def _process_new_message(self, message_object: dict) -> None:
         #user = await redis_queries.return_or_create_user(pool=self.app["redis_pool"], user_id=message_object["from_id"])
@@ -70,9 +66,14 @@ class WebApp:
         if func:
             await func(message)
 
+    async def _create_pg_tables(self) -> None:
+        async with self._get_pg_connection() as connection:
+            await pg_queries.preparing_db(connection=connection)
+
     async def prepare(self, postgres_dsn: str, redis_address: str) -> None:
         self.app["pg_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
         self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address)
+        await self._create_pg_tables()
 
     @staticmethod
     async def _on_clean_up(app: Application) -> None:
