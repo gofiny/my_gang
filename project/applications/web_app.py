@@ -79,7 +79,7 @@ class WebApp:
         await self._create_pg_tables()
 
     @staticmethod
-    async def _on_clean_up(app: Application) -> None:
+    async def _on_shutdown(app: Application) -> None:
         await app["pg_pool"].close()
         await app["redis_pool"].close()
 
@@ -87,5 +87,5 @@ class WebApp:
         return Message(bot=self.bot, message_json=message_object, user=user)
 
     def start_app(self, socket_path=None):
-        self.app.on_cleanup.append(self._on_clean_up)
+        self.app.on_shutdown.append(self._on_shutdown)
         run_app(self.app, path=socket_path)
