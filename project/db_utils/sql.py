@@ -11,8 +11,8 @@ create_users_table = '''CREATE TABLE IF NOT EXISTS users
 create_new_user = '''INSERT INTO users
                     (
                         "uuid",
-                        "user_id",
+                        "user_id"
                     ) VALUES (
                         "$1",
-                        "$2"
+                        $2
                     ) RETURNING *'''
