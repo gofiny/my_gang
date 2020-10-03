@@ -36,7 +36,7 @@ async def get_or_create_user(connection: Connection, user_id: int) -> User:
     return User(dict(user))
 
 
-async def change_subscribe(pool, user: User, new_status: bool) -> None:
+async def change_subscribe(pool, user: User) -> None:
     async with pool.acquire() as connection:
         async with connection.transaction():
-            connection.execute(sql.change_subscribe, user.user_id, new_status)
+            connection.execute(sql.change_subscribe, user.is_followed, user.user_id)
