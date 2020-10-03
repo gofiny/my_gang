@@ -4,7 +4,7 @@ from db_utils.models import User
 
 
 async def get_user_or_none(pool: Redis, user_id: int) -> Optional[User]:
-    user = await pool.hgetall(key=f"users:{user_id}", encoding="utf-8")
+    user = await pool.hgetall(key=f"pusers:{user_id}", encoding="utf-8")
     if user:
         return User(user)
     return None
@@ -12,4 +12,4 @@ async def get_user_or_none(pool: Redis, user_id: int) -> Optional[User]:
 
 async def add_user(pool: Redis, user: User) -> None:
     user = {"user_id": user.user_id, "if_followed": user.is_followed}
-    await pool.hmset_dict(f"users:{user['user_id']}", user)
+    await pool.hmset_dict(f"pusers:{user['user_id']}", user)

@@ -1,6 +1,6 @@
 _PG_USER = "my_gang"
 _PG_PASSWORD = "pass123"
-_PG_DATABASE = "my_gang_debug"
+_PG_DATABASE = "my_gang_progress"
 _PG_HOST = "localhost"
 _PG_PORT = "5432"
 PG_DESTINATION = f"postgres://{_PG_USER}:{_PG_PASSWORD}@{_PG_HOST}:{_PG_PORT}/{_PG_DATABASE}"
