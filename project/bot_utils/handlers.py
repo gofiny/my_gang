@@ -35,7 +35,7 @@ async def unsubscribe(message: Message):
     user = message.user
     user.is_followed = True
     await pg_queries.change_subscribe(pool=message.app.get_pg_pool(), user=user)
-    await message.answer(text=dialogs.subscribe, keyboard=keyboards.subscribe())
+    await message.answer(text=dialogs.unsubscribe, keyboard=keyboards.subscribe())
 
 
 @bot.message_handler(text="*")
