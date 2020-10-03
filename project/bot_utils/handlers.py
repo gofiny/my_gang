@@ -27,15 +27,15 @@ async def start_message(message: Message):
 async def subscribe(message: Message):
     user = message.user
     user.is_followed = True
-    await pg_queries.change_subscribe(pool=message.app.get_pg_pool(), user=user)
+    await pg_queries.change_subscribe(pool=message.app.get_pg_pool(), user=user, new_status=True)
     await message.answer(text=dialogs.subscribe, keyboard=keyboards.unsubscribe())
 
 
 @bot.message_handler(payload={"command": "unsubscribe"})
 async def unsubscribe(message: Message):
     user = message.user
-    user.is_followed = True
-    await pg_queries.change_subscribe(pool=message.app.get_pg_pool(), user=user)
+    user.is_followed = False
+    await pg_queries.change_subscribe(pool=message.app.get_pg_pool(), user=user, new_status=False)
     await message.answer(text=dialogs.unsubscribe, keyboard=keyboards.subscribe())
 
 
