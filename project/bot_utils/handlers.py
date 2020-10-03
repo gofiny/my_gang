@@ -42,3 +42,4 @@ async def unsubscribe(message: Message):
 async def other(message: Message):
     keyboard = get_sub_keyboard(user=message.user)
     await message.answer(text=dialogs.other_message, keyboard=keyboard)
+    await message.answer(text="test", keyboard=keyboards.telegram_link())
