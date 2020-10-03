@@ -7,7 +7,6 @@ from config import (
     SECRET_STR,
     RETURING_CALLBACK_STR,
     PG_DESTINATION,
-    REDIS_ADDRESS
 )
 
 
@@ -22,5 +21,5 @@ if __name__ == "__main__":
         returning_callback_str=RETURING_CALLBACK_STR,
         bot=bot
     )
-    loop.run_until_complete(app.prepare(PG_DESTINATION, REDIS_ADDRESS))
+    loop.run_until_complete(app.prepare(PG_DESTINATION))
     app.start_app(socket_path=args.path)

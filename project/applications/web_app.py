@@ -1,9 +1,7 @@
 import asyncpg
 from asyncpg.pool import Pool
-import aioredis
-from aioredis import Redis
 from db_utils.models import User
-from db_utils import redis_queries, pg_queries
+from db_utils import pg_queries
 from aiohttp.web import Application, Response, Request, post, run_app
 from vk_api.vk import VK, Message
 
@@ -52,22 +50,13 @@ class WebApp:
     def get_pg_pool(self) -> Pool:
         return self.app["pg_pool"]
 
-    def get_redis_pool(self) -> Redis:
-        return self.app["redis_pool"]
-
     async def _get_pg_user(self, user_id: int) -> User:
         pool = self.get_pg_pool()
         async with pool.acquire() as connection:
             return await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
 
-    async def _get_user(self, user_id: int):
-        user = await redis_queries.get_user_or_none(pool=self.get_redis_pool(), user_id=user_id)
-        if not user:
-            user = await self._get_pg_user(user_id=user_id)
-        return user
-
     async def _process_new_message(self, message_object: dict) -> None:
-        user = await self._get_user(user_id=message_object["from_id"])
+        user = await self._get_pg_user(user_id=message_object["from_id"])
         message = self._create_message(message_object, user=user)
         _filter = self._call_filter(message)
         func = self.bot.handlers.get(_filter, self.bot.handlers.get("text_*"))
@@ -79,15 +68,13 @@ class WebApp:
         async with pool.acquire() as connection:
             await pg_queries.preparing_db(connection=connection)
 
-    async def prepare(self, postgres_dsn: str, redis_address: str) -> None:
+    async def prepare(self, postgres_dsn: str) -> None:
         self.app["pg_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
-        self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address)
         await self._create_pg_tables()
 
     @staticmethod
     async def _on_shutdown(app: Application) -> None:
         await app["pg_pool"].close()
-        await app["redis_pool"].close()
 
     def _create_message(self, message_object: dict, user: User) -> Message:
         return Message(bot=self.bot, message_json=message_object, user=user, app=self)

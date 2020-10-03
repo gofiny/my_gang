@@ -2,7 +2,7 @@ from db_utils.models import User
 from vk_api.vk import Message, VK, Keyboard
 from config import API_KEY, API_VER
 from bot_utils import keyboards, dialogs
-from db_utils import redis_queries, pg_queries
+from db_utils import pg_queries
 
 bot = VK(API_KEY, API_VER)
 
@@ -26,7 +26,6 @@ async def start_message(message: Message):
 async def subscribe(message: Message):
     user = message.user
     user.is_followed = True
-    await redis_queries.change_subscribe(pool=message.app.get_redis_pool(), user=user)
     await pg_queries.change_subscribe(pool=message.app.get_pg_pool(), user=user)
     await message.answer(text=dialogs.subscribe, keyboard=keyboards.unsubscribe())
 
@@ -35,7 +34,6 @@ async def subscribe(message: Message):
 async def unsubscribe(message: Message):
     user = message.user
     user.is_followed = True
-    await redis_queries.change_subscribe(pool=message.app.get_redis_pool(), user=user)
     await pg_queries.change_subscribe(pool=message.app.get_pg_pool(), user=user)
     await message.answer(text=dialogs.subscribe, keyboard=keyboards.subscribe())
 
