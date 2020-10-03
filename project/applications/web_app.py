@@ -2,7 +2,7 @@ import asyncpg
 from asyncpg import Connection
 from asyncpg.pool import Pool
 import aioredis
-from typing import Coroutine
+from typing import Coroutine, Optional
 from db_utils.models import User
 from db_utils import redis_queries, pg_queries
 from aiohttp.web import Application, Response, Request, post, run_app
@@ -53,16 +53,19 @@ class WebApp:
     def _get_pg_pool(self) -> Pool:
         return self.app["pg_pool"]
 
-    async def _check_user_exists(self, user_id: int) -> User:
-
+    async def _get_pg_user(self, user_id: int) -> User:
         pool = self._get_pg_pool()
         async with pool.acquire() as connection:
-            user = await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
-            return user
+            return await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
+
+    async def _get_user(self, user_id: int):
+        user = await redis_queries.get_user_or_none(user_id=user_id)
+        if not user:
+            user = await self._get_pg_user(user_id=user_id)
+        return user
 
     async def _process_new_message(self, message_object: dict) -> None:
-        #user = await redis_queries.return_or_create_user(pool=self.app["redis_pool"], user_id=message_object["from_id"])
-        user = await self._check_user_exists(user_id=message_object["from_id"])
+        user = await self._get_user(user_id=message_object["from_id"])
         message = self._create_message(message_object, user=user)
         _filter = self._call_filter(message)
         func = self.bot.handlers.get(_filter, self.bot.handlers.get("text_*"))
