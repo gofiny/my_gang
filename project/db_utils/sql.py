@@ -16,3 +16,5 @@ create_new_user = '''INSERT INTO users
                         $1,
                         $2
                     ) RETURNING *'''
+
+change_subscribe = '''UPDATE users SET is_followed=$1 WHERE user_id=$2'''

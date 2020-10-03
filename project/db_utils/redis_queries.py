@@ -13,3 +13,7 @@ async def get_user_or_none(pool: Redis, user_id: int) -> Optional[User]:
 async def add_user(pool: Redis, user: User) -> None:
     user = {"user_id": user.user_id, "if_followed": user.is_followed}
     await pool.hmset_dict(f"pusers:{user['user_id']}", user)
+
+
+async def change_subscribe(pool: Redis, user: User):
+    await pool.hset(f"pusers:{user.user_id}", "is_followed", user.is_followed)

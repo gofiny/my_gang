@@ -49,19 +49,19 @@ class WebApp:
     def _get_message_object(request_object: dict) -> dict:
         return request_object["object"]["message"]
 
-    def _get_pg_pool(self) -> Pool:
+    def get_pg_pool(self) -> Pool:
         return self.app["pg_pool"]
 
-    def _get_redis_pool(self) -> Redis:
+    def get_redis_pool(self) -> Redis:
         return self.app["redis_pool"]
 
     async def _get_pg_user(self, user_id: int) -> User:
-        pool = self._get_pg_pool()
+        pool = self.get_pg_pool()
         async with pool.acquire() as connection:
             return await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
 
     async def _get_user(self, user_id: int):
-        user = await redis_queries.get_user_or_none(pool=self._get_redis_pool(), user_id=user_id)
+        user = await redis_queries.get_user_or_none(pool=self.get_redis_pool(), user_id=user_id)
         if not user:
             user = await self._get_pg_user(user_id=user_id)
         return user
@@ -75,7 +75,7 @@ class WebApp:
             await func(message)
 
     async def _create_pg_tables(self) -> None:
-        pool = self._get_pg_pool()
+        pool = self.get_pg_pool()
         async with pool.acquire() as connection:
             await pg_queries.preparing_db(connection=connection)
 
@@ -90,7 +90,7 @@ class WebApp:
         await app["redis_pool"].close()
 
     def _create_message(self, message_object: dict, user: User) -> Message:
-        return Message(bot=self.bot, message_json=message_object, user=user)
+        return Message(bot=self.bot, message_json=message_object, user=user, app=self)
 
     def start_app(self, socket_path=None):
         self.app.on_shutdown.append(self._on_shutdown)

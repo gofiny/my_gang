@@ -6,13 +6,14 @@ import json
 
 
 class Message:
-    def __init__(self, message_json: dict, bot: "VK", user: User):
+    def __init__(self, message_json: dict, bot: "VK", user: User, app):
         self.id = message_json["id"]
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]
         self.text = message_json.get("text")
         self.payload = message_json.get("payload")
         self.bot = bot
+        self.app = app
         self.user = user
 
         if self.payload:

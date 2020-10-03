@@ -1,33 +1,46 @@
-from vk_api.vk import Message, VK
+from db_utils.models import User
+from vk_api.vk import Message, VK, Keyboard
 from config import API_KEY, API_VER
-from bot_utils import keyboards
+from bot_utils import keyboards, dialogs
+from db_utils import redis_queries, pg_queries
 
 bot = VK(API_KEY, API_VER)
 
 
+def get_sub_keyboard(user: User) -> Keyboard:
+    if user.is_followed:
+        keyboard = keyboards.unsubscribe()
+    else:
+        keyboard = keyboards.subscribe()
+
+    return keyboard
+
+
 @bot.message_handler(payload={"command": "start"})
 async def start_message(message: Message):
+    keyboard = get_sub_keyboard(message.user)
+    await message.answer(text=dialogs.start, keyboard=keyboard)
+
+
+@bot.message_handler(payload={"command": "subscribe"})
+async def subscribe(message: Message):
     user = message.user
-    await message.answer(text=f"user: {user.user_id} if_followed: {user.is_followed}", keyboard=keyboards.info_payload())
+    user.is_followed = True
+    await redis_queries.change_subscribe(pool=message.app.get_redis_pool(), user=user)
+    await pg_queries.change_subscribe(pool=message.app.get_pg_pool(), user=user)
+    await message.answer(text=dialogs.subscribe, keyboard=keyboards.unsubscribe())
 
 
-@bot.message_handler(text="test")
-async def text_test(message: Message):
-    await bot.send_message(user_ids=message.from_id, text="text work", keyboard=keyboards.payload_start())
-
-
-@bot.message_handler(text="send info")
-async def test_payload_info(message: Message):
-    info = message.payload["info"]
-    await bot.send_message(user_ids=message.from_id, text=f"payload info: {info}")
-
-
-@bot.message_handler(text="test keyboard")
-async def test_keyboard(message: Message):
-    keyboard = keyboards.test_count_buttons(41)
-    await bot.send_message(user_ids=message.from_id, text="see:", keyboard=keyboard)
+@bot.message_handler(payload={"command": "unsubscribe"})
+async def unsubscribe(message: Message):
+    user = message.user
+    user.is_followed = True
+    await redis_queries.change_subscribe(pool=message.app.get_redis_pool(), user=user)
+    await pg_queries.change_subscribe(pool=message.app.get_pg_pool(), user=user)
+    await message.answer(text=dialogs.subscribe, keyboard=keyboards.subscribe())
 
 
 @bot.message_handler(text="*")
 async def other(message: Message):
-    await bot.send_message(user_ids=message.from_id, text="Не знаю что ответить")
+    keyboard = get_sub_keyboard(user=message.user)
+    await message.answer(text=dialogs.other_message, keyboard=keyboard)

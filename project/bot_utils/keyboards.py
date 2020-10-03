@@ -1,21 +1,13 @@
 from vk_api.vk import Keyboard, Button
 
 
-def payload_start() -> Keyboard:
+def subscribe() -> Keyboard:
     keyboard = Keyboard()
-    keyboard.add_button(Button(label="start button", payload={"command": "start"}))
+    keyboard.add_button(Button(label="Подписаться на рассылку", payload={"command": "subscribe"}))
     return keyboard
 
 
-def info_payload() -> Keyboard:
-    keyboard = Keyboard(inline=True)
-    keyboard.add_button(Button(label="send info", payload={"info": "one two three"}))
-    return keyboard
-
-
-def test_count_buttons(button_count: int) -> Keyboard:
+def unsubscribe() -> Keyboard:
     keyboard = Keyboard()
-    for num, button in enumerate(range(1, button_count)):
-        keyboard.add_button(Button(label=num))
-
+    keyboard.add_button(Button(label="Отписаться от рассылки", payload={"command": "unsubscribe"}))
     return keyboard
