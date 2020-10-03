@@ -38,5 +38,5 @@ async def get_or_create_user(connection: Connection, user_id: int) -> User:
 
 async def change_subscribe(pool, user: User) -> None:
     async with pool.acquire() as connection:
-        async with connection.transaction:
+        async with connection.transaction():
             connection.execute(sql.change_subscribe, user.user_id, user.is_followed)
