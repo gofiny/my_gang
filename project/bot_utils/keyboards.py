@@ -17,5 +17,5 @@ def unsubscribe() -> Keyboard:
 
 def telegram_link() -> Keyboard:
     keyboard = Keyboard(inline=True)
-    keyboard.add_button(Button(type="open_link", label="Новости", link="https://t.me/MyGangNews"))
+    keyboard.add_button(Button(b_type="open_link", label="Новости", link="https://t.me/MyGangNews"))
     return keyboard

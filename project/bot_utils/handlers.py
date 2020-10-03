@@ -20,6 +20,7 @@ def get_sub_keyboard(user: User) -> Keyboard:
 async def start_message(message: Message):
     keyboard = get_sub_keyboard(message.user)
     await message.answer(text=dialogs.start, keyboard=keyboard)
+    await message.answer(text=dialogs.telegram_request, keyboard=keyboards.telegram_link())
 
 
 @bot.message_handler(payload={"command": "subscribe"})
@@ -42,4 +43,4 @@ async def unsubscribe(message: Message):
 async def other(message: Message):
     keyboard = get_sub_keyboard(user=message.user)
     await message.answer(text=dialogs.other_message, keyboard=keyboard)
-    await message.answer(text="test", keyboard=keyboards.telegram_link())
+    await message.answer(text=dialogs.telegram_request, keyboard=keyboards.telegram_link())
