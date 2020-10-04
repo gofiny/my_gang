@@ -9,17 +9,21 @@ from vk_api.vk import VK, Message
 
 
 class WebApp:
-    def __init__(self, address_prefix: str,  secret_str: str, returning_callback_str: str, bot: VK):
+    def __init__(
+            self, tlg_address_prefix: str, vk_address_prefix: str,
+            secret_str: str, returning_callback_str: str, bot: VK
+    ):
         self.bot = bot
         self.secret_str = secret_str
         self.app = Application()
         self.returning_callback_str = returning_callback_str
-        self._set_base_handler(address_prefix=address_prefix)
+        self._set_base_handlers(tlg_address_prefix=tlg_address_prefix, vk_address_prefix=vk_address_prefix)
 
-    def _set_base_handler(self, address_prefix: str):
-        self.app.add_routes([post(f"/{address_prefix}/", self._base_handler)])
+    def _set_base_handlers(self, tlg_address_prefix: str, vk_address_prefix: str):
+        self.app.add_routes([post(f"/{vk_address_prefix}/", self._vk_base_handler)])
+        self.app.add_routes([post(f"/{tlg_address_prefix}/", self._vk_base_handler)])
 
-    async def _base_handler(self, request: Request) -> Response:
+    async def _vk_base_handler(self, request: Request) -> Response:
         request_json = await request.json()
         if request_json.get("secret") != self.secret_str:
             return Response(status=404)
@@ -30,6 +34,9 @@ class WebApp:
             message_object = self._get_message_object(request_json)
             await self._process_new_message(message_object)
 
+        return Response(body="ok")
+
+    async def _tlg_base_handler(self, request: Request) -> Response:
         return Response(body="ok")
 
     @staticmethod
@@ -49,19 +56,19 @@ class WebApp:
     def _get_message_object(request_object: dict) -> dict:
         return request_object["object"]["message"]
 
-    def _get_pg_pool(self) -> Pool:
+    def get_pg_pool(self) -> Pool:
         return self.app["pg_pool"]
 
-    def _get_redis_pool(self) -> Redis:
+    def get_redis_pool(self) -> Redis:
         return self.app["redis_pool"]
 
     async def _get_pg_user(self, user_id: int) -> User:
-        pool = self._get_pg_pool()
+        pool = self.get_pg_pool()
         async with pool.acquire() as connection:
             return await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
 
     async def _get_user(self, user_id: int):
-        user = await redis_queries.get_user_or_none(pool=self._get_redis_pool(), user_id=user_id)
+        user = await redis_queries.get_user_or_none(pool=self.get_redis_pool(), user_id=user_id)
         if not user:
             user = await self._get_pg_user(user_id=user_id)
         return user
@@ -75,7 +82,7 @@ class WebApp:
             await func(message)
 
     async def _create_pg_tables(self) -> None:
-        pool = self._get_pg_pool()
+        pool = self.get_pg_pool()
         async with pool.acquire() as connection:
             await pg_queries.preparing_db(connection=connection)
 

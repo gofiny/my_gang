@@ -1,4 +1,5 @@
 from asyncpg import Connection, Record
+from asyncpg.pool import Pool
 from db_utils.models import User
 from typing import Optional
 from uuid import uuid4
@@ -8,9 +9,15 @@ from db_utils import sql
 def transaction(func):
     async def wrapper(*args, **kwargs):
         params = {**kwargs}
-        connection = params["connection"]
-        async with connection.transaction():
-            result = await func(*args, **kwargs)
+        connection: Connection = params.get("connection")
+        pool: Pool = params.get("pool")
+        if connection:
+            async with connection.transaction():
+                result = await func(*args, **kwargs)
+        else:
+            async with pool.acquire() as connection:
+                async with connection.transaction():
+                    result = await func(*args, **kwargs)
         return result
     return wrapper
 
