@@ -1,9 +1,11 @@
 import argparse
 import asyncio
-from bot_utils.handlers import bot
+from vk_bot.handlers import vk_bot
+from tlg_bot.handlers import dp
 from applications.web_app import WebApp
 from config import (
-    ADDRESS_PREFIX,
+    VK_ADDRESS_PREFIX,
+    TLG_ADDRESS_PREFIX,
     SECRET_STR,
     RETURING_CALLBACK_STR,
     PG_DESTINATION,
@@ -17,10 +19,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     loop = asyncio.get_event_loop()
     app = WebApp(
-        address_prefix=ADDRESS_PREFIX,
+        tlg_address_prefix=TLG_ADDRESS_PREFIX,
+        vk_address_prefix=VK_ADDRESS_PREFIX,
         secret_str=SECRET_STR,
         returning_callback_str=RETURING_CALLBACK_STR,
-        bot=bot
+        vk_bot=vk_bot
     )
     loop.run_until_complete(app.prepare(PG_DESTINATION, REDIS_ADDRESS))
     app.start_app(socket_path=args.path)

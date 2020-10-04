@@ -1,19 +1,119 @@
+import asyncio
 import asyncpg
 from asyncpg.pool import Pool
 import aioredis
+import itertools
+import functools
 from aioredis import Redis
+from aiogram import types
+from aiogram import Bot, Dispatcher
+from aiogram.dispatcher.webhook import BaseResponse
 from db_utils.models import User
 from db_utils import redis_queries, pg_queries
-from aiohttp.web import Application, Response, Request, post, run_app
+from aiohttp.web import Application, Response, Request, post, run_app, View
 from vk_api.vk import VK, Message
+
+
+class WebhookRequestHandler(View):
+    def get_dispatcher(self):
+        dp = self.request.app['dp']
+        try:
+            Dispatcher.set_current(dp)
+            Bot.set_current(dp.bot)
+        except RuntimeError:
+            pass
+        return dp
+
+    async def parse_update(self):
+        data = await self.request.json()
+        update = types.Update(**data)
+        return update
+
+    async def post(self):
+
+        update = await self.parse_update()
+
+        results = await self.process_update(update)
+        response = self.get_response(results)
+
+        if response:
+            web_response = response.get_web_response()
+        else:
+            web_response = Response(text='ok')
+
+        if self.request.app.get('RETRY_AFTER', None):
+            web_response.headers['Retry-After'] = self.request.app['RETRY_AFTER']
+
+        return web_response
+
+    @staticmethod
+    async def get():
+        return Response(text='')
+
+    @staticmethod
+    async def head():
+        return Response(text='')
+
+    async def process_update(self, update):
+
+        dispatcher = self.get_dispatcher()
+        loop = dispatcher.loop or asyncio.get_event_loop()
+
+        waiter = loop.create_future()
+        timeout_handle = loop.call_later(55, asyncio.tasks._release_waiter, waiter)
+        cb = functools.partial(asyncio.tasks._release_waiter, waiter)
+
+        fut = asyncio.ensure_future(dispatcher.updates_handler.notify(update), loop=loop)
+        fut.add_done_callback(cb)
+
+        try:
+            try:
+                await waiter
+            except asyncio.CancelledError:
+                fut.remove_done_callback(cb)
+                fut.cancel()
+                raise
+
+            if fut.done():
+                return fut.result()
+            else:
+
+                fut.remove_done_callback(cb)
+                fut.add_done_callback(self.respond_via_request)
+        finally:
+            timeout_handle.cancel()
+
+    def respond_via_request(self, task):
+        dispatcher = self.get_dispatcher()
+        loop = dispatcher.loop or asyncio.get_event_loop()
+
+        try:
+            results = task.result()
+        except Exception as e:
+            loop.create_task(
+                dispatcher.errors_handlers.notify(dispatcher, types.Update.get_current(), e))
+        else:
+            response = self.get_response(results)
+            if response is not None:
+                asyncio.ensure_future(response.execute_response(dispatcher.bot), loop=loop)
+
+    @staticmethod
+    def get_response(results):
+        if results is None:
+            return None
+        for result in itertools.chain.from_iterable(results):
+            if isinstance(result, BaseResponse):
+                return result
 
 
 class WebApp:
     def __init__(
             self, tlg_address_prefix: str, vk_address_prefix: str,
-            secret_str: str, returning_callback_str: str, bot: VK
+            secret_str: str, returning_callback_str: str,
+            vk_bot: VK, tlg_dp: Dispatcher
     ):
-        self.bot = bot
+        self.vk_bot = vk_bot
+        self.tlg_dp = tlg_dp
         self.secret_str = secret_str
         self.app = Application()
         self.returning_callback_str = returning_callback_str
@@ -21,7 +121,7 @@ class WebApp:
 
     def _set_base_handlers(self, tlg_address_prefix: str, vk_address_prefix: str):
         self.app.add_routes([post(f"/{vk_address_prefix}/", self._vk_base_handler)])
-        self.app.add_routes([post(f"/{tlg_address_prefix}/", self._vk_base_handler)])
+        self.app.add_routes([post(f"/{tlg_address_prefix}/", WebhookRequestHandler)])
 
     async def _vk_base_handler(self, request: Request) -> Response:
         request_json = await request.json()
@@ -34,9 +134,6 @@ class WebApp:
             message_object = self._get_message_object(request_json)
             await self._process_new_message(message_object)
 
-        return Response(body="ok")
-
-    async def _tlg_base_handler(self, request: Request) -> Response:
         return Response(body="ok")
 
     @staticmethod
@@ -77,7 +174,7 @@ class WebApp:
         user = await self._get_user(user_id=message_object["from_id"])
         message = self._create_message(message_object, user=user)
         _filter = self._call_filter(message)
-        func = self.bot.handlers.get(_filter, self.bot.handlers.get("text_*"))
+        func = self.vk_bot.handlers.get(_filter, self.vk_bot.handlers.get("text_*"))
         if func:
             await func(message)
 
@@ -89,6 +186,7 @@ class WebApp:
     async def prepare(self, postgres_dsn: str, redis_address: str) -> None:
         self.app["pg_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
         self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address)
+        self.app["dp"] = self.tlg_dp
         await self._create_pg_tables()
 
     @staticmethod
@@ -97,7 +195,7 @@ class WebApp:
         await app["redis_pool"].close()
 
     def _create_message(self, message_object: dict, user: User) -> Message:
-        return Message(bot=self.bot, message_json=message_object, user=user)
+        return Message(bot=self.vk_bot, message_json=message_object, user=user)
 
     def start_app(self, socket_path=None):
         self.app.on_shutdown.append(self._on_shutdown)
