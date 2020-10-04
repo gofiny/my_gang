@@ -184,15 +184,22 @@ class WebApp:
             await pg_queries.preparing_db(connection=connection)
 
     async def prepare(self, postgres_dsn: str, redis_address: str) -> None:
+        self.app["vk_bot"] = self.vk_bot
         self.app["pg_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
-        self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address)
+        self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address, encoding="utf-8")
         self.app["dp"] = self.tlg_dp
         await self._create_pg_tables()
 
     @staticmethod
     async def _on_shutdown(app: Application) -> None:
-        await app["pg_pool"].close()
-        await app["redis_pool"].close()
+        vk_bot = app["vk_bot"]
+        pg_pool = app["pg_poll"]
+        redis_pool = app["redis_pool"]
+
+        redis_pool.close()
+        await redis_pool.wait_closed()
+        await pg_pool.close()
+        await vk_bot.clean_up()
 
     def _create_message(self, message_object: dict, user: User) -> Message:
         return Message(bot=self.vk_bot, message_json=message_object, user=user)
