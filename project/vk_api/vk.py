@@ -75,10 +75,20 @@ class Keyboard:
 
 class VK:
     def __init__(self, api_key, api_ver):
-        self._session = ClientSession()
+        self._session = None
         self.handlers = {}  # {"text_some_text": func} or {"payload_payload_command": func}
         self._API_KEY = api_key
         self._API_VER = api_ver
+
+    @staticmethod
+    def get_new_session():
+        return ClientSession()
+
+    @property
+    def session(self) -> ClientSession:
+        if self._session is None or self._session.closed:
+            self._session = self.get_new_session()
+        return self._session
 
     @staticmethod
     def _make_filter(**params) -> str:
@@ -110,7 +120,7 @@ class VK:
         return getrandbits(31) * choice([-1, 1])
 
     async def clean_up(self) -> None:
-        await self._session.close()
+        await self.session.close()
 
     async def _make_request(self, method_name: str, params: dict) -> None:
         _BASE_URL = "https://api.vk.com/method/%s"
@@ -119,7 +129,7 @@ class VK:
             "access_token": self._API_KEY,
             "v": self._API_VER
         }
-        async with self._session.get(_BASE_URL % method_name, params=params) as resp:
+        async with self.session.get(_BASE_URL % method_name, params=params) as resp:
             # if resp.status != 200:
             print(await resp.text())
 
