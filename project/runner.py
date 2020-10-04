@@ -23,7 +23,8 @@ if __name__ == "__main__":
         vk_address_prefix=VK_ADDRESS_PREFIX,
         secret_str=SECRET_STR,
         returning_callback_str=RETURING_CALLBACK_STR,
-        vk_bot=vk_bot
+        vk_bot=vk_bot,
+        tlg_dp=dp
     )
     loop.run_until_complete(app.prepare(PG_DESTINATION, REDIS_ADDRESS))
     app.start_app(socket_path=args.path)
