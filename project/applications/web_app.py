@@ -192,9 +192,9 @@ class WebApp:
 
     @staticmethod
     async def _on_shutdown(app: Application) -> None:
-        vk_bot = app["vk_bot"]
-        pg_pool = app["pg_pool"]
-        redis_pool = app["redis_pool"]
+        vk_bot: VK = app["vk_bot"]
+        pg_pool: Pool = app["pg_pool"]
+        redis_pool: Redis = app["redis_pool"]
 
         redis_pool.close()
         await redis_pool.wait_closed()
