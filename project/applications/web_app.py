@@ -1,9 +1,9 @@
 import asyncio
 import asyncpg
-from asyncpg.pool import Pool
 import aioredis
 import itertools
 import functools
+from asyncpg.pool import Pool
 from aioredis import Redis
 from aiogram import types
 from aiogram import Bot, Dispatcher
