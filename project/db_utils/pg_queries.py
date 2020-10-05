@@ -1,6 +1,6 @@
 from asyncpg import Connection, Record
 from asyncpg.pool import Pool
-from db_utils.models import User
+from db_utils.models import Player
 from typing import Optional
 from uuid import uuid4
 from db_utils import sql
@@ -24,20 +24,20 @@ def transaction(func):
 
 @transaction
 async def preparing_db(connection: Connection):
-    await connection.execute(sql.create_users_table)
+    await connection.execute(sql.create_players_table)
 
 
 async def _get_user(connection: Connection, user_id: int) -> Optional[Record]:
     return await connection.fetchrow(sql.select_user_by_user_id, user_id)
 
 
-async def _create_new_user(connection: Connection, user_id: int) -> Record:
-    return await connection.fetchrow(sql.create_new_user, uuid4(), user_id)
+async def _create_new_player(connection: Connection, user_id: int) -> Record:
+    return await connection.fetchrow(sql.create_new_player, uuid4(), user_id)
 
 
 @transaction
-async def get_or_create_user(connection: Connection, user_id: int) -> User:
+async def get_or_create_user(connection: Connection, user_id: int) -> Player:
     user = await _get_user(connection, user_id)
     if not user:
-        user = await _create_new_user(connection, user_id)
-    return User(dict(user))
+        user = await _create_new_player(connection, user_id)
+    return Player(dict(user))

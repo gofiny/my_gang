@@ -1,12 +1,12 @@
 from aiohttp import ClientSession
-from db_utils.models import User
+from db_utils.models import Player
 from typing import Union, Optional, List, Callable
 from random import getrandbits, choice
 import json
 
 
 class Message:
-    def __init__(self, message_json: dict, bot: "VK", user: User):
+    def __init__(self, message_json: dict, bot: "VK", user: Player):
         self.id = message_json["id"]
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]

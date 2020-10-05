@@ -8,7 +8,7 @@ from aioredis import Redis
 from aiogram import types
 from aiogram import Bot, Dispatcher
 from aiogram.dispatcher.webhook import BaseResponse
-from db_utils.models import User
+from db_utils.models import Player
 from db_utils import redis_queries, pg_queries
 from aiohttp.web import Application, Response, Request, post, run_app, View
 from vk_api.vk import VK, Message
@@ -133,7 +133,6 @@ class WebApp:
         elif request_type == "message_new":
             message_object = self._get_message_object(request_json)
             await self._process_new_message(message_object)
-
         return Response(body="ok")
 
     @staticmethod
@@ -146,7 +145,6 @@ class WebApp:
                 _filter = f'text_{message.text}'
         else:
             _filter = f'text_{message.text}'
-
         return _filter
 
     @staticmethod
@@ -159,7 +157,7 @@ class WebApp:
     def get_redis_pool(self) -> Redis:
         return self.app["redis_pool"]
 
-    async def _get_pg_user(self, user_id: int) -> User:
+    async def _get_pg_user(self, user_id: int) -> Player:
         pool = self.get_pg_pool()
         async with pool.acquire() as connection:
             return await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
@@ -201,7 +199,7 @@ class WebApp:
         await pg_pool.close()
         await vk_bot.clean_up()
 
-    def _create_message(self, message_object: dict, user: User) -> Message:
+    def _create_message(self, message_object: dict, user: Player) -> Message:
         return Message(bot=self.vk_bot, message_json=message_object, user=user)
 
     def start_app(self, socket_path=None):
