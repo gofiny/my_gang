@@ -1,10 +1,10 @@
 from aioredis import Redis
 from typing import Optional
-from db_utils.models import Player
 
 
-async def get_user_or_none(pool: Redis, user_id: int) -> Optional[Player]:
-    user = await pool.hgetall(key=f"users:{user_id}", encoding="utf-8")
-    if user:
-        return Player(user)
-    return None
+async def get_player_states(pool: Redis, vk_id: int = None, tlg_id: int = None) -> Optional[dict]:
+    key = f"t"
+    states = await pool.hgetall()
+
+
+

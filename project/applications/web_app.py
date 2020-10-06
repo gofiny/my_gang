@@ -157,15 +157,20 @@ class WebApp:
     def get_redis_pool(self) -> Redis:
         return self.app["redis_pool"]
 
-    async def _get_pg_user(self, user_id: int) -> Player:
+    async def check_player(self, user_id: int, prefix: str = "vk"):
+        pool = self.get_pg_pool()
+        async with pool.acquire() as conn:
+            user_uuid = await pg_queries.get_player_uuid(connection=conn, user_id=user_id, prefix=prefix)
+            if not user_uuid:
+                pass
+
+    async def _get_pg_user(self, user_id: int, prefix: str = "vk") -> Player:
         pool = self.get_pg_pool()
         async with pool.acquire() as connection:
             return await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
 
     async def _get_user(self, user_id: int):
-        user = await redis_queries.get_user_or_none(pool=self.get_redis_pool(), user_id=user_id)
-        if not user:
-            user = await self._get_pg_user(user_id=user_id)
+        user = await self._get_pg_user(user_id=user_id)
         return user
 
     async def _process_new_message(self, message_object: dict) -> None:
@@ -182,6 +187,7 @@ class WebApp:
             await pg_queries.preparing_db(connection=connection)
 
     async def prepare(self, postgres_dsn: str, redis_address: str) -> None:
+        self.app["web_app"] = self
         self.app["vk_bot"] = self.vk_bot
         self.app["pg_pool"] = await asyncpg.create_pool(dsn=postgres_dsn)
         self.app["redis_pool"] = await aioredis.create_redis_pool(redis_address, encoding="utf-8")
