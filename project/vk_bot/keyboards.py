@@ -1,6 +1,11 @@
 from vk_api.vk import Keyboard, Button
 
 
+def empty_keyboard() -> Keyboard:
+    keyboard = Keyboard()
+    return keyboard
+
+
 def payload_start() -> Keyboard:
     keyboard = Keyboard()
     keyboard.add_button(Button(label="start button", payload={"command": "start"}))

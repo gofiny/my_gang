@@ -36,20 +36,24 @@ async def get_player_uuid(connection: Connection, user_id: int, prefix: str) -> 
     return user_uuid
 
 
-async def _get_player_with_stuff(connection: Connection, user_id: int, prefix: str) -> Record:
-    return await connection.fetchrow(sql.select_player_and_stuff % prefix, user_id)
-
-
-async def _create_new_player(connection: Connection, user_id: int, username: str, prefix: str) -> None:
-    return await connection.fetchrow(
-        sql.create_new_player_with_stuff % prefix,
-        uuid4(), user_id, username, uuid4(), uuid4(), int(time())
-    )
+@transaction
+async def _get_player_with_stuff(connection: Connection, user_id: int, prefix: str) -> Player:
+    player_data = await connection.fetchrow(sql.select_player_and_stuff % prefix, user_id)
+    states = {"main_state": 0}
+    counters = {
+        "lm_time": player_data["lm_time"],
+        "daily_actions": player_data["daily_actions"],
+        "total_actions": player_data["total_actions"]
+    }
+    player_data = dict(player_data)
+    player_data["states"] = states
+    player_data["counters"] = counters
+    return Player(player_data)
 
 
 @transaction
-async def create_player_and_return(connection: Connection, user_id: int) -> Player:
-    user = await _get_user(connection, user_id)
-    if not user:
-        user = await _create_new_player(connection, user_id)
-    return Player(dict(user))
+async def _create_new_player(connection: Connection, user_id: int, prefix: str) -> None:
+    return await connection.fetchrow(
+        sql.create_new_player_with_stuff % prefix,
+        uuid4(), user_id, uuid4(), uuid4(), int(time())
+    )

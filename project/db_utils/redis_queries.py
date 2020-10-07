@@ -1,10 +1,14 @@
 from aioredis import Redis
+from db_utils.models import Player
 from typing import Optional
 
 
-async def get_player_states(pool: Redis, vk_id: int = None, tlg_id: int = None) -> Optional[dict]:
-    key = f"t"
-    states = await pool.hgetall()
+async def add_player(pool: Redis, player: Player) -> None:
+    await pool.hmset_dict(f"player:{player.uuid}", player.serialize())
 
 
-
+async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
+    data = await pool.hgetall(f"player:{player_uuid}", encoding="utf-8")
+    if data:
+        return Player(data)
+    return data

@@ -13,7 +13,7 @@ create_players_table = '''CREATE TABLE IF NOT EXISTS players
                         "uuid" uuid NOT NULL PRIMARY KEY,
                         "vk_id" int NULL UNIQUE,
                         "tlg_id" int NULL UNIQUE,
-                        "name" varchar(35) NOT NULL UNIQUE,
+                        "name" varchar(35) NULL,
                         "level" int NOT NULL DEFAULT 1,
                         "health" int NOT NULL DEFAULT 1000,
                         "power" int NOT NULL DEFAULT 100,
@@ -53,13 +53,13 @@ create_new_player = '''INSERT INTO players
 create_new_player_with_stuff = '''WITH player as (
                                     INSERT INTO players
                                     (
-                                        "uuid", "%s_id", "name"
-                                    ) VALUES ($1, $2, $3), 
+                                        "uuid", "%s_id",
+                                    ) VALUES ($1, $2), 
                                   WITH wallet as (
                                     (
                                         "uuid", "player"
-                                    ) VALUES ($4, $1)),
+                                    ) VALUES ($3, $1)),
                                   WITH counter as (
                                     (
                                         "uuid", "player", "lm_time"
-                                    ) VALUES ($5, $1, $6)'''
+                                    ) VALUES ($4, $1, $5)'''

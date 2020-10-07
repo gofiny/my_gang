@@ -3,6 +3,8 @@ import asyncpg
 import aioredis
 import itertools
 import functools
+from common_utils import exceptions
+from asyncpg import Connection
 from asyncpg.pool import Pool
 from aioredis import Redis
 from aiogram import types
@@ -12,6 +14,7 @@ from db_utils.models import Player
 from db_utils import redis_queries, pg_queries
 from aiohttp.web import Application, Response, Request, post, run_app, View
 from vk_api.vk import VK, Message
+from typing import Optional
 
 
 class WebhookRequestHandler(View):
@@ -157,27 +160,39 @@ class WebApp:
     def get_redis_pool(self) -> Redis:
         return self.app["redis_pool"]
 
-    async def check_player(self, user_id: int, prefix: str = "vk"):
-        pool = self.get_pg_pool()
-        async with pool.acquire() as conn:
-            user_uuid = await pg_queries.get_player_uuid(connection=conn, user_id=user_id, prefix=prefix)
-            if not user_uuid:
-                pass
-
-    async def _get_pg_user(self, user_id: int, prefix: str = "vk") -> Player:
-        pool = self.get_pg_pool()
+    async def check_player(self, user_id: int, prefix):
+        pool = await self.get_pg_pool()
         async with pool.acquire() as connection:
-            return await pg_queries.get_or_create_user(connection=connection, user_id=user_id)
+            user_uuid = await pg_queries.get_player_uuid(connection=connection, user_id=user_id, prefix=prefix)
+            if not user_uuid:
+                raise exceptions.PlayerNotRegistered
+            return user_uuid
 
-    async def _get_user(self, user_id: int):
-        user = await self._get_pg_user(user_id=user_id)
-        return user
+    async def get_redis_player(self, player_uuid: str) -> Player:
+        pool = self.get_redis_pool()
+        player = await redis_queries.get_player(pool=pool, player_uuid=player_uuid)
+        if not player:
+            raise exceptions.DisconnectedPlayer
+        return player
+
+    async def get_player(self, user_id: int, prefix: str = "vk") -> Player:
+        player_uuid = await self.check_player(user_id=user_id, prefix=prefix)
+        player = await self.get_redis_player(player_uuid=player_uuid)
+        return player
 
     async def _process_new_message(self, message_object: dict) -> None:
-        user = await self._get_user(user_id=message_object["from_id"])
-        message = self._create_message(message_object, user=user)
-        _filter = self._call_filter(message)
-        func = self.vk_bot.handlers.get(_filter, self.vk_bot.handlers.get("text_*"))
+        try:
+            player = await self.get_player(user_id=message_object["from_id"])
+            message = self._create_message(message_object, player=player)
+            _filter = self._call_filter(message)
+            func = self.vk_bot.handlers.get(_filter, self.vk_bot.handlers.get("text_*"))
+        except exceptions.PlayerNotRegistered:
+            func = self.vk_bot.handlers.get("payload_register")
+            message = self._create_message(message_object)
+        except exceptions.DisconnectedPlayer:
+            func = self.vk_bot.handlers.get("disconnected")
+            message = self._create_message(message_object)
+
         if func:
             await func(message)
 
@@ -205,8 +220,8 @@ class WebApp:
         await pg_pool.close()
         await vk_bot.clean_up()
 
-    def _create_message(self, message_object: dict, user: Player) -> Message:
-        return Message(bot=self.vk_bot, message_json=message_object, user=user)
+    def _create_message(self, message_object: dict, player: Optional[Player] = None) -> Message:
+        return Message(bot=self.vk_bot, message_json=message_object, player=player)
 
     def start_app(self, socket_path=None):
         self.app.on_shutdown.append(self._on_shutdown)
