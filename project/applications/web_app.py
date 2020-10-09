@@ -169,11 +169,11 @@ class WebApp:
         return await pg_queries.get_player_with_stuff(connection=connection, player_uuid=player_uuid)
 
     async def add_player_to_redis(self, player: Player):
-        pool = await self.get_redis_pool()
+        pool = self.get_redis_pool()
         await redis_queries.add_player(pool=pool, player=player)
 
     async def check_player(self, user_id: int, prefix):
-        pool = await self.get_pg_pool()
+        pool = self.get_pg_pool()
         async with pool.acquire() as connection:
             user_uuid = await pg_queries.get_player_uuid(connection=connection, user_id=user_id, prefix=prefix)
             if not user_uuid:
