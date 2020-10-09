@@ -37,8 +37,8 @@ async def get_player_uuid(connection: Connection, user_id: int, prefix: str) -> 
 
 
 @transaction
-async def _get_player_with_stuff(connection: Connection, user_id: int, prefix: str) -> Player:
-    player_data = await connection.fetchrow(sql.select_player_and_stuff % prefix, user_id)
+async def get_player_with_stuff(connection: Connection, player_uuid: str) -> Player:
+    player_data = await connection.fetchrow(sql.select_player_and_stuff, player_uuid)
     states = {"main_state": 0}
     counters = {
         "lm_time": player_data["lm_time"],
@@ -52,7 +52,7 @@ async def _get_player_with_stuff(connection: Connection, user_id: int, prefix: s
 
 
 @transaction
-async def _create_new_player(connection: Connection, user_id: int, prefix: str) -> None:
+async def create_new_player(connection: Connection, user_id: int, prefix: str) -> str:
     return await connection.fetchrow(
         sql.create_new_player_with_stuff % prefix,
         uuid4(), user_id, uuid4(), uuid4(), int(time())

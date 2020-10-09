@@ -1,11 +1,9 @@
 from vk_api.vk import Message, VK
 from config import VK_API_KEY, VK_API_VER
 from vk_bot import keyboards
+from common_utils import dialogs
 
 vk_bot = VK(VK_API_KEY, VK_API_VER)
-
-
-
 
 
 @vk_bot.message_handler(payload={"command": "start"})
@@ -21,7 +19,7 @@ async def connect_request(message: Message):
 
 @vk_bot.message_handler(payload={"command": "register"})
 async def register_request(message: Message):
-    await message.answer()
+    await message.answer(text=dialogs.reg_start, keyboard=keyboards.empty_keyboard())
 
 
 @vk_bot.message_handler(text="*")

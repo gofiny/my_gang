@@ -6,7 +6,7 @@ select_player_and_stuff = '''SELECT pl.uuid as player_uuid,
                                 co.*
                              FROM players pl
                              LEFT JOIN counters co ON pl.uuid=co.player
-                             WHERE pl.%s_id=$1'''  # where %s it`s tlg or vk prefix
+                             WHERE uuid=$1'''
 
 create_players_table = '''CREATE TABLE IF NOT EXISTS players
                     (
@@ -54,7 +54,7 @@ create_new_player_with_stuff = '''WITH player as (
                                     INSERT INTO players
                                     (
                                         "uuid", "%s_id",
-                                    ) VALUES ($1, $2), 
+                                    ) VALUES ($1, $2) RETURNING uuid), 
                                   WITH wallet as (
                                     (
                                         "uuid", "player"
@@ -62,4 +62,4 @@ create_new_player_with_stuff = '''WITH player as (
                                   WITH counter as (
                                     (
                                         "uuid", "player", "lm_time"
-                                    ) VALUES ($4, $1, $5)'''
+                                    ) VALUES ($4, $1, $5)) RETURNING player.uuid'''
