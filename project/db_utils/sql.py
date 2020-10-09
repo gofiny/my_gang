@@ -62,4 +62,4 @@ create_new_player_with_stuff = '''WITH player as (
                                   WITH counter as (
                                     (
                                         "uuid", "player", "lm_time"
-                                    ) VALUES ($4, $1, $5)) RETURNING player.uuid'''
+                                    ) VALUES ($4, $1, $5)) RETURNING (SELECT uuid FROM player)'''
