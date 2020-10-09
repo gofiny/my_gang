@@ -54,7 +54,7 @@ create_new_player_with_stuff = '''WITH player as (
                                     INSERT INTO players
                                     (
                                         "uuid", "%s_id"
-                                    ) VALUES ($1, $2)), 
+                                    ) VALUES ($1, $2) RETURNING uuid), 
                                   wallet as (
                                     (
                                         "uuid", "player"
