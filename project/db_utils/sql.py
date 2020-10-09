@@ -23,7 +23,7 @@ create_players_table = '''CREATE TABLE IF NOT EXISTS players
 
 create_counters_table = '''CREATE TABLE IF NOT EXISTS counters
                         (
-                            "uuid" uuid NOT NULL PRIMARY_KEY,
+                            "uuid" uuid NOT NULL PRIMARY KEY,
                             "player" uuid NOT NULL REFERENCES "players" ("uuid") ON DELETE CASCADE,
                             "lm_time" int NULL,
                             "daily_actions" int DEFAULT 1,
