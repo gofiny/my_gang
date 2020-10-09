@@ -26,6 +26,8 @@ def transaction(func):
 @transaction
 async def preparing_db(connection: Connection):
     await connection.execute(sql.create_players_table)
+    await connection.execute(sql.create_counters_table)
+    await connection.execute(sql.create_wallets_table)
 
 
 @transaction
