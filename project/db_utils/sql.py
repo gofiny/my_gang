@@ -53,14 +53,14 @@ create_new_player = '''INSERT INTO players
 create_new_player_with_stuff = '''WITH player as (
                                     INSERT INTO players
                                     (
-                                        "uuid", "%s_id"
+                                        uuid, %s_id
                                     ) VALUES ($1, $2) RETURNING uuid), 
                                   wallet as (
                                     (
-                                        "uuid", "player"
+                                        uuid, player
                                     ) VALUES ($3, $1)),
                                   counter as (
                                     (
-                                        "uuid", "player", "lm_time"
+                                        uuid, player, lm_time
                                     ) VALUES ($4, $1, $5))
                                   SELECT uuid FROM player'''
