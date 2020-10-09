@@ -6,7 +6,7 @@ select_player_and_stuff = '''SELECT pl.uuid as player_uuid,
                                 co.*
                              FROM players pl
                              LEFT JOIN counters co ON pl.uuid=co.player
-                             WHERE uuid=$1'''
+                             WHERE pl.uuid=$1'''
 
 create_players_table = '''CREATE TABLE IF NOT EXISTS players
                     (
