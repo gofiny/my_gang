@@ -1,4 +1,4 @@
-select_pl_uuid_by_user_id = 'SELECT uuid FROM player WHERE %s_id=$1'
+select_pl_uuid_by_user_id = 'SELECT uuid FROM players WHERE %s_id=$1'
 
 select_player_and_stuff = '''SELECT pl.uuid as player_uuid,
                                 pl.vk_id, pl.tlg_id, pl.name, pl.health,
