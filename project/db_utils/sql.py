@@ -34,7 +34,7 @@ create_wallets_table = '''CREATE TABLE IF NOT EXISTS wallets
                           (
                              "uuid" uuid NOT NULL PRIMARY KEY,
                              "player" uuid NOT NULL REFERENCES "players" ("uuid") ON DELETE CASCADE,
-                             "dollars" int NOT NULL DEFAULT 300,
+                             "dollars" int NOT NULL DEFAULT 300
                           )'''
 
 create_new_player = '''INSERT INTO players
