@@ -59,6 +59,6 @@ class Player:
             "mind": self.mind,
             "respect": self.respect,
             "states": self.states.serialize(),
-            "counter": self.counter.serialize()
+            "counters": self.counter.serialize()
         }
         return json.dumps(data)
