@@ -49,7 +49,7 @@ class Player:
 
     def serialize(self) -> str:
         data = {
-            "uuid": self.uuid,
+            "player_uuid": self.uuid,
             "vk_id": self.vk_id,
             "tlg_id": self.tlg_id,
             "name": self.name,
