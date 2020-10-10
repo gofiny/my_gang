@@ -4,11 +4,11 @@ from typing import Optional
 
 
 async def add_player(pool: Redis, player: Player) -> None:
-    await pool.hmset_dict(f"player:{player.uuid}", player.serialize())
+    await pool.set(f"player:{player.uuid}", player.serialize())
 
 
 async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
-    data = await pool.hgetall(f"player:{player_uuid}", encoding="utf-8")
+    data = await pool.get(f"player:{player_uuid}", encoding="utf-8")
     if data:
-        return Player(data)
+        return Player(data, need_deserialize=True)
     return data

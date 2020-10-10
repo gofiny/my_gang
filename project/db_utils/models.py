@@ -1,3 +1,7 @@
+import json
+from typing import Union
+
+
 class Counters:
     def __init__(self, player_uuid: str, **kwargs):
         params = {**kwargs}
@@ -6,7 +10,7 @@ class Counters:
         self.daily_actions = params["daily_actions"]
         self.total_actions = params["total_actions"]
 
-    def serialize(self):
+    def serialize(self) -> dict:
         data = {
             "lm_time": self.lm_time,
             "daily_actions": self.daily_actions,
@@ -20,7 +24,7 @@ class States:
         params = {**kwargs}
         self.main_state = params["main_state"]
 
-    def serialize(self):
+    def serialize(self) -> dict:
         data = {
             "main_state": self.main_state
         }
@@ -28,7 +32,9 @@ class States:
 
 
 class Player:
-    def __init__(self, data: dict):
+    def __init__(self, data: Union[dict, str], need_deserialize: bool = False):
+        if need_deserialize:
+            data = json.loads(data)
         self.uuid = str(data["player_uuid"])
         self.vk_id = data["vk_id"]
         self.tlg_id = data["tlg_id"]
@@ -41,7 +47,7 @@ class Player:
         self.states = States(**data["states"])
         self.counter = Counters(player_uuid=self.uuid, **data["counters"])
 
-    def serialize(self):
+    def serialize(self) -> str:
         data = {
             "uuid": self.uuid,
             "vk_id": self.vk_id,
@@ -55,4 +61,4 @@ class Player:
             "states": self.states.serialize(),
             "counter": self.counter.serialize()
         }
-        return data
+        return json.dumps(data)
