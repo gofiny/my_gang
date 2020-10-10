@@ -44,8 +44,8 @@ class WebhookRequestHandler(View):
         update = await self.parse_update()
 
         try:
-            await self.prepare(update=update)
             _ = self.get_dispatcher()
+            await self.prepare(update=update)
         except exceptions.PlayerNotRegistered:
             from tlg_bot.handlers import register_request
             await register_request(message=update.message)
