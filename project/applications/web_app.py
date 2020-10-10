@@ -154,10 +154,12 @@ class WebApp:
     def _get_message_object(request_object: dict) -> dict:
         return request_object["object"]["message"]
 
-    def get_pg_pool(self) -> Pool:
+    @property
+    def pg_pool(self) -> Pool:
         return self.app["pg_pool"]
 
-    def get_redis_pool(self) -> Redis:
+    @property
+    def redis_pool(self) -> Redis:
         return self.app["redis_pool"]
 
     @staticmethod
@@ -169,12 +171,10 @@ class WebApp:
         return await pg_queries.get_player_with_stuff(connection=connection, player_uuid=player_uuid)
 
     async def add_player_to_redis(self, player: Player):
-        pool = self.get_redis_pool()
-        await redis_queries.add_player(pool=pool, player=player)
+        await redis_queries.add_player(pool=self.redis_pool, player=player)
 
     async def check_player(self, user_id: int, prefix):
-        pool = self.get_pg_pool()
-        async with pool.acquire() as connection:
+        async with self.pg_pool.acquire() as connection:
             user_uuid = await pg_queries.get_player_uuid(connection=connection, user_id=user_id, prefix=prefix)
             if not user_uuid:
                 player_uuid = await self.register_player(connection=connection, user_id=user_id, prefix=prefix)
@@ -184,8 +184,7 @@ class WebApp:
             return user_uuid
 
     async def get_player_from_redis(self, player_uuid: str) -> Player:
-        pool = self.get_redis_pool()
-        player = await redis_queries.get_player(pool=pool, player_uuid=player_uuid)
+        player = await redis_queries.get_player(pool=self.redis_pool, player_uuid=player_uuid)
         if not player:
             raise exceptions.DisconnectedPlayer
         return player
@@ -212,8 +211,7 @@ class WebApp:
             await func(message)
 
     async def _create_pg_tables(self) -> None:
-        pool = self.get_pg_pool()
-        async with pool.acquire() as connection:
+        async with self.pg_pool.acquire() as connection:
             await pg_queries.preparing_db(connection=connection)
 
     async def prepare(self, postgres_dsn: str, redis_address: str) -> None:

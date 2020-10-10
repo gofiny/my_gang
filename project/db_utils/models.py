@@ -29,17 +29,17 @@ class States:
 
 class Player:
     def __init__(self, data: dict):
-        self.uuid = str(data.get("player_uuid"))
-        self.vk_id = data.get("vk_id")
-        self.tlg_id = data.get("tlg_id")
-        self.name = data.get("name")
-        self.level = data.get("level")
-        self.health = data.get("health")
-        self.power = data.get("power")
-        self.mind = data.get("mind")
-        self.respect = data.get("respect")
-        self.states = States(**data.get("states"))
-        self.counter = Counters(player_uuid=self.uuid, **data.get("counters"))
+        self.uuid = str(data["player_uuid"])
+        self.vk_id = data["vk_id"]
+        self.tlg_id = data["tlg_id"]
+        self.name = data["name"]
+        self.level = data["level"]
+        self.health = data["health"]
+        self.power = data["power"]
+        self.mind = data["mind"]
+        self.respect = ["respect"]
+        self.states = States(**data["states"])
+        self.counter = Counters(player_uuid=self.uuid, **data["counters"])
 
     def serialize(self):
         data = {
