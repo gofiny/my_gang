@@ -29,7 +29,7 @@ class States:
 
 class Player:
     def __init__(self, data: dict):
-        self.uuid = data.get("player_uuid")
+        self.uuid = str(data.get("player_uuid"))
         self.vk_id = data.get("vk_id")
         self.tlg_id = data.get("tlg_id")
         self.name = data.get("name")

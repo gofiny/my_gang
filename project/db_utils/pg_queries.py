@@ -34,7 +34,7 @@ async def preparing_db(connection: Connection):
 async def get_player_uuid(connection: Connection, user_id: int, prefix: str) -> Optional[str]:
     user_uuid = await connection.fetchrow(sql.select_pl_uuid_by_user_id % prefix, user_id)
     if user_uuid:
-        user_uuid = user_uuid["uuid"]
+        user_uuid = str(user_uuid["uuid"])
     return user_uuid
 
 
