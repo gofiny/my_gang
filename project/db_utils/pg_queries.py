@@ -55,7 +55,8 @@ async def get_player_with_stuff(connection: Connection, player_uuid: str) -> Pla
 
 @transaction
 async def create_new_player(connection: Connection, user_id: int, prefix: str) -> str:
-    return await connection.fetchrow(
+    player_uuid = await connection.fetchrow(
         sql.create_new_player_with_stuff % prefix,
         uuid4(), user_id, uuid4(), uuid4(), int(time())
     )
+    return str(player_uuid["uuid"])
