@@ -1,6 +1,18 @@
 from vk_api.vk import Keyboard, Button
 
 
+def main_menu() -> Keyboard:
+    keyboard = Keyboard()
+    keyboard.add_button(Button(label="Тут будет меню"))
+    return keyboard
+
+
+def connect() -> Keyboard:
+    keyboard = Keyboard()
+    keyboard.add_button(Button(label="Подключиться", payload={"command": "connect"}, color="positive"))
+    return keyboard
+
+
 def empty_keyboard() -> Keyboard:
     keyboard = Keyboard()
     return keyboard

@@ -8,13 +8,13 @@ vk_bot = VK(VK_API_KEY, VK_API_VER)
 
 @vk_bot.message_handler(payload={"command": "start"})
 async def start_message(message: Message):
-    user = message.user
-    await message.answer(text=f"user: {user.user_id} if_foled: {user.is_followed}", keyboard=keyboards.info_payload())
+
+    await message.answer(text="Work", keyboard=keyboards.info_payload())
 
 
 @vk_bot.message_handler(payload={"command": "disconnected"})
 async def connect_request(message: Message):
-    pass
+    await message.answer(text=dialogs.req_connect, keyboard=keyboards.connect())
 
 
 @vk_bot.message_handler(payload={"command": "register"})
