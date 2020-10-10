@@ -1,16 +1,20 @@
 from config import TLG_API_KEY
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
+from tlg_bot import keyboards
 from common_utils import dialogs
-from vk_api.vk import Message as VkMessage
 
 
 tlg_bot = Bot(TLG_API_KEY)
 dp = Dispatcher(tlg_bot)
 
 
-async def register_request(message: VkMessage):
-    await tlg_bot.send_message(chat_id=message.from_id, text=dialogs.reg_start)
+async def connect_request(message: Message):
+    await message.answer(text=dialogs.req_connect, reply_markup=keyboards.connect())
+
+
+async def register_request(message: Message):
+    await message.answer(text=dialogs.reg_start, reply_markup=keyboards.empty_keyboard())
 
 
 @dp.message_handler(commands=["start"])

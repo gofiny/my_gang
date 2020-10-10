@@ -27,6 +27,13 @@ class WebhookRequestHandler(View):
             pass
         return dp
 
+    async def prepare(self, update: types.Update):
+        app: WebApp = self.request.app["web_app"]
+
+        player = await app.get_player(user_id=update.message.chat.id, prefix="tlg")
+        update.message.__setattr__("player", player)
+        update.message.__setattr__("web_app", app)
+
     async def parse_update(self):
         data = await self.request.json()
         update = types.Update(**data)
@@ -36,16 +43,27 @@ class WebhookRequestHandler(View):
 
         update = await self.parse_update()
 
-        results = await self.process_update(update)
-        response = self.get_response(results)
-
-        if response:
-            web_response = response.get_web_response()
+        try:
+            await self.prepare(update=update)
+        except exceptions.PlayerNotRegistered:
+            from tlg_bot.handlers import register_request
+            await register_request(message=update.message)
+            web_response = Response(text="ok")
+        except exceptions.DisconnectedPlayer:
+            from tlg_bot.handlers import connect_request
+            await connect_request(message=update.message)
+            web_response = Response(text="ok")
         else:
-            web_response = Response(text='ok')
+            results = await self.process_update(update)
+            response = self.get_response(results)
 
-        if self.request.app.get('RETRY_AFTER', None):
-            web_response.headers['Retry-After'] = self.request.app['RETRY_AFTER']
+            if response:
+                web_response = response.get_web_response()
+            else:
+                web_response = Response(text='ok')
+
+            if self.request.app.get('RETRY_AFTER', None):
+                web_response.headers['Retry-After'] = self.request.app['RETRY_AFTER']
 
         return web_response
 
@@ -131,11 +149,11 @@ class WebApp:
         if request_json.get("secret") != self.secret_str:
             return Response(status=404)
         request_type = request_json["type"]
-        if request_type == "confirmation":
-            return Response(body=self.returning_callback_str)
-        elif request_type == "message_new":
+        if request_type == "message_new":
             message_object = self._get_message_object(request_json)
             await self._process_new_message(message_object)
+        elif request_type == "confirmation":
+            return Response(body=self.returning_callback_str)
         return Response(body="ok")
 
     @staticmethod
@@ -197,15 +215,15 @@ class WebApp:
     async def _process_new_message(self, message_object: dict) -> None:
         try:
             player = await self.get_player(user_id=message_object["from_id"])
-            message = self._create_message(message_object, player=player)
+            message = self.create_message(message_object, player=player)
             _filter = self._call_filter(message)
             func = self.vk_bot.handlers.get(_filter, self.vk_bot.handlers.get("text_*"))
         except exceptions.PlayerNotRegistered:
             func = self.vk_bot.handlers.get("payload_register")
-            message = self._create_message(message_object)
+            message = self.create_message(message_object)
         except exceptions.DisconnectedPlayer:
             func = self.vk_bot.handlers.get("payload_disconnected")
-            message = self._create_message(message_object)
+            message = self.create_message(message_object)
 
         if func:
             await func(message)
@@ -233,7 +251,7 @@ class WebApp:
         await pg_pool.close()
         await vk_bot.clean_up()
 
-    def _create_message(self, message_object: dict, player: Optional[Player] = None) -> Message:
+    def create_message(self, message_object: dict, player: Optional[Player] = None) -> Message:
         return Message(bot=self.vk_bot, message_json=message_object, player=player)
 
     def start_app(self, socket_path=None):
