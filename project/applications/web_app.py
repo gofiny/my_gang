@@ -171,7 +171,10 @@ class WebApp:
         return _filter
 
     def get_all_message_handler(self) -> Optional[Callable]:
-        return self.vk_bot.handlers.get("text_*")
+        func = self.vk_bot.handlers.get("text_*")
+        if not func:
+            return func
+        return func["states"][None]
 
     def get_handler_by_state(self, _filter: str, player: Player) -> Optional[Callable]:
         exists_filter = self.vk_bot.handlers.get(_filter)

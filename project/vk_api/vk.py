@@ -132,9 +132,11 @@ class VK:
         finished_filter = self.add_state_to_filter(_filter=_filter, _requirement_state=state, _state=_state, func=func)
         self.handlers[_filter] = finished_filter
 
-    def message_handler(self, text: Optional[str] = None, payload: Optional[dict] = None) -> Callable:
+    def message_handler(self, text: Optional[str] = None,
+                        payload: Optional[dict] = None,
+                        state: Optional[dict] = None) -> Callable:
         def decorator(func):
-            self._register_handler(func, text, payload)
+            self._register_handler(func, text, payload, state)
         return decorator
 
     @staticmethod
