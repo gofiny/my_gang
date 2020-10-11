@@ -54,6 +54,7 @@ class WebhookRequestHandler(View):
         except exceptions.DisconnectedPlayer as e:
             from tlg_bot.handlers import connect_request, connect
             if update.message.text == "Подключиться":
+                update.message.conf["web_app"] = self.request.app["web_app"]
                 await connect(message=update.message, player_uuid=e.player_uuid)
             else:
                 await connect_request(message=update.message)
