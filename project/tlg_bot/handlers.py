@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import BoundFilter
 from aiogram.types import Message
 from tlg_bot import keyboards
 from db_utils import pg_queries
-from common_utils import dialogs, exceptions
+from common_utils import dialogs, exceptions, stuff
 
 
 tlg_bot = Bot(TLG_API_KEY)
@@ -45,8 +45,10 @@ async def register_name(message: Message):
     player = message.conf["player"]
     keyboard = None
     try:
-        if len(message.text) > 30:
-            raise exceptions.NameTooLong
+        if len(message.text) > 30 or len(message.text) < 4:
+            raise exceptions.NotCorrectName
+        if stuff.name_validation(message.text):
+            raise exceptions.NotCorrectName
         await pg_queries.open_connection(
             pool=web_app.pg_pool, func=pg_queries.set_name_to_player,
             name=message.text, player_uuid=player.uuid)
@@ -57,7 +59,7 @@ async def register_name(message: Message):
         await web_app.add_player_to_redis(player)
     except exceptions.NameAlreadyExists:
         text = dialogs.this_name_taken
-    except exceptions.NameTooLong:
+    except exceptions.NotCorrectName:
         text = dialogs.name_too_long
     await message.answer(text=text, reply_markup=keyboard)
 

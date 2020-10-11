@@ -10,5 +10,5 @@ class NameAlreadyExists(Exception):
     """If player name is exists in the database"""
 
 
-class NameTooLong(Exception):
-    """If player name greater than 30 symbols"""
+class NotCorrectName(Exception):
+    """If player name greater than 30 symbols or lower than 4"""
