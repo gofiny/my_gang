@@ -13,12 +13,10 @@ async def start_message(message: Message):
     await message.answer(text="Work", keyboard=keyboards.info_payload())
 
 
-@vk_bot.message_handler(payload={"command": "disconnected"})
 async def connect_request(message: Message):
     await message.answer(text=dialogs.req_connect, keyboard=keyboards.connect())
 
 
-@vk_bot.message_handler(payload={"command": "register"})
 async def register_request(message: Message):
     await message.answer(text=dialogs.reg_start, keyboard=keyboards.empty_keyboard())
 

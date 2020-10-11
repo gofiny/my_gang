@@ -235,10 +235,12 @@ class WebApp:
             _filter = self._call_filter(message)
             func = self.get_handler_by_state(_filter=_filter, player=player)
         except exceptions.PlayerNotRegistered:
-            func = self.vk_bot.handlers.get("payload_register")
+            from vk_bot.handlers import register_request
+            func = register_request
             message = self.create_message(message_object)
         except exceptions.DisconnectedPlayer:
-            func = self.vk_bot.handlers.get("payload_disconnected")
+            from vk_bot.handlers import connect_request
+            func = connect_request
             message = self.create_message(message_object)
 
         if func:
