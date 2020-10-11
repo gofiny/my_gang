@@ -30,6 +30,16 @@ class States:
         }
         return data
 
+    @property
+    def all_states(self) -> dict:
+        states = {
+            "main_state": self.main_state
+        }
+        return states
+
+    def is_that_state(self, state_name: str, value: int) -> bool:
+        return self.all_states.get(state_name) == value
+
 
 class Player:
     def __init__(self, data: Union[dict, str], need_deserialize: bool = False):

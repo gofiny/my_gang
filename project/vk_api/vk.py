@@ -77,7 +77,7 @@ class Keyboard:
 class VK:
     def __init__(self, api_key, api_ver):
         self._session = None
-        self.handlers = {}  # {"text_some_text": func} or {"payload_payload_command": func}
+        self.handlers = {}  # {"text_some_text": {"states": {None: func}}}}
         self._API_KEY = api_key
         self._API_VER = api_ver
 
@@ -107,9 +107,30 @@ class VK:
 
         return _filter
 
-    def _register_handler(self, func, text: Optional[str] = None, payload: Optional[dict] = None) -> None:
+    @staticmethod
+    def _create_state_filter(func: Callable, state: Optional[dict]) -> dict:
+        _state = {
+            "states": {
+                json.dumps(state): func
+            }
+        }
+        return _state
+
+    def add_state_to_filter(self, _filter: str, _requirement_state: dict, _state: dict, func: Callable) -> dict:
+        exists_filter = self.handlers.get(_filter)
+        if exists_filter:
+            exists_filter["states"][json.dumps(_requirement_state)] = func
+            return exists_filter
+        return _state
+
+    def _register_handler(
+            self, func: Callable, text: Optional[str] = None,
+            payload: Optional[dict] = None,
+            state: Optional[dict] = None) -> None:
         _filter = self._make_filter(text=text, payload=payload)
-        self.handlers[_filter] = func
+        _state = self._create_state_filter(func=func, state=state)
+        finished_filter = self.add_state_to_filter(_filter=_filter, _requirement_state=state, _state=_state, func=func)
+        self.handlers[_filter] = finished_filter
 
     def message_handler(self, text: Optional[str] = None, payload: Optional[dict] = None) -> Callable:
         def decorator(func):

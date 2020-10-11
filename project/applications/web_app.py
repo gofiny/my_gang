@@ -3,6 +3,7 @@ import asyncpg
 import aioredis
 import itertools
 import functools
+import json
 from common_utils import exceptions
 from asyncpg import Connection
 from asyncpg.pool import Pool
@@ -14,7 +15,7 @@ from db_utils.models import Player
 from db_utils import redis_queries, pg_queries
 from aiohttp.web import Application, Response, Request, post, run_app, View
 from vk_api.vk import VK, Message
-from typing import Optional
+from typing import Optional, Callable
 
 
 class WebhookRequestHandler(View):
@@ -169,6 +170,22 @@ class WebApp:
             _filter = f'text_{message.text}'
         return _filter
 
+    def get_all_message_handler(self) -> Optional[Callable]:
+        return self.vk_bot.handlers.get("text_*")
+
+    def get_handler_by_state(self, _filter: str, player: Player) -> Optional[Callable]:
+        exists_filter = self.vk_bot.handlers.get(_filter)
+        player_states = player.states
+        if exists_filter:
+            states = json.loads(exists_filter["states"])
+            for state, func in states:
+                if not state:
+                    return func
+                state_name = list(state.keys())[0]
+                if player_states.is_that_state(state_name=state_name, value=state[state_name]):
+                    return func
+        return self.get_all_message_handler()
+
     @staticmethod
     def _get_message_object(request_object: dict) -> dict:
         return request_object["object"]["message"]
@@ -218,7 +235,7 @@ class WebApp:
             player = await self.get_player(user_id=message_object["from_id"])
             message = self.create_message(message_object, player=player)
             _filter = self._call_filter(message)
-            func = self.vk_bot.handlers.get(_filter, self.vk_bot.handlers.get("text_*"))
+            func = self.get_handler_by_state(_filter=_filter, player=player)
         except exceptions.PlayerNotRegistered:
             func = self.vk_bot.handlers.get("payload_register")
             message = self.create_message(message_object)
