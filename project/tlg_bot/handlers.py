@@ -3,7 +3,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.dispatcher.filters import BoundFilter
 from aiogram.types import Message
 from tlg_bot import keyboards
-from common_utils import dialogs
+from db_utils import pg_queries
+from common_utils import dialogs, exceptions
 
 
 tlg_bot = Bot(TLG_API_KEY)
@@ -39,8 +40,26 @@ async def start(message: Message):
 
 
 @dp.message_handler(pl_state={"main_state": 0})
-async def test_states(message: Message):
-    await message.answer(text="God damn it, work!")
+async def register_name(message: Message):
+    web_app = message.conf["web_app"]
+    player = message.conf["player"]
+    keyboard = None
+    try:
+        if len(message.text) > 30:
+            raise exceptions.NameTooLong
+        await pg_queries.open_connection(
+            pool=web_app.pg_pool, func=pg_queries.set_name_to_player,
+            name=message.text, player_uuid=player.uuid)
+        text = dialogs.welcome % message.text
+        keyboard = keyboards.main_menu()
+        player.states.main_state = 1
+        player.name = message.text
+        await web_app.add_player_to_redis(player)
+    except exceptions.NameAlreadyExists:
+        text = dialogs.this_name_taken
+    except exceptions.NameTooLong:
+        text = dialogs.name_too_long
+    await message.answer(text=text, reply_markup=keyboard)
 
 
 @dp.message_handler()
