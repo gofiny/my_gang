@@ -268,7 +268,7 @@ class WebApp:
         await vk_bot.clean_up()
 
     def create_message(self, message_object: dict, player: Optional[Player] = None) -> Message:
-        return Message(bot=self.vk_bot, message_json=message_object, player=player)
+        return Message(bot=self.vk_bot, message_json=message_object, web_app=self, player=player)
 
     def start_app(self, socket_path=None):
         self.app.on_shutdown.append(self._on_shutdown)

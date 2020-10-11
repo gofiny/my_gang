@@ -7,7 +7,7 @@ import json
 
 
 class Message:
-    def __init__(self, message_json: dict, bot: "VK", player: Optional[Player]):
+    def __init__(self, message_json: dict, bot: "VK", web_app, player: Optional[Player]):
         self.id = message_json["id"]
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]
@@ -15,6 +15,7 @@ class Message:
         self.payload = message_json.get("payload")
         self.bot = bot
         self.player = player
+        self.web_app = web_app
 
         if self.payload:
             self.payload = json.loads(self.payload)

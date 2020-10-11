@@ -1,8 +1,9 @@
 from time import time
 from asyncpg import Connection, Record
 from asyncpg.pool import Pool
+from common_utils import exceptions
 from db_utils.models import Player
-from typing import Optional
+from typing import Optional, Callable
 from uuid import uuid4
 from db_utils import sql
 
@@ -11,14 +12,8 @@ def transaction(func):
     async def wrapper(*args, **kwargs):
         params = {**kwargs}
         connection: Connection = params.get("connection")
-        pool: Pool = params.get("pool")
-        if connection:
-            async with connection.transaction():
-                result = await func(*args, **kwargs)
-        else:
-            async with pool.acquire() as connection:
-                async with connection.transaction():
-                    result = await func(*args, **kwargs)
+        async with connection.transaction():
+            result = await func(*args, **kwargs)
         return result
     return wrapper
 
@@ -60,3 +55,16 @@ async def create_new_player(connection: Connection, user_id: int, prefix: str) -
         uuid4(), user_id, uuid4(), uuid4(), int(time())
     )
     return str(player_uuid["uuid"])
+
+
+@transaction
+async def set_name_to_player(connection: Connection, name: str, player_uuid: str) -> None:
+    name_exists = await connection.fetchval(sql.select_name_from_players, name)
+    if name_exists:
+        raise exceptions.NameAlreadyExists
+    await connection.execute(sql.set_name_to_player, name, player_uuid)
+
+
+async def open_connection(pool: Pool, func: Callable, *args, **kwargs):
+    async with pool.acquire() as connection:
+        await func(connection=connection, *args, **kwargs)

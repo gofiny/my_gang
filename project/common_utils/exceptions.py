@@ -1,6 +1,14 @@
 class PlayerNotRegistered(Exception):
-    """Raise if player is not registered"""
+    """If player is not registered"""
 
 
 class DisconnectedPlayer(Exception):
-    """Raise if player is not exists on redis base"""
+    """If player is not exists on redis base"""
+
+
+class NameAlreadyExists(Exception):
+    """If player name is exists in the database"""
+
+
+class NameTooLong(Exception):
+    """If player name greater than 30 symbols"""
