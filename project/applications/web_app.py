@@ -51,9 +51,12 @@ class WebhookRequestHandler(View):
             from tlg_bot.handlers import register_request
             await register_request(message=update.message)
             web_response = Response(text="ok")
-        except exceptions.DisconnectedPlayer:
-            from tlg_bot.handlers import connect_request
-            await connect_request(message=update.message)
+        except exceptions.DisconnectedPlayer as e:
+            from tlg_bot.handlers import connect_request, connect
+            if update.message.text == "Подключиться":
+                await connect(message=update.message, player_uuid=e.player_uuid)
+            else:
+                await connect_request(message=update.message)
             web_response = Response(text="ok")
         else:
             results = await self.process_update(update)
@@ -220,7 +223,7 @@ class WebApp:
     async def get_player_from_redis(self, player_uuid: str) -> Player:
         player = await redis_queries.get_player(pool=self.redis_pool, player_uuid=player_uuid)
         if not player:
-            raise exceptions.DisconnectedPlayer
+            raise exceptions.DisconnectedPlayer(player_uuid=player_uuid)
         return player
 
     async def get_player(self, user_id: int, prefix: str = "vk") -> Player:
@@ -238,10 +241,14 @@ class WebApp:
             from vk_bot.handlers import register_request
             func = register_request
             message = self.create_message(message_object)
-        except exceptions.DisconnectedPlayer:
-            from vk_bot.handlers import connect_request
-            func = connect_request
+        except exceptions.DisconnectedPlayer as e:
+            from vk_bot.handlers import connect_request, connect
+            func = None
             message = self.create_message(message_object)
+            if message.payload == {"command": "connect"}:
+                await connect(message=message, player_uuid=e.player_uuid)
+            else:
+                func = connect_request
 
         if func:
             await func(message)

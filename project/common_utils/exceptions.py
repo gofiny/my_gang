@@ -4,6 +4,9 @@ class PlayerNotRegistered(Exception):
 
 class DisconnectedPlayer(Exception):
     """If player is not exists on redis base"""
+    def __init__(self, player_uuid: str, message: str = "Player are not connected"):
+        super().__init__(message)
+        self.player_uuid = player_uuid
 
 
 class NameAlreadyExists(Exception):

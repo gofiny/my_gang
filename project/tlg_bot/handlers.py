@@ -34,6 +34,15 @@ async def register_request(message: Message):
     await message.answer(text=dialogs.reg_start, reply_markup=keyboards.empty_keyboard())
 
 
+async def connect(message: Message, player_uuid: str):
+    web_app = message.conf["web_app"]
+    async with web_app.pg_pool.acquire() as connection:
+        player = await web_app.get_player_from_pg(connection=connection, player_uuid=player_uuid)
+        player.states.main_state = 1
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.main_menu, reply_markup=keyboards.main_menu())
+
+
 @dp.message_handler(commands=["start"])
 async def start(message: Message):
     await message.answer(text="Hello! That`s good!")
