@@ -175,7 +175,9 @@ class WebApp:
         player_states = player.states
         if exists_filter:
             states = exists_filter["states"]
-            for state, func in states:
+            for state_row in states:
+                state = list(state_row.keys())[0]
+                func = state_row[state]
                 state = json.loads(state)
                 if not state:
                     return func
