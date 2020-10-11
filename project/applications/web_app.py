@@ -174,8 +174,9 @@ class WebApp:
         exists_filter = self.vk_bot.handlers.get(_filter, self.vk_bot.handlers.get("text_*"))
         player_states = player.states
         if exists_filter:
-            states = json.loads(exists_filter["states"])
+            states = exists_filter["states"]
             for state, func in states:
+                state = json.loads(state)
                 if not state:
                     return func
                 state_name = list(state.keys())[0]
