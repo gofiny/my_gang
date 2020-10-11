@@ -22,11 +22,12 @@ async def register_request(message: Message):
     await message.answer(text=dialogs.reg_start, keyboard=keyboards.empty_keyboard())
 
 
+@vk_bot.message_handler(text="*", state={"main_state": 0})
+async def state_test(message: Message):
+    await message.answer(text="God damn it, work!")
+
+
 @vk_bot.message_handler(text="*")
 async def other(message: Message):
     await vk_bot.send_message(user_ids=message.from_id, text="Не знаю что ответить")
 
-
-@vk_bot.message_handler(text="*", state={"main_state": 0})
-async def state_test(message: Message):
-    await message.answer(text="God damn, work!")
