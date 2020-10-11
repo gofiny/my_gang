@@ -32,8 +32,8 @@ class WebhookRequestHandler(View):
         app: WebApp = self.request.app["web_app"]
 
         player = await app.get_player(user_id=update.message.chat.id, prefix="tlg")
-        update.message.__setattr__("player", player)
-        update.message.__setattr__("web_app", app)
+        update.message.conf["player"] = player
+        update.message.conf["web_app"] = app
 
     async def parse_update(self):
         data = await self.request.json()
