@@ -3,12 +3,12 @@ from db_utils.models import Player
 from typing import Union, Optional, List, Callable
 from random import getrandbits, choice
 from typing import Optional
-from applications.web_app import WebApp
+from applications import web_app
 import json
 
 
 class Message:
-    def __init__(self, message_json: dict, bot: "VK", web_app: WebApp, player: Optional[Player]):
+    def __init__(self, message_json: dict, bot: "VK", web_app: web_app.WebApp, player: Optional[Player]):
         self.id = message_json["id"]
         self.date = message_json["date"]
         self.from_id = message_json["from_id"]
