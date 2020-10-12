@@ -7,12 +7,6 @@ from db_utils import pg_queries
 vk_bot = VK(VK_API_KEY, VK_API_VER)
 
 
-@vk_bot.message_handler(payload={"command": "start"})
-async def start_message(message: Message):
-
-    await message.answer(text="Work", keyboard=keyboards.info_payload())
-
-
 async def connect_request(message: Message):
     await message.answer(text=dialogs.req_connect, keyboard=keyboards.connect())
 
@@ -26,6 +20,15 @@ async def connect(message: Message, player_uuid: str):
     async with web_app.pg_pool.acquire() as connection:
         player = await web_app.get_player_from_pg(connection=connection, player_uuid=player_uuid)
         player.states.main_state = 1
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.main_menu, keyboard=keyboards.main_menu())
+
+
+@vk_bot.message_handler(payload={"command": "start"})
+async def start(message: Message):
+    web_app = message.web_app
+    player = message.player
+    player.states.main_state = 1
     await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.main_menu, keyboard=keyboards.main_menu())
 

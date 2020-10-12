@@ -45,7 +45,11 @@ async def connect(message: Message, player_uuid: str):
 
 @dp.message_handler(commands=["start"])
 async def start(message: Message):
-    await message.answer(text="Hello! That`s good!")
+    web_app = message.conf["web_app"]
+    player = message.conf["player"]
+    player.states.main_state = 1
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.main_menu, reply_markup=keyboards.main_menu())
 
 
 @dp.message_handler(pl_state={"main_state": 0})

@@ -71,3 +71,17 @@ create_new_player_with_stuff = '''WITH player as (
 select_name_from_players = '''SELECT name FROM players WHERE name=$1'''
 
 set_name_to_player = '''UPDATE players SET name=$1 WHERE uuid=$2'''
+
+update_player = '''WITH players as (
+                   UPDATE players SET 
+                        level=$1,
+                        health=$2,
+                        power=$3,
+                        mind=$4,
+                        respect=$5
+                    WHERE uuid=$6), 
+                    UPDATE counters SET
+                        lm_time=$7,
+                        daily_actions=$8,
+                        total_actions=$9
+                    WHERE player=$6'''
