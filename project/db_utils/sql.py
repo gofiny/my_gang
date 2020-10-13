@@ -83,7 +83,7 @@ create_new_player_with_stuff = '''WITH player as (
                                     (
                                         uuid, player
                                     ) VALUES ($6, $1)
-                                  ))
+                                  )
                                   SELECT uuid FROM player'''
 
 select_name_from_players = '''SELECT name FROM players WHERE name=$1'''
