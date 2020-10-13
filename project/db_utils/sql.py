@@ -41,7 +41,7 @@ create_storage_table = '''CREATE TABLE IF NOT EXISTS storage
                             "glasses" int NULL DEFAULT 0,
                             "cap" int NULL DEFAULT 0,
                             "gloves" int NULL DEFAULT 0
-                          ('''
+                          )'''
 
 create_wallets_table = '''CREATE TABLE IF NOT EXISTS wallets
                           (
