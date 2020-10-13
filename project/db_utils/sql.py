@@ -113,7 +113,7 @@ create_seller = '''WITH seller AS (
                         uuid, name
                     ) VALUES (
                         $1, $2
-                    )
+                    ))
                     INSERT INTO storage 
                     (
                         uuid,
