@@ -60,8 +60,8 @@ async def register_name(message: Message):
     try:
         if len(message.text) > 30 or len(message.text) < 4:
             raise exceptions.NotCorrectName
-        if stuff.name_validation(message.text):
-            raise exceptions.NotCorrectName
+        #if stuff.name_validation(message.text):
+        #    raise exceptions.NotCorrectName
         await pg_queries.open_connection(
             pool=web_app.pg_pool, func=pg_queries.set_name_to_player,
             name=message.text, player_uuid=player.uuid)
