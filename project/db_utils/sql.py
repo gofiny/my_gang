@@ -77,7 +77,7 @@ create_new_player_with_stuff = '''WITH player as (
                                     INSERT INTO counters
                                     (
                                         uuid, player, lm_time
-                                    ) VALUES ($4, $1, $5),
+                                    ) VALUES ($4, $1, $5)),
                                   stuff as (
                                     INSERT INTO storage
                                     (
