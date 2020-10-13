@@ -24,9 +24,9 @@ async def preparing_db(connection: Connection) -> None:
     await connection.execute(sql.create_counters_table)
     await connection.execute(sql.create_wallets_table)
     await connection.execute(sql.create_storage_table)
-    seller_uuid = await connection.fetchval(sql.check_seller)
+    seller_uuid = await connection.fetchval(sql.check_seller, "seller")
     if not seller_uuid:
-        await connection.execute(sql.create_seller, uuid4(), uuid4())
+        await connection.execute(sql.create_seller, uuid4(), "seller", uuid4())
 
 
 @transaction
