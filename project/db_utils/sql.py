@@ -33,7 +33,7 @@ create_counters_table = '''CREATE TABLE IF NOT EXISTS counters
 create_storage_table = '''CREATE TABLE IF NOT EXISTS storage
                           (
                             "uuid" uuid NOT NULL PRIMARY KEY,
-                            "player" uuid NOT NULL REFERENCES "player" ("uuid") ON DELETE CASCADE,
+                            "player" uuid NOT NULL REFERENCES "players" ("uuid") ON DELETE CASCADE,
                             "watch" int NULL DEFAULT 0,
                             "phone" int NULL DEFAULT 0,
                             "headphones" int NULL DEFAULT 0,
