@@ -105,7 +105,7 @@ update_player = '''WITH players as (
                         total_actions=$9
                     WHERE player=$6'''
 
-check_seller = '''SELECT uuid FROM players WHERE name="seller"'''
+check_seller = '''SELECT uuid FROM players WHERE name = "seller"'''
 
 create_seller = '''WITH seller AS (
                     INSERT INTO players

@@ -26,7 +26,7 @@ async def preparing_db(connection: Connection) -> None:
     await connection.execute(sql.create_storage_table)
     seller_uuid = await connection.fetchval(sql.check_seller)
     if not seller_uuid:
-        await connection.execute(sql.create_seller)
+        await connection.execute(sql.create_seller, uuid4(), uuid4())
 
 
 @transaction
@@ -56,7 +56,7 @@ async def get_player_with_stuff(connection: Connection, player_uuid: str) -> Pla
 async def create_new_player(connection: Connection, user_id: int, prefix: str) -> str:
     player_uuid = await connection.fetchrow(
         sql.create_new_player_with_stuff % prefix,
-        uuid4(), user_id, uuid4(), uuid4(), int(time())
+        uuid4(), user_id, uuid4(), uuid4(), int(time()), uuid4()
     )
     return str(player_uuid["uuid"])
 
