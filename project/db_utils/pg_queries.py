@@ -3,7 +3,7 @@ from asyncpg import Connection, Record
 from asyncpg.pool import Pool
 from common_utils import exceptions
 from db_utils.models import Player
-from typing import Optional, Callable
+from typing import Optional, Callable, Any
 from uuid import uuid4
 from db_utils import sql
 
@@ -19,10 +19,14 @@ def transaction(func):
 
 
 @transaction
-async def preparing_db(connection: Connection):
+async def preparing_db(connection: Connection) -> None:
     await connection.execute(sql.create_players_table)
     await connection.execute(sql.create_counters_table)
     await connection.execute(sql.create_wallets_table)
+    await connection.execute(sql.create_storage_table)
+    seller_uuid = await connection.fetchval(sql.check_seller)
+    if not seller_uuid:
+        await connection.execute(sql.create_seller)
 
 
 @transaction
@@ -65,6 +69,8 @@ async def set_name_to_player(connection: Connection, name: str, player_uuid: str
     await connection.execute(sql.set_name_to_player, name, player_uuid)
 
 
-async def open_connection(pool: Pool, func: Callable, *args, **kwargs):
+async def open_connection(pool: Pool, func: Callable, *args, **kwargs) -> Optional[Any]:
     async with pool.acquire() as connection:
-        await func(connection=connection, *args, **kwargs)
+        val = await func(connection=connection, *args, **kwargs)
+        if val:
+            return val

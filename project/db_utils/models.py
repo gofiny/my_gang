@@ -72,3 +72,16 @@ class Player:
             "counters": self.counter.serialize()
         }
         return json.dumps(data)
+
+
+class Storage:
+    def __init__(self, data: dict, player: Player):
+        self.uuid = data["uuid"]
+        self.player = player
+        self.watch = data["watch"]
+        self.phone = data["phone"]
+        self.headphones = data["headphones"]
+        self.credit_card = data["credit_card"]
+        self.glasses = data["glasses"]
+        self.cap = data["cap"]
+        self.gloves = data["gloves"]

@@ -30,6 +30,19 @@ create_counters_table = '''CREATE TABLE IF NOT EXISTS counters
                             "total_actions" int DEFAULT 1
                         )'''
 
+create_storage_table = '''CREATE TABLE IF NOT EXISTS storage
+                          (
+                            "uuid" uuid NOT NULL PRIMARY KEY,
+                            "player" uuid NOT NULL REFERENCES "player" ("uuid") ON DELETE CASCADE,
+                            "watch" int NULL DEFAULT 0,
+                            "phone" int NULL DEFAULT 0,
+                            "headphones" int NULL DEFAULT 0,
+                            "credit_card" int NULL DEFAULT 0,
+                            "glasses" int NULL DEFAULT 0,
+                            "cap" int NULL DEFAULT 0,
+                            "gloves" int NULL DEFAULT 0
+                          ('''
+
 create_wallets_table = '''CREATE TABLE IF NOT EXISTS wallets
                           (
                              "uuid" uuid NOT NULL PRIMARY KEY,
@@ -64,7 +77,13 @@ create_new_player_with_stuff = '''WITH player as (
                                     INSERT INTO counters
                                     (
                                         uuid, player, lm_time
-                                    ) VALUES ($4, $1, $5))
+                                    ) VALUES ($4, $1, $5),
+                                  stuff as (
+                                    INSERT INTO storage
+                                    (
+                                        uuid, player
+                                    ) VALUES ($6, $1)
+                                  ))
                                   SELECT uuid FROM player'''
 
 
@@ -85,3 +104,25 @@ update_player = '''WITH players as (
                         daily_actions=$8,
                         total_actions=$9
                     WHERE player=$6'''
+
+check_seller = '''SELECT uuid FROM players WHERE name="seller"'''
+
+create_seller = '''WITH seller AS (
+                    INSERT INTO players
+                    (
+                        uuid, name
+                    ) VALUES (
+                        $1, "seller"
+                    )
+                    INSERT INTO storage 
+                    (
+                        uuid,
+                        player,
+                        watch,
+                        phone,
+                        headphones,
+                        credit_card,
+                        glasses,
+                        cap,
+                        gloves
+                    ) VALUES ($2, $1, 100, 100, 100, 100, 100, 100, 100)'''
