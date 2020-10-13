@@ -86,7 +86,6 @@ create_new_player_with_stuff = '''WITH player as (
                                   ))
                                   SELECT uuid FROM player'''
 
-
 select_name_from_players = '''SELECT name FROM players WHERE name=$1'''
 
 set_name_to_player = '''UPDATE players SET name=$1 WHERE uuid=$2'''
