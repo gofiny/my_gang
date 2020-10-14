@@ -2,7 +2,7 @@ from time import time
 from asyncpg import Connection, Record
 from asyncpg.pool import Pool
 from common_utils import exceptions
-from db_utils.models import Player
+from db_utils.models import Player, Wallet
 from typing import Optional, Callable, Any
 from uuid import uuid4
 from db_utils import sql
@@ -67,6 +67,11 @@ async def set_name_to_player(connection: Connection, name: str, player_uuid: str
     if name_exists:
         raise exceptions.NameAlreadyExists
     await connection.execute(sql.set_name_to_player, name, player_uuid)
+
+
+@transaction
+async def get_player_wallet(connection: Connection, player_uuid: str) -> Wallet:
+    return await connection.fetchrow(sql.select_wallet, player_uuid)
 
 
 async def open_connection(pool: Pool, func: Callable, *args, **kwargs) -> Optional[Any]:

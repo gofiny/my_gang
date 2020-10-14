@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import BoundFilter
 from aiogram.types import Message
 from tlg_bot import keyboards
 from db_utils import pg_queries
-from common_utils import dialogs, exceptions, stuff
+from common_utils import dialogs, exceptions
 
 
 tlg_bot = Bot(TLG_API_KEY)
@@ -60,7 +60,7 @@ async def register_name(message: Message):
     try:
         if len(message.text) > 30 or len(message.text) < 4:
             raise exceptions.NotCorrectName
-        #if stuff.name_validation(message.text):
+        # if stuff.name_validation(message.text):
         #    raise exceptions.NotCorrectName
         await pg_queries.open_connection(
             pool=web_app.pg_pool, func=pg_queries.set_name_to_player,
@@ -81,6 +81,20 @@ async def register_name(message: Message):
 async def my_profile(message: Message):
     player = message.conf["player"]
     text = dialogs.my_profile % (player.name, player.level, player.respect, 0, player.power, player.health, player.mind)
+    await message.answer(text=text)
+
+
+@dp.message_handler(text=["\U0001F4B0 Кошелек"])
+async def wallet(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    player_wallet = await pg_queries.open_connection(
+        pool=web_app.pg_pool,
+        func=pg_queries.get_player_wallet,
+        player_uuid=player.uuid
+    )
+    text = dialogs.wallet % player_wallet.dollars
+
     await message.answer(text=text)
 
 

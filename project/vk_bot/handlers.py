@@ -1,7 +1,7 @@
 from vk_api.vk import Message, VK
 from config import VK_API_KEY, VK_API_VER
 from vk_bot import keyboards
-from common_utils import dialogs, exceptions, stuff
+from common_utils import dialogs, exceptions
 from db_utils import pg_queries
 
 vk_bot = VK(VK_API_KEY, VK_API_VER)
@@ -41,7 +41,7 @@ async def register_name(message: Message):
     try:
         if len(message.text) > 30 or len(message.text) < 4:
             raise exceptions.NotCorrectName
-        #if stuff.name_validation(message.text):
+        # if stuff.name_validation(message.text):
         #    raise exceptions.NotCorrectName
         await pg_queries.open_connection(
             pool=web_app.pg_pool, func=pg_queries.set_name_to_player,
@@ -62,6 +62,20 @@ async def register_name(message: Message):
 async def my_profile(message: Message):
     player = message.player
     text = dialogs.my_profile % (player.name, player.level, player.respect, 0, player.power, player.health, player.mind)
+    await message.answer(text=text)
+
+
+@vk_bot.message_handler(payload={"command": "wallet"})
+async def wallet(message: Message):
+    player = message.player
+    web_app = message.web_app
+    player_wallet = await pg_queries.open_connection(
+        pool=web_app.pg_pool,
+        func=pg_queries.get_player_wallet,
+        player_uuid=player.uuid
+    )
+    text = dialogs.wallet % player_wallet.dollars
+
     await message.answer(text=text)
 
 

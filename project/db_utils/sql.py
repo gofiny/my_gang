@@ -125,3 +125,5 @@ create_seller = '''WITH seller AS (
                         cap,
                         gloves
                     ) VALUES ($3, $1, 100, 100, 100, 100, 100, 100, 100)'''
+
+select_wallet = '''SELECT * FROM wallet WHERE player=$1'''

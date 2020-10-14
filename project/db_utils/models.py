@@ -85,3 +85,9 @@ class Storage:
         self.glasses = data["glasses"]
         self.cap = data["cap"]
         self.gloves = data["gloves"]
+
+
+class Wallet:
+    def __init__(self, data: dict):
+        self.uuid = data["uuid"]
+        self.dollars = data["dollars"]
