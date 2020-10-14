@@ -71,7 +71,8 @@ async def set_name_to_player(connection: Connection, name: str, player_uuid: str
 
 @transaction
 async def get_player_wallet(connection: Connection, player_uuid: str) -> Wallet:
-    return await connection.fetchrow(sql.select_wallet, player_uuid)
+    wallet = await connection.fetchrow(sql.select_wallet, player_uuid)
+    return Wallet(dict(wallet))
 
 
 async def open_connection(pool: Pool, func: Callable, *args, **kwargs) -> Optional[Any]:
