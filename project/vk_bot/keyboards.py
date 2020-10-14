@@ -34,7 +34,7 @@ def home() -> Keyboard:
     keyboard = Keyboard()
     keyboard.add_button(Button(label="\U0001F464 Профиль", payload={"command": "my_profile"}))
     keyboard.add_button(Button(label="\U0001F4E6 Хранилище", payload={"command": "storage"}))
-    keyboard.add_button(Button(label="\U001F4B06 Кошелек", payload={"command": "wallet"}))
+    keyboard.add_button(Button(label="\U0001F4B0 Кошелек", payload={"command": "wallet"}))
 
     keyboard.add_empty_row()
     keyboard.add_button(Button(label="\U0001F6AA На улицу", payload={"command": "street"}, color="primary"))
