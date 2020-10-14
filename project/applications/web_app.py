@@ -167,7 +167,8 @@ class WebApp:
         if message.payload:
             payload = message.payload
             if payload.get("command"):
-                _filter = f'payload_{payload["command"]}'
+                payload = payload["command"].split()[0]
+                _filter = f'payload_{payload}'
             else:
                 _filter = f'text_{message.text}'
         else:
