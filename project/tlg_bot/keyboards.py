@@ -23,7 +23,7 @@ def home() -> ReplyKeyboardMarkup:
     keyboard.row(
         KeyboardButton("\U0001F464 Профиль"),
         KeyboardButton("\U0001F4E6 Хранилище"),
-        KeyboardButton("\U001F4B06 Кошелек")
+        KeyboardButton("\U0001F4B0 Кошелек")
     )
     keyboard.row(
         KeyboardButton("\U0001F6AA На улицу"),
