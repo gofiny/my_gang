@@ -15,9 +15,9 @@ create_players_table = '''CREATE TABLE IF NOT EXISTS players
                         "tlg_id" int NULL UNIQUE,
                         "name" varchar(35) NULL,
                         "level" int NOT NULL DEFAULT 1,
-                        "health" int NOT NULL DEFAULT 1000,
-                        "power" int NOT NULL DEFAULT 100,
-                        "mind" int NOT NULL DEFAULT 100,
+                        "health" int NOT NULL DEFAULT 100,
+                        "power" int NOT NULL DEFAULT 10,
+                        "mind" int NOT NULL DEFAULT 5,
                         "respect" int NOT NULL DEFAULT 0
                     )'''
 
@@ -86,7 +86,7 @@ create_new_player_with_stuff = '''WITH player as (
                                   )
                                   SELECT uuid FROM player'''
 
-select_name_from_players = '''SELECT name FROM players WHERE name=$1'''
+select_name_from_players = '''SELECT name FROM players WHERE LOWER(name)=LOWER($1)'''
 
 set_name_to_player = '''UPDATE players SET name=$1 WHERE uuid=$2'''
 

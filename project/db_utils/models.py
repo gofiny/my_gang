@@ -53,7 +53,7 @@ class Player:
         self.health = data["health"]
         self.power = data["power"]
         self.mind = data["mind"]
-        self.respect = ["respect"]
+        self.respect = data["respect"]
         self.states = States(**data["states"])
         self.counter = Counters(player_uuid=self.uuid, **data["counters"])
 
