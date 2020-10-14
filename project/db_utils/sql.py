@@ -126,4 +126,4 @@ create_seller = '''WITH seller AS (
                         gloves
                     ) VALUES ($3, $1, 100, 100, 100, 100, 100, 100, 100)'''
 
-select_wallet = '''SELECT * FROM wallet WHERE player=$1'''
+select_wallet = '''SELECT * FROM wallets WHERE player=$1'''
