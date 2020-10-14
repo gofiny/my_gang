@@ -30,9 +30,15 @@ def info_payload() -> Keyboard:
     return keyboard
 
 
-def test_count_buttons(button_count: int) -> Keyboard:
+def home() -> Keyboard:
     keyboard = Keyboard()
-    for num, button in enumerate(range(1, button_count)):
-        keyboard.add_button(Button(label=num))
+    keyboard.add_button(Button(label="\U0001F464 Профиль", payload={"command": "my_profile"}))
+    keyboard.add_button(Button(label="\U0001F4E6 Хранилище", payload={"command": "storage"}))
+    keyboard.add_button(Button(label="\U001F4B06 Кошелек", payload={"command": "wallet"}))
+
+    keyboard.add_empty_row()
+    keyboard.add_button(Button(label="\U0001F6AA На улицу", payload={"command": "street"}, color="primary"))
+    keyboard.add_button(Button(label="\U00002699 Насройки", payload={"command": "settings"}, color="primary"))
 
     return keyboard
+

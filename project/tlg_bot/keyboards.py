@@ -1,4 +1,4 @@
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 
 
 def main_menu() -> ReplyKeyboardMarkup:
@@ -13,6 +13,20 @@ def connect() -> ReplyKeyboardMarkup:
     return keyboard
 
 
-def empty_keyboard() -> ReplyKeyboardMarkup:
+def empty_keyboard() -> ReplyKeyboardRemove:
+    keyboard = ReplyKeyboardRemove()
+    return keyboard
+
+
+def home() -> ReplyKeyboardMarkup:
     keyboard = ReplyKeyboardMarkup()
+    keyboard.row(
+        KeyboardButton("\U0001F464 Профиль"),
+        KeyboardButton("\U0001F4E6 Хранилище"),
+        KeyboardButton("\U001F4B06 Кошелек")
+    )
+    keyboard.row(
+        KeyboardButton("\U0001F6AA На улицу"),
+        KeyboardButton("\U00002699 Насройки")
+    )
     return keyboard

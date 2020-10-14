@@ -66,7 +66,7 @@ async def register_name(message: Message):
             pool=web_app.pg_pool, func=pg_queries.set_name_to_player,
             name=message.text, player_uuid=player.uuid)
         text = dialogs.welcome % message.text
-        keyboard = keyboards.main_menu()
+        keyboard = keyboards.home()
         player.states.main_state = 1
         player.name = message.text
         await web_app.add_player_to_redis(player)
