@@ -77,6 +77,13 @@ async def register_name(message: Message):
     await message.answer(text=text, reply_markup=keyboard)
 
 
+@dp.message_handler(text=["\U0001F464 Профиль"])
+async def my_profile(message: Message):
+    player = message.conf["player"]
+    text = dialogs.my_profile % (player.name, player.level, player.respect, 0, player.power, player.health, player.mind)
+    await message.answer(text=text)
+
+
 @dp.message_handler()
 async def other_messages(message: Message):
     await message.answer(text="It`s work!")

@@ -58,6 +58,13 @@ async def register_name(message: Message):
     await message.answer(text=text, keyboard=keyboard)
 
 
+@vk_bot.message_handler(payload={"command": "my_profile"})
+async def my_profile(message: Message):
+    player = message.player
+    text = dialogs.my_profile % (player.name, player.level, player.respect, 0, player.power, player.health, player.mind)
+    await message.answer(text=text)
+
+
 @vk_bot.message_handler(text="*")
 async def other(message: Message):
     await vk_bot.send_message(user_ids=message.from_id, text="Не знаю что ответить")

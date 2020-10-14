@@ -38,7 +38,7 @@ def home() -> Keyboard:
 
     keyboard.add_empty_row()
     keyboard.add_button(Button(label="\U0001F6AA На улицу", payload={"command": "street"}, color="primary"))
-    keyboard.add_button(Button(label="\U00002699 Насройки", payload={"command": "settings"}, color="primary"))
+    keyboard.add_button(Button(label="\U00002699 Настройки", payload={"command": "settings"}, color="primary"))
 
     return keyboard
 

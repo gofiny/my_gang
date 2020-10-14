@@ -19,7 +19,7 @@ def empty_keyboard() -> ReplyKeyboardRemove:
 
 
 def home() -> ReplyKeyboardMarkup:
-    keyboard = ReplyKeyboardMarkup()
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.row(
         KeyboardButton("\U0001F464 Профиль"),
         KeyboardButton("\U0001F4E6 Хранилище"),
@@ -27,6 +27,6 @@ def home() -> ReplyKeyboardMarkup:
     )
     keyboard.row(
         KeyboardButton("\U0001F6AA На улицу"),
-        KeyboardButton("\U00002699 Насройки")
+        KeyboardButton("\U00002699 Настройки")
     )
     return keyboard
