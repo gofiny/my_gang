@@ -41,4 +41,3 @@ def home() -> Keyboard:
     keyboard.add_button(Button(label="\U00002699 Настройки", payload={"command": "settings"}, color="primary"))
 
     return keyboard
-

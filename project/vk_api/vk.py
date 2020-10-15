@@ -1,6 +1,6 @@
 from aiohttp import ClientSession
 from db_utils.models import Player
-from typing import Union, Optional, List, Callable
+from typing import Union, List, Callable
 from random import getrandbits, choice
 from typing import Optional
 import json

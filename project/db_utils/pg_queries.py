@@ -1,8 +1,8 @@
 from time import time
-from asyncpg import Connection, Record
+from asyncpg import Connection
 from asyncpg.pool import Pool
 from common_utils import exceptions
-from db_utils.models import Player, Wallet
+from db_utils.models import Player, Wallet, Storage, States, Counters
 from typing import Optional, Callable, Any
 from uuid import uuid4
 from db_utils import sql
@@ -40,15 +40,11 @@ async def get_player_uuid(connection: Connection, user_id: int, prefix: str) -> 
 @transaction
 async def get_player_with_stuff(connection: Connection, player_uuid: str) -> Player:
     player_data = await connection.fetchrow(sql.select_player_and_stuff, player_uuid)
-    states = {"main_state": 0}
-    counters = {
-        "lm_time": player_data["lm_time"],
-        "daily_actions": player_data["daily_actions"],
-        "total_actions": player_data["total_actions"]
-    }
     player_data = dict(player_data)
-    player_data["states"] = states
-    player_data["counters"] = counters
+    player_data["states"] = States({"main_state": 0})
+    player_data["counters"] = Counters(player_data)
+    player_data["wallet"] = Wallet(player_data)
+    player_data["storage"] = Storage(player_data)
     return Player(player_data)
 
 

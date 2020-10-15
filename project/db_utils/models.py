@@ -3,12 +3,10 @@ from typing import Union
 
 
 class Counters:
-    def __init__(self, player_uuid: str, **kwargs):
-        params = {**kwargs}
-        self.player = player_uuid
-        self.lm_time = params["lm_time"]
-        self.daily_actions = params["daily_actions"]
-        self.total_actions = params["total_actions"]
+    def __init__(self, data: dict):
+        self.lm_time = data["lm_time"]
+        self.daily_actions = data["daily_actions"]
+        self.total_actions = data["total_actions"]
 
     def serialize(self) -> dict:
         data = {
@@ -20,15 +18,8 @@ class Counters:
 
 
 class States:
-    def __init__(self, **kwargs):
-        params = {**kwargs}
-        self.main_state = params["main_state"]
-
-    def serialize(self) -> dict:
-        data = {
-            "main_state": self.main_state
-        }
-        return data
+    def __init__(self, data: dict):
+        self.main_state = data["main_state"]
 
     @property
     def all_states(self) -> dict:
@@ -37,14 +28,71 @@ class States:
         }
         return states
 
+    def serialize(self) -> dict:
+        return self.all_states
+
     def is_that_state(self, state_name: str, value: int) -> bool:
         return self.all_states.get(state_name) == value
+
+
+class Storage:
+    def __init__(self, data: dict):
+        self.uuid = data["storage_uuid"]
+        self.watch = data["watch"]
+        self.phone = data["phone"]
+        self.headphones = data["headphones"]
+        self.credit_card = data["credit_card"]
+        self.glasses = data["glasses"]
+        self.cap = data["cap"]
+        self.gloves = data["gloves"]
+
+    @property
+    def all_stuff(self) -> dict:
+        stuff = {
+            "watch": self.watch,
+            "phone": self.phone,
+            "headphones": self.headphones,
+            "credit_card": self.credit_card,
+            "glasses": self.glasses,
+            "cap": self.cap,
+            "gloves": self.gloves
+        }
+
+        return stuff
+
+    def serialize(self) -> dict:
+        return self.all_stuff
+
+
+class Wallet:
+    def __init__(self, data: dict):
+        self.uuid = data["wallet_uuid"]
+        self.dollars = data["dollars"]
+
+    @property
+    def all_currency(self) -> dict:
+        currency = {
+            "dollars": self.dollars
+        }
+        return currency
+
+    def serialize(self) -> dict:
+        return self.all_currency
 
 
 class Player:
     def __init__(self, data: Union[dict, str], need_deserialize: bool = False):
         if need_deserialize:
             data = json.loads(data)
+            self.states = States(data=data["states"])
+            self.counter = Counters(data=data["counters"])
+            self.wallet = Wallet(data=data["wallet"])
+            self.storage = Storage(data=data["storage"])
+        else:
+            self.states = data["states"]
+            self.counter = data["counters"]
+            self.wallet = data["wallet"]
+            self.storage = data["storage"]
         self.uuid = str(data["player_uuid"])
         self.vk_id = data["vk_id"]
         self.tlg_id = data["tlg_id"]
@@ -54,8 +102,6 @@ class Player:
         self.power = data["power"]
         self.mind = data["mind"]
         self.respect = data["respect"]
-        self.states = States(**data["states"])
-        self.counter = Counters(player_uuid=self.uuid, **data["counters"])
 
     def serialize(self) -> str:
         data = {
@@ -69,25 +115,8 @@ class Player:
             "mind": self.mind,
             "respect": self.respect,
             "states": self.states.serialize(),
-            "counters": self.counter.serialize()
+            "counters": self.counter.serialize(),
+            "wallet": self.wallet.serialize(),
+            "storage": self.storage.serialize()
         }
         return json.dumps(data)
-
-
-class Storage:
-    def __init__(self, data: dict, player: Player):
-        self.uuid = data["uuid"]
-        self.player = player
-        self.watch = data["watch"]
-        self.phone = data["phone"]
-        self.headphones = data["headphones"]
-        self.credit_card = data["credit_card"]
-        self.glasses = data["glasses"]
-        self.cap = data["cap"]
-        self.gloves = data["gloves"]
-
-
-class Wallet:
-    def __init__(self, data: dict):
-        self.uuid = data["uuid"]
-        self.dollars = data["dollars"]

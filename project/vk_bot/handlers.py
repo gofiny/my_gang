@@ -68,13 +68,7 @@ async def my_profile(message: Message):
 @vk_bot.message_handler(payload={"command": "wallet"})
 async def wallet(message: Message):
     player = message.player
-    web_app = message.web_app
-    player_wallet = await pg_queries.open_connection(
-        pool=web_app.pg_pool,
-        func=pg_queries.get_player_wallet,
-        player_uuid=player.uuid
-    )
-    text = dialogs.wallet % player_wallet.dollars
+    text = dialogs.wallet % player.wallet.dollars
 
     await message.answer(text=text)
 
