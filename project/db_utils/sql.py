@@ -1,13 +1,11 @@
 select_pl_uuid_by_user_id = 'SELECT uuid FROM players WHERE %s_id=$1'
 
-select_player_and_stuff = '''SELECT pl.uuid as player_uuid,
-                                pl.vk_id, pl.tlg_id, pl.name, pl.health,
-                                pl.power, pl.mind, pl.respect, pl.level,
-                                co.*, w.uuid as wallet_uuid, w.dollars,
+select_player_and_stuff = '''SELECT pl.uuid as player_uuid, pl.*,
+                                co.*, w.uuid as wallet_uuid, w.*,
                                 s.uuid as storage_uuid, s.*
                              FROM players pl
-                                 LEFT JOIN counters co ON pl.uuid=co.player,
-                                 LEFT JOIN wallets w ON pl.uuid=w.player,
+                                 LEFT JOIN counters co ON pl.uuid=co.player
+                                 LEFT JOIN wallets w ON pl.uuid=w.player
                                  LEFT JOIN storage s ON pl.uuid=s.player
                              WHERE pl.uuid=$1'''
 
