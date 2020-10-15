@@ -41,11 +41,14 @@ async def get_player_uuid(connection: Connection, user_id: int, prefix: str) -> 
 async def get_player_with_stuff(connection: Connection, player_uuid: str) -> Player:
     player_data = await connection.fetchrow(sql.select_player_and_stuff, player_uuid)
     player_data = dict(player_data)
-    player_data["states"] = States({"main_state": 0})
-    player_data["counters"] = Counters(player_data)
-    player_data["wallet"] = Wallet(player_data)
-    player_data["storage"] = Storage(player_data)
-    return Player(player_data)
+    player = Player(
+        data=player_data,
+        states=States({"main_state": 0}),
+        counters=Counters(player_data),
+        wallet=Wallet(player_data),
+        storage=Storage(player_data)
+    )
+    return player
 
 
 @transaction

@@ -8,13 +8,17 @@ class Counters:
         self.daily_actions = data["daily_actions"]
         self.total_actions = data["total_actions"]
 
-    def serialize(self) -> dict:
+    @property
+    def all_counters(self) -> dict:
         data = {
             "lm_time": self.lm_time,
             "daily_actions": self.daily_actions,
             "total_actions": self.total_actions
         }
         return data
+
+    def serialize(self) -> str:
+        return json.dumps(self.all_counters)
 
 
 class States:
@@ -28,8 +32,8 @@ class States:
         }
         return states
 
-    def serialize(self) -> dict:
-        return self.all_states
+    def serialize(self) -> str:
+        return json.dumps(self.all_states)
 
     def is_that_state(self, state_name: str, value: int) -> bool:
         return self.all_states.get(state_name) == value
@@ -60,8 +64,8 @@ class Storage:
 
         return stuff
 
-    def serialize(self) -> dict:
-        return self.all_stuff
+    def serialize(self) -> str:
+        return json.dumps(self.all_stuff)
 
 
 class Wallet:
@@ -76,23 +80,17 @@ class Wallet:
         }
         return currency
 
-    def serialize(self) -> dict:
-        return self.all_currency
+    def serialize(self) -> str:
+        return json.dumps(self.all_currency)
 
 
 class Player:
-    def __init__(self, data: Union[dict, str], need_deserialize: bool = False):
+    def __init__(self, data: Union[dict, str],
+                 states: States, wallet: Wallet,
+                 counters: Counters, storage: Storage,
+                 need_deserialize: bool = False):
         if need_deserialize:
             data = json.loads(data)
-            self.states = States(data=data["states"])
-            self.counter = Counters(data=data["counters"])
-            self.wallet = Wallet(data=data["wallet"])
-            self.storage = Storage(data=data["storage"])
-        else:
-            self.states = data["states"]
-            self.counter = data["counters"]
-            self.wallet = data["wallet"]
-            self.storage = data["storage"]
         self.uuid = str(data["player_uuid"])
         self.vk_id = data["vk_id"]
         self.tlg_id = data["tlg_id"]
@@ -102,8 +100,13 @@ class Player:
         self.power = data["power"]
         self.mind = data["mind"]
         self.respect = data["respect"]
+        self.states = states
+        self.counters = counters
+        self.wallet = wallet
+        self.storage = storage
 
-    def serialize(self) -> str:
+    @property
+    def all_params(self):
         data = {
             "player_uuid": self.uuid,
             "vk_id": self.vk_id,
@@ -114,9 +117,8 @@ class Player:
             "power": self.power,
             "mind": self.mind,
             "respect": self.respect,
-            "states": self.states.serialize(),
-            "counters": self.counter.serialize(),
-            "wallet": self.wallet.serialize(),
-            "storage": self.storage.serialize()
         }
-        return json.dumps(data)
+        return data
+
+    def serialize(self) -> str:
+        return json.dumps(self.all_params)
