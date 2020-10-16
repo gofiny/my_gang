@@ -17,7 +17,7 @@ async def add_player(pool: Redis, player: Player) -> None:
 
 
 async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
-    #data = await pool.get(f"player:{player_uuid}", encoding="utf-8")
+    # data = await pool.get(f"player:{player_uuid}", encoding="utf-8")
     transaction = pool.multi_exec()
     transaction.hgetall(key=f"player:{player_uuid}", encoding="utf-8")
     transaction.hgetall(key=f"wallet:{player_uuid}", encoding="utf-8")
@@ -25,5 +25,5 @@ async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
     transaction.hgetall(key=f"storage:{player_uuid}", encoding="utf-8")
     data = await transaction.execute()
     if data[0]:
-        return Player(data, need_deserialize=True)
+        return Player(data, wallet=data[1], counters=data[2], storage=data[3], need_deserialize=True)
     return data
