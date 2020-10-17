@@ -25,7 +25,7 @@ async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
     transaction.hgetall(key=f"counters:{player_uuid}", encoding="utf-8")
     transaction.hgetall(key=f"storage:{player_uuid}", encoding="utf-8")
     data = await transaction.execute()
-    logger.info(f"{data}")
+    logger.debug(f"{data[0]}")
     if data[0]:
         return Player(data, wallet=data[1], counters=data[2], storage=data[3], need_deserialize=True)
     return data
