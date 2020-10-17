@@ -1,3 +1,4 @@
+from loguru import logger
 from aioredis import Redis
 from db_utils.models import Player
 from typing import Optional
@@ -24,6 +25,7 @@ async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
     transaction.hgetall(key=f"counters:{player_uuid}", encoding="utf-8")
     transaction.hgetall(key=f"storage:{player_uuid}", encoding="utf-8")
     data = await transaction.execute()
+    logger.info(f"{data}")
     if data[0]:
         return Player(data, wallet=data[1], counters=data[2], storage=data[3], need_deserialize=True)
     return data

@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+from loguru import logger
 from vk_bot.handlers import vk_bot
 from tlg_bot.handlers import dp
 from applications.web_app import WebApp
@@ -9,7 +10,8 @@ from config import (
     SECRET_STR,
     RETURING_CALLBACK_STR,
     PG_DESTINATION,
-    REDIS_ADDRESS
+    REDIS_ADDRESS,
+    LOGS_DIR
 )
 
 
@@ -18,6 +20,9 @@ if __name__ == "__main__":
     parser.add_argument("--path")
     args = parser.parse_args()
     loop = asyncio.get_event_loop()
+    logger.add(f"{LOGS_DIR}/info.log", format="{time:YYYY-MM-DD at HH:mm:ss} | {message}", level="INFO")
+    logger.add(f"{LOGS_DIR}/debug.log", format="{time:YYYY-MM-DD at HH:mm:ss} | {message}", level="DEBUG")
+    logger.add(f"{LOGS_DIR}/error.log", format="{time:YYYY-MM-DD at HH:mm:ss} | {message}", level="ERROR")
     app = WebApp(
         tlg_address_prefix=TLG_ADDRESS_PREFIX,
         vk_address_prefix=VK_ADDRESS_PREFIX,

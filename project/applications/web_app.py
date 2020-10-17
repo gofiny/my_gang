@@ -4,6 +4,7 @@ import aioredis
 import itertools
 import functools
 import json
+from loguru import logger
 from common_utils import exceptions
 from asyncpg import Connection
 from asyncpg.pool import Pool
