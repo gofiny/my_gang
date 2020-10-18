@@ -132,8 +132,8 @@ class Player:
             "respect": self.respect,
             "states": self.states.all_states,
             "counters": self.counters.all_counters,
-            "wallet": self.wallet.serialize(),
-            "storage": self.storage.serialize()
+            "wallet": self.wallet.data_to_serialize,
+            "storage": self.storage.data_to_serialize
         }
         return data
 
