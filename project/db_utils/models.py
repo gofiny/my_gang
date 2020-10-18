@@ -51,6 +51,20 @@ class Storage:
         self.gloves = data["gloves"]
 
     @property
+    def present_stuff(self):
+        stuff = {
+            "\U0000231A watch": self.watch,
+            "\U0001F4F1 phone": self.phone,
+            "\U0001F3A7 headphones": self.headphones,
+            "\U0001F4B3 credit_card": self.credit_card,
+            "\U0001F453 glasses": self.glasses,
+            "\U0001F9E2 cap": self.cap,
+            "\U0001F9E4 gloves": self.gloves
+        }
+
+        return stuff
+
+    @property
     def all_stuff(self) -> dict:
         stuff = {
             "watch": self.watch,

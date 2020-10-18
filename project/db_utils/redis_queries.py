@@ -1,4 +1,3 @@
-from loguru import logger
 from aioredis import Redis
 from db_utils.models import Player
 from typing import Optional

@@ -2,7 +2,7 @@ from time import time
 from asyncpg import Connection
 from asyncpg.pool import Pool
 from common_utils import exceptions
-from db_utils.models import Player, Wallet, Storage, States, Counters
+from db_utils.models import Player, Wallet
 from typing import Optional, Callable, Any
 from uuid import uuid4
 from db_utils import sql

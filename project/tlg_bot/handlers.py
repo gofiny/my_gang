@@ -40,7 +40,7 @@ async def connect(message: Message, player_uuid: str):
         player = await web_app.get_player_from_pg(connection=connection, player_uuid=player_uuid)
         player.states.main_state = 1
     await web_app.add_player_to_redis(player)
-    await message.answer(text=dialogs.main_menu, reply_markup=keyboards.main_menu())
+    await message.answer(text=dialogs.home, reply_markup=keyboards.home())
 
 
 @dp.message_handler(commands=["start"])
@@ -49,7 +49,7 @@ async def start(message: Message):
     player = message.conf["player"]
     player.states.main_state = 1
     await web_app.add_player_to_redis(player)
-    await message.answer(text=dialogs.main_menu, reply_markup=keyboards.main_menu())
+    await message.answer(text=dialogs.home, reply_markup=keyboards.home())
 
 
 @dp.message_handler(pl_state={"main_state": 0})
@@ -89,6 +89,13 @@ async def wallet(message: Message):
     player = message.conf["player"]
     text = dialogs.wallet % player.wallet.dollars
 
+    await message.answer(text=text)
+
+
+@dp.message_handler(text=["\U0001F4E6 Хранилище"])
+async def storage(message: Message):
+    player = message.conf["player"]
+    text = dialogs.storage(player)
     await message.answer(text=text)
 
 
