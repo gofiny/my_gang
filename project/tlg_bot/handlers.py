@@ -80,7 +80,7 @@ async def register_name(message: Message):
 @dp.message_handler(text=["\U0001F464 Профиль"])
 async def my_profile(message: Message):
     player = message.conf["player"]
-    text = dialogs.my_profile % (player.name, player.level, player.respect,
+    text = dialogs.my_profile % (player.name, player.level.level, player.respect,
                                  player.level.level_max, player.power, player.health, player.mind)
     await message.answer(text=text)
 
