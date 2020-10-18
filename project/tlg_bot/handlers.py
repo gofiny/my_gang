@@ -100,6 +100,17 @@ async def storage(message: Message):
     await message.answer(text=text)
 
 
+@dp.message_handler(text=["\U0001F3E0 Домой"])
+async def home(message: Message):
+    await message.answer(text=dialogs.home, reply_markup=keyboards.home())
+
+
+@dp.message_handler(text=["\U0001F6AA На улицу"])
+async def street(message: Message):
+    keyboard = keyboards.street(level=message.conf["player"].level)
+    await message.answer(text=dialogs.street, reply_markup=keyboard)
+
+
 @dp.message_handler()
 async def other_messages(message: Message):
     await message.answer(text="It`s work!")

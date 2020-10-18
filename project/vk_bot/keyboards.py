@@ -1,4 +1,5 @@
 from vk_api.vk import Keyboard, Button
+from db_utils.models import Levels
 
 
 def main_menu() -> Keyboard:
@@ -38,6 +39,27 @@ def home() -> Keyboard:
 
     keyboard.add_empty_row()
     keyboard.add_button(Button(label="\U0001F6AA На улицу", payload={"command": "street"}, color="primary"))
+    keyboard.add_button(Button(label="\U00002699 Настройки", payload={"command": "settings"}, color="primary"))
+
+    return keyboard
+
+
+def street(level: Levels) -> Keyboard:
+    keyboard = Keyboard()
+    keyboard.add_button(Button(label="\U0001F919 Движухи", payload={"command": "job"}))
+    keyboard.add_button(Button(label="\U0001F199 Прокачка", payload={"command": "upgrade"}))
+    keyboard.add_empty_row()
+
+    keyboard.add_button(Button(label="\U0001F4B0 Барыга", payload={"command": "seller"}))
+
+    if level.level < 3:
+        keyboard.add_button(Button(label="\U0001F44A Разборки", payload={"command": "lock 3"}))
+    else:
+        keyboard.add_button(Button(label="\U0001F512 Разборки", payload={"command": "fights"}))
+
+    keyboard.add_empty_row()
+    keyboard.add_button(Button(label="\U0001F3E0 Домой", payload={"command": "home"}, color="primary"))
+    keyboard.add_button(Button(label="\U0001F5FA Карта", payload={"command": "map"}, color="primary"))
     keyboard.add_button(Button(label="\U00002699 Настройки", payload={"command": "settings"}, color="primary"))
 
     return keyboard

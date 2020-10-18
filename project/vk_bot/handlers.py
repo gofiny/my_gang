@@ -81,6 +81,17 @@ async def storage(message: Message):
     await message.answer(text=text)
 
 
+@vk_bot.message_handler(payload={"command": "home"})
+async def home(message: Message):
+    await message.answer(text=dialogs.home, keyboard=keyboards.home())
+
+
+@vk_bot.message_handler(payload={"command": "street"})
+async def street(message: Message):
+    keyboard = keyboards.street(level=message.player.level)
+    await message.answer(text=dialogs.street, keyboard=keyboard)
+
+
 @vk_bot.message_handler(text="*")
 async def other(message: Message):
     await vk_bot.send_message(user_ids=message.from_id, text="Не знаю что ответить")
