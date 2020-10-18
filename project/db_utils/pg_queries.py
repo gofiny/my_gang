@@ -42,12 +42,7 @@ async def get_player_with_stuff(connection: Connection, player_uuid: str) -> Pla
     player_data = await connection.fetchrow(sql.select_player_and_stuff, player_uuid)
     player_data = dict(player_data)
     player_data["states"] = {"main_state": 0}
-    player = Player(
-        data=player_data,
-        counters=Counters(player_data),
-        wallet=Wallet(player_data),
-        storage=Storage(player_data)
-    )
+    player = Player(data=player_data)
     return player
 
 

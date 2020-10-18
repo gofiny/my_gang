@@ -85,9 +85,7 @@ class Wallet:
 
 
 class Player:
-    def __init__(self, data: Union[dict, str],
-                 wallet: Wallet, counters: Counters,
-                 storage: Storage, need_deserialize: bool = False):
+    def __init__(self, data: Union[dict, str], need_deserialize: bool = False, from_redis: bool = False):
         if need_deserialize:
             data = json.loads(data)
         self.uuid = str(data["player_uuid"])
@@ -99,10 +97,14 @@ class Player:
         self.power = data["power"]
         self.mind = data["mind"]
         self.respect = data["respect"]
-        self.states = States["states"]
-        self.counters = counters
-        self.wallet = wallet
-        self.storage = storage
+        self.states = States(data["states"])
+        if from_redis:
+            self.counters = Counters(data["counters"])
+            self.wallet = Wallet(data["wallet"])
+            self.storage = Storage(data["storage"])
+        self.counters = Counters(data)
+        self.wallet = Wallet(data)
+        self.storage = Storage(data)
 
     @property
     def all_params(self):
@@ -116,7 +118,10 @@ class Player:
             "power": self.power,
             "mind": self.mind,
             "respect": self.respect,
-            "states": self.states.all_states
+            "states": self.states.all_states,
+            "counters": self.counters.all_counters,
+            "wallet": self.wallet.all_currency,
+            "storage": self.storage.all_stuff
         }
         return data
 
