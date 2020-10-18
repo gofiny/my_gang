@@ -1,5 +1,5 @@
 import json
-from typing import Union
+from typing import Union, Optional
 
 
 class Levels:
@@ -21,12 +21,30 @@ class Levels:
         self.respect = respect
         self.current_level = self.LEVELS[self.level]
 
-    def how_much_is_left(self):
+    def _set_current_level(self):
+        self.current_level = self.LEVELS[self.level]
+
+    def _level_up(self) -> None:
+        self.level += 1
+        self._set_current_level()
+
+    @property
+    def how_much_is_left(self) -> int:
         return self.current_level["max"] - (self.respect + 1)
 
     @property
-    def level_max(self):
+    def level_max(self) -> int:
         return self.current_level["max"]
+
+    def will_new_level(self) -> bool:
+        return self.how_much_is_left <= 0
+
+    def add_respect(self, count: int) -> Optional[int]:
+        self.respect += count
+        is_new_level = self.will_new_level()
+        if is_new_level:
+            self._level_up()
+            return self.level
 
 
 class Counters:
@@ -78,7 +96,7 @@ class Storage:
         self.gloves = data["gloves"]
 
     @property
-    def present_stuff(self):
+    def present_stuff(self) -> dict:
         stuff = {
             "\U0000231A часы": self.watch,
             "\U0001F4F1 телефоны": self.phone,
@@ -133,7 +151,7 @@ class Wallet:
         data["wallet_uuid"] = self.uuid
         return data
 
-    def serialize(self):
+    def serialize(self) -> str:
         return json.dumps(self.data_to_serialize)
 
 
@@ -159,8 +177,15 @@ class Player:
         self.level = Levels(level=data["level"], respect=self.respect)
         self.states = States(data["states"])
 
+    def add_respect(self, count: int) -> Optional[int]:
+        self.respect += count
+        new_level = self.level.add_respect(count)
+        if new_level:
+            self.level = new_level
+            return new_level
+
     @property
-    def all_params(self):
+    def all_params(self) -> dict:
         data = {
             "player_uuid": self.uuid,
             "vk_id": self.vk_id,
