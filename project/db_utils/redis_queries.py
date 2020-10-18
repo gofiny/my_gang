@@ -5,7 +5,7 @@ from typing import Optional
 
 
 async def add_player(pool: Redis, player: Player) -> None:
-    await pool.hmset_dict(f"player:{player.uuid}", player.all_params)
+    await pool.hmset_dict(f"player:{player.uuid}", **player.all_params)
 
 
 async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
