@@ -64,10 +64,14 @@ class Storage:
 
         return stuff
 
-    def serialize(self) -> str:
+    @property
+    def data_to_serialize(self) -> dict:
         data = self.all_stuff
         data["storage_uuid"] = self.uuid
-        return json.dumps(data)
+        return data
+
+    def serialize(self) -> str:
+        return json.dumps(self.data_to_serialize)
 
 
 class Wallet:
@@ -82,10 +86,14 @@ class Wallet:
         }
         return currency
 
-    def serialize(self) -> str:
+    @property
+    def data_to_serialize(self) -> dict:
         data = self.all_currency
         data["wallet_uuid"] = self.uuid
-        return json.dumps(data)
+        return data
+
+    def serialize(self):
+        return json.dumps(self.data_to_serialize)
 
 
 class Player:
