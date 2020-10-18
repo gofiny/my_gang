@@ -41,7 +41,7 @@ class States:
 
 class Storage:
     def __init__(self, data: dict):
-        self.uuid = data["storage_uuid"]
+        self.uuid = str(data["storage_uuid"])
         self.watch = data["watch"]
         self.phone = data["phone"]
         self.headphones = data["headphones"]
@@ -76,7 +76,7 @@ class Storage:
 
 class Wallet:
     def __init__(self, data: dict):
-        self.uuid = data["wallet_uuid"]
+        self.uuid = str(data["wallet_uuid"])
         self.dollars = data["dollars"]
 
     @property
