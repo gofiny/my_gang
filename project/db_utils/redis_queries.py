@@ -5,6 +5,7 @@ from typing import Optional
 
 
 async def add_player(pool: Redis, player: Player) -> None:
+    logger.debug(f"{player.all_params}")
     await pool.hmset_dict(f"player:{player.uuid}", **player.all_params)
 
 
