@@ -53,13 +53,13 @@ class Storage:
     @property
     def present_stuff(self):
         stuff = {
-            "\U0000231A watch": self.watch,
-            "\U0001F4F1 phone": self.phone,
-            "\U0001F3A7 headphones": self.headphones,
-            "\U0001F4B3 credit_card": self.credit_card,
-            "\U0001F453 glasses": self.glasses,
-            "\U0001F9E2 cap": self.cap,
-            "\U0001F9E4 gloves": self.gloves
+            "\U0000231A часы": self.watch,
+            "\U0001F4F1 телефоны": self.phone,
+            "\U0001F3A7 наушники": self.headphones,
+            "\U0001F4B3 кредитки": self.credit_card,
+            "\U0001F453 очки": self.glasses,
+            "\U0001F9E2 кепки": self.cap,
+            "\U0001F9E4 перчатки": self.gloves
         }
 
         return stuff
