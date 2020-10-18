@@ -65,7 +65,9 @@ class Storage:
         return stuff
 
     def serialize(self) -> str:
-        return json.dumps(self.all_stuff)
+        data = self.all_stuff
+        data["uuid"] = self.uuid
+        return json.dumps(data)
 
 
 class Wallet:
@@ -81,7 +83,9 @@ class Wallet:
         return currency
 
     def serialize(self) -> str:
-        return json.dumps(self.all_currency)
+        data = self.all_currency
+        data["uuid"] = self.uuid
+        return json.dumps(data)
 
 
 class Player:
