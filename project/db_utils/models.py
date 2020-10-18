@@ -102,9 +102,10 @@ class Player:
             self.counters = Counters(data["counters"])
             self.wallet = Wallet(data["wallet"])
             self.storage = Storage(data["storage"])
-        self.counters = Counters(data)
-        self.wallet = Wallet(data)
-        self.storage = Storage(data)
+        else:
+            self.counters = Counters(data)
+            self.wallet = Wallet(data)
+            self.storage = Storage(data)
 
     @property
     def all_params(self):
