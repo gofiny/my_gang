@@ -61,7 +61,8 @@ async def register_name(message: Message):
 @vk_bot.message_handler(payload={"command": "my_profile"})
 async def my_profile(message: Message):
     player = message.player
-    text = dialogs.my_profile % (player.name, player.level, player.respect, 0, player.power, player.health, player.mind)
+    text = dialogs.my_profile % (player.name, player.level, player.respect,
+                                 player.level.level_max, player.power, player.health, player.mind)
     await message.answer(text=text)
 
 

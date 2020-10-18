@@ -2,6 +2,33 @@ import json
 from typing import Union
 
 
+class Levels:
+    LEVELS = {
+        1: {"min": 0, "max": 200},
+        2: {"min": 201, "max": 600},
+        3: {"min": 601, "max": 1500},
+        4: {"min": 1501, "max": 3000},
+        5: {"min": 3001, "max": 6000},
+        6: {"min": 6001, "max": 10000},
+        7: {"min": 10001, "max": 15000},
+        8: {"min": 15001, "max": 23000},
+        9: {"min": 23001, "max": 33000},
+        10: {"min": 33001, "max": 100000}
+    }
+
+    def __init__(self, level: int, respect: int):
+        self.level = level
+        self.respect = respect
+        self.current_level = self.LEVELS[self.level]
+
+    def how_much_is_left(self):
+        return self.current_level["max"] - (self.respect + 1)
+
+    @property
+    def level_max(self):
+        return self.current_level["max"]
+
+
 class Counters:
     def __init__(self, data: dict):
         self.lm_time = data["lm_time"]
@@ -125,11 +152,11 @@ class Player:
         self.vk_id = data["vk_id"]
         self.tlg_id = data["tlg_id"]
         self.name = data["name"]
-        self.level = data["level"]
         self.health = data["health"]
         self.power = data["power"]
         self.mind = data["mind"]
         self.respect = data["respect"]
+        self.level = Levels(level=data["level"], respect=self.respect)
         self.states = States(data["states"])
 
     @property
@@ -139,7 +166,7 @@ class Player:
             "vk_id": self.vk_id,
             "tlg_id": self.tlg_id,
             "name": self.name,
-            "level": self.level,
+            "level": self.level.level,
             "health": self.health,
             "power": self.power,
             "mind": self.mind,
