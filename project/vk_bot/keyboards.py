@@ -50,7 +50,7 @@ def street(level: Levels) -> Keyboard:
     keyboard.add_button(Button(label="\U0001F199 Прокачка", payload={"command": "upgrade"}))
     keyboard.add_empty_row()
 
-    keyboard.add_button(Button(label="\U0001F4B0 Барыга", payload={"command": "seller"}))
+    keyboard.add_button(Button(label="\U0001F99D Барыга", payload={"command": "seller"}))
 
     if level.level < 3:
         keyboard.add_button(Button(label="\U0001F512 Разборки", payload={"command": "lock 3"}))

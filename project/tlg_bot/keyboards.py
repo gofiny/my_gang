@@ -40,7 +40,7 @@ def street(level: Levels):
         KeyboardButton("\U0001F199 Прокачка")
     )
     keyboard.row(
-        KeyboardButton("\U0001F4B0 Барыга"),
+        KeyboardButton("\U0001F99D Барыга"),
         KeyboardButton("\U0001F44A Разборки") if level.level > 3 else KeyboardButton("\U0001F512 Разборки")
     )
     keyboard.row(
