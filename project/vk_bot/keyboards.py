@@ -53,9 +53,9 @@ def street(level: Levels) -> Keyboard:
     keyboard.add_button(Button(label="\U0001F4B0 Барыга", payload={"command": "seller"}))
 
     if level.level < 3:
-        keyboard.add_button(Button(label="\U0001F44A Разборки", payload={"command": "lock 3"}))
+        keyboard.add_button(Button(label="\U0001F512 Разборки", payload={"command": "lock 3"}))
     else:
-        keyboard.add_button(Button(label="\U0001F512 Разборки", payload={"command": "fights"}))
+        keyboard.add_button(Button(label="\U0001F44A Разборки", payload={"command": "fights"}))
 
     keyboard.add_empty_row()
     keyboard.add_button(Button(label="\U0001F3E0 Домой", payload={"command": "home"}, color="primary"))
