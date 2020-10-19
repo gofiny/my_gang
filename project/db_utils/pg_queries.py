@@ -24,9 +24,19 @@ async def preparing_db(connection: Connection) -> None:
     await connection.execute(sql.create_counters_table)
     await connection.execute(sql.create_wallets_table)
     await connection.execute(sql.create_storage_table)
-    seller_uuid = await connection.fetchval(sql.check_seller, "seller")
-    if not seller_uuid:
-        await connection.execute(sql.create_seller, uuid4(), "seller", uuid4())
+    await connection.execute(sql.create_goods_table)
+    is_created = await connection.fetchval(sql.check_goods, "watch")
+    if not is_created:
+        goods = [
+            (uuid4(), "watch", "\U0000231A часы", 30, 50),
+            (uuid4(), "phone", "\U0001F4F1 телефоны", 30, 300),
+            (uuid4(), "headphones", "\U0001F3A7 наушники", 30, 20),
+            (uuid4(), "credit_card", "\U0001F4B3 кредитки", 30, 30),
+            (uuid4(), "glasses", "\U0001F453 очки", 30, 30),
+            (uuid4(), "cap", "\U0001F9E2 кепки", 30, 15),
+            (uuid4(), "gloves", "\U0001F9E4 перчатки", 30, 10),
+        ]
+        await connection.executemany(sql.create_goods, goods)
 
 
 @transaction

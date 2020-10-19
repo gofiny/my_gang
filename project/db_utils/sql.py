@@ -51,6 +51,15 @@ create_wallets_table = '''CREATE TABLE IF NOT EXISTS wallets
                              "dollars" int NOT NULL DEFAULT 300
                           )'''
 
+create_goods_table = '''CREATE TABLE IF NOT EXISTS goods
+                        (
+                            "uuid" uuid NOT NULL PRIMARY KEY,
+                            "name" varchar(20) NOT NULL,
+                            "present_name" varchar(20) NOT NULL,
+                            "quantity" int DEFAULT 30,
+                            "price" int NOT NULL
+                        )'''
+
 create_new_player = '''INSERT INTO players
                     (
                         "uuid",
@@ -126,5 +135,9 @@ create_seller = '''WITH seller AS (
                         cap,
                         gloves
                     ) VALUES ($3, $1, 100, 100, 100, 100, 100, 100, 100)'''
+
+check_goods = '''SELECT name FROM goods WHERE name=$1'''
+
+create_goods = '''INSERT INTO goods (uuid, name, present_name, quantity, price) VALUES ($1, $2, $3, $4, $5)'''
 
 select_wallet = '''SELECT * FROM wallets WHERE player=$1'''
