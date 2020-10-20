@@ -33,7 +33,7 @@ def home() -> ReplyKeyboardMarkup:
     return keyboard
 
 
-def street(level: Levels):
+def street():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.row(
         KeyboardButton("\U0001F919 Движухи"),
@@ -41,11 +41,22 @@ def street(level: Levels):
     )
     keyboard.row(
         KeyboardButton("\U0001F575 Барыга"),
-        KeyboardButton("\U0001F44A Разборки") if level.level > 3 else KeyboardButton("\U0001F512 Разборки")
+        KeyboardButton("\U0001F44A Разборки")
     )
     keyboard.row(
         KeyboardButton("\U0001F3E0 Домой"),
         KeyboardButton("\U0001F5FA Карта"),
         KeyboardButton("\U00002699 Настройки")
     )
+    return keyboard
+
+
+def choose_upgrade():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    keyboard.row(KeyboardButton("\U0001F4AA Сила"))
+    keyboard.row(KeyboardButton("\U00002764 Здоровье"))
+    keyboard.row(KeyboardButton("\U0001F9E0 Интеллект"))
+    keyboard.row(KeyboardButton("\U00002B05 Назад"))
+
     return keyboard

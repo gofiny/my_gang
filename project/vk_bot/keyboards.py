@@ -47,13 +47,13 @@ def home() -> Keyboard:
 def street(level: Levels) -> Keyboard:
     keyboard = Keyboard()
     keyboard.add_button(Button(label="\U0001F919 Движухи", payload={"command": "job"}))
-    keyboard.add_button(Button(label="\U0001F199 Прокачка", payload={"command": "upgrade"}))
+    keyboard.add_button(Button(label="\U0001F199 Прокачка", payload={"command": "choose_upgrade"}))
     keyboard.add_empty_row()
 
     keyboard.add_button(Button(label="\U0001F575 Барыга", payload={"command": "seller"}))
 
     if level.level < 3:
-        keyboard.add_button(Button(label="\U0001F512 Разборки", payload={"command": "lock 3"}))
+        keyboard.add_button(Button(label="\U0001F44A Разборки", payload={"command": "lock 3"}))
     else:
         keyboard.add_button(Button(label="\U0001F44A Разборки", payload={"command": "fights"}))
 
@@ -61,5 +61,21 @@ def street(level: Levels) -> Keyboard:
     keyboard.add_button(Button(label="\U0001F3E0 Домой", payload={"command": "home"}, color="primary"))
     keyboard.add_button(Button(label="\U0001F5FA Карта", payload={"command": "map"}, color="primary"))
     keyboard.add_button(Button(label="\U00002699 Настройки", payload={"command": "settings"}, color="primary"))
+
+    return keyboard
+
+
+def choose_upgrade():
+    keyboard = Keyboard()
+    keyboard.add_button(Button(label="\U0001F4AA Сила", payload={"command": "choose_power"}))
+
+    keyboard.add_empty_row()
+    keyboard.add_button(Button(label="\U00002764 Здоровье", payload={"command": "choose_health"}))
+
+    keyboard.add_empty_row()
+    keyboard.add_button(Button(label="\U0001F9E0 Интеллект", payload={"command": "choose_mind"}))
+
+    keyboard.add_empty_row()
+    keyboard.add_button(Button(label="\U00002B05 Назад", payload={"command": "street"}, color="primary"))
 
     return keyboard

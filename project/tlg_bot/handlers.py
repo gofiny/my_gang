@@ -107,8 +107,13 @@ async def home(message: Message):
 
 @dp.message_handler(text=["\U0001F6AA На улицу"])
 async def street(message: Message):
-    keyboard = keyboards.street(level=message.conf["player"].level)
+    keyboard = keyboards.street()
     await message.answer(text=dialogs.street, reply_markup=keyboard)
+
+
+@dp.message_handler(text=["\U0001F199 Прокачка"])
+async def choose_upgrade(message: Message):
+    await message.answer(text=dialogs.choose_upgrade, reply_markup=keyboards.choose_upgrade())
 
 
 @dp.message_handler()

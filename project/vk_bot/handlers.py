@@ -92,6 +92,11 @@ async def street(message: Message):
     await message.answer(text=dialogs.street, keyboard=keyboard)
 
 
+@vk_bot.message_handler(payload={"command": "choose_upgrade"})
+async def choose_upgrade(message: Message):
+    await message.answer(text=dialogs.choose_upgrade, keyboard=keyboards.choose_upgrade())
+
+
 @vk_bot.message_handler(text="*")
 async def other(message: Message):
     await vk_bot.send_message(user_ids=message.from_id, text="Не знаю что ответить")
