@@ -57,6 +57,6 @@ def choose_upgrade():
     keyboard.row(KeyboardButton("\U0001F4AA Сила"))
     keyboard.row(KeyboardButton("\U00002764 Здоровье"))
     keyboard.row(KeyboardButton("\U0001F9E0 Интеллект"))
-    keyboard.row(KeyboardButton("\U00002B05 Назад"))
+    keyboard.row(KeyboardButton("\U00002B05 На улицу"))
 
     return keyboard

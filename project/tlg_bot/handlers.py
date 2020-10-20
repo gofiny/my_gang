@@ -105,7 +105,7 @@ async def home(message: Message):
     await message.answer(text=dialogs.home, reply_markup=keyboards.home())
 
 
-@dp.message_handler(text=["\U0001F6AA На улицу"])
+@dp.message_handler(text=["\U0001F6AA На улицу", "\U00002B05 На улицу"])
 async def street(message: Message):
     keyboard = keyboards.street()
     await message.answer(text=dialogs.street, reply_markup=keyboard)
