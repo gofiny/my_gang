@@ -60,3 +60,11 @@ def choose_upgrade():
     keyboard.row(KeyboardButton("\U00002B05 На улицу"))
 
     return keyboard
+
+
+def power_active_start():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.row(KeyboardButton("\U000025B6 Начать"))
+    keyboard.row(KeyboardButton("\U00002B05 Прокачка"))
+
+    return keyboard

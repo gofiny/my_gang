@@ -12,6 +12,7 @@ my_profile = '''=== %s ===\n\U0001F31F Уровень: %s\n\U0001F91F\
 wallet = '''=== Кошелек ===\n\U0001F4B5 Доллары: %s$'''
 street = '''Выбирай куда будешь двигаться '''
 choose_upgrade = '''Выбирать что хочешь прокачать'''
+power_active_start = '''Тут будет описание прокачки'''
 
 
 def storage(player: Player):

@@ -111,9 +111,14 @@ async def street(message: Message):
     await message.answer(text=dialogs.street, reply_markup=keyboard)
 
 
-@dp.message_handler(text=["\U0001F199 Прокачка"])
+@dp.message_handler(text=["\U0001F199 Прокачка", "\U00002B05 Прокачка"])
 async def choose_upgrade(message: Message):
     await message.answer(text=dialogs.choose_upgrade, reply_markup=keyboards.choose_upgrade())
+
+
+@dp.message_handler(text=["\U0001F4AA Сила"])
+async def choose_power(message: Message):
+    await message.answer(text=dialogs.power_active_start, reply_markup=keyboards.power_active_start())
 
 
 @dp.message_handler()

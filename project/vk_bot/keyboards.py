@@ -79,3 +79,13 @@ def choose_upgrade():
     keyboard.add_button(Button(label="\U00002B05 Назад", payload={"command": "street"}, color="primary"))
 
     return keyboard
+
+
+def power_active_start():
+    keyboard = Keyboard()
+    keyboard.add_button(Button(label="\U000025B6 Начать", payload={"command": "power_active_start"}, color="positive"))
+
+    keyboard.add_empty_row()
+    keyboard.add_button(Button(label="\U00002B05 Назад", payload={"command": "choose_upgrade"}, color="primary"))
+
+    return keyboard
