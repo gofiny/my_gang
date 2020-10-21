@@ -100,5 +100,7 @@ def power_active():
     buttons = [*other_buttons, up, down]
     shuffle(buttons)
     keyboard.add_buttons(buttons=buttons)
-    keyboard.add_button(Button(label="\U0000270B Поставить штангу", payload={"command": "power_active_stop"}))
+    keyboard.add_button(Button(label="\U0000270B Поставить штангу",
+                               payload={"command": "power_active_stop"},
+                               color="primary"))
     return keyboard
