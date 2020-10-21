@@ -1,5 +1,5 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from db_utils.models import Levels
+from random import shuffle
 
 
 def main_menu() -> ReplyKeyboardMarkup:
@@ -64,7 +64,19 @@ def choose_upgrade():
 
 def power_active_start():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.row(KeyboardButton("\U000025B6 Начать"))
+    keyboard.row(KeyboardButton("\U0001F4AA Начать"))
     keyboard.row(KeyboardButton("\U00002B05 Прокачка"))
 
+    return keyboard
+
+
+def power_active():
+    keyboard = ReplyKeyboardMarkup(row_width=4)
+    up = KeyboardButton("\U0001f446")
+    down = KeyboardButton("\U0001F447")
+    other_buttons = [KeyboardButton("\U0001F44F")] * 6
+    buttons = [*other_buttons, up, down]
+    shuffle(buttons)
+    keyboard.add(*buttons)
+    keyboard.add(KeyboardButton("\U0000270B Поставить штангу"))
     return keyboard

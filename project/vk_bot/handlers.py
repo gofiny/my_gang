@@ -102,6 +102,16 @@ async def choose_power(message: Message):
     await message.answer(text=dialogs.power_active_start, keyboard=keyboards.power_active_start())
 
 
+@vk_bot.message_handler(payload={"command": "power_active_start"})
+async def power_active_start(message: Message):
+    await message.answer(text=dialogs.power_active_up, keyboard=keyboards.power_active())
+
+
+@vk_bot.message_handler(payload={"command": "power_active_stop"})
+async def power_active_stop(message: Message):
+    await message.answer(text=dialogs.power_active_stop, keyboard=keyboards.choose_upgrade())
+
+
 @vk_bot.message_handler(text="*")
 async def other(message: Message):
     await vk_bot.send_message(user_ids=message.from_id, text="Не знаю что ответить")

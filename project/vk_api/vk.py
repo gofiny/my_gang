@@ -47,9 +47,10 @@ class Button:
 
 
 class Keyboard:
-    def __init__(self, one_time: bool = False, inline: bool = False):
+    def __init__(self, one_time: bool = False, inline: bool = False, default_width: int = 5):
         self.one_time = one_time
         self.inline = inline
+        self.default_width = default_width
         self.buttons = []
 
     def add_empty_row(self):
@@ -60,11 +61,15 @@ class Keyboard:
 
     def add_button(self, button: Button):
         try:
-            if len(self.buttons[-1]) == 5:
+            if len(self.buttons[-1]) == self.default_width:
                 self.add_empty_row()
         except IndexError:
             self.add_empty_row()
         self.buttons[-1].append(button.button)
+
+    def add_buttons(self, buttons: list):
+        for button in buttons:
+            self.add_button(button)
 
     def get_keyboard(self):
         _keyboard = {

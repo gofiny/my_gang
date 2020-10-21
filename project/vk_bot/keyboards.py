@@ -1,5 +1,6 @@
 from vk_api.vk import Keyboard, Button
 from db_utils.models import Levels
+from random import shuffle
 
 
 def main_menu() -> Keyboard:
@@ -83,9 +84,21 @@ def choose_upgrade():
 
 def power_active_start():
     keyboard = Keyboard()
-    keyboard.add_button(Button(label="\U000025B6 Начать", payload={"command": "power_active_start"}, color="positive"))
+    keyboard.add_button(Button(label="\U0001F4AA Начать", payload={"command": "power_active_start"}, color="positive"))
 
     keyboard.add_empty_row()
     keyboard.add_button(Button(label="\U00002B05 Назад", payload={"command": "choose_upgrade"}, color="primary"))
 
+    return keyboard
+
+
+def power_active():
+    keyboard = Keyboard(one_time=True, default_width=4)
+    up = Button(label="\U0001f446", payload={"command": "power_action up"})
+    down = Button(label="\U0001F447", payload={"command": "power_action down"})
+    other_buttons = [Button(label="\U0001F44F", payload={"command": "power_action stuff"})] * 6
+    buttons = [*other_buttons, up, down]
+    shuffle(buttons)
+    keyboard.add_buttons(buttons=buttons)
+    keyboard.add_button(Button(label="\U0000270B Поставить штангу", payload={"command": "power_active_stop"}))
     return keyboard

@@ -121,6 +121,16 @@ async def choose_power(message: Message):
     await message.answer(text=dialogs.power_active_start, reply_markup=keyboards.power_active_start())
 
 
+@dp.message_handler(text=["\U0001F4AA Начать"])
+async def power_active_start(message: Message):
+    await message.answer(text=dialogs.power_active_up, reply_markup=keyboards.power_active())
+
+
+@dp.message_handler(text=["\U0000270B Поставить штангу"])
+async def power_active_stop(message: Message):
+    await message.answer(text=dialogs.power_active_stop, reply_markup=keyboards.choose_upgrade())
+
+
 @dp.message_handler()
 async def other_messages(message: Message):
     await message.answer(text="It`s work!")
