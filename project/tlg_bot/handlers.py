@@ -123,7 +123,12 @@ async def choose_power(message: Message):
 
 @dp.message_handler(text=["\U0001F4AA Начать"])
 async def power_active_start(message: Message):
-    await message.answer(text=dialogs.power_active_up, reply_markup=keyboards.power_active())
+    web_app = message.conf["web_app"]
+    player = message.conf["player"]
+    player.states.main_state = 10
+    player.states.power_stage = 0
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.power_active_down, reply_markup=keyboards.power_active())
 
 
 @dp.message_handler(text=["\U0000270B Поставить штангу"])

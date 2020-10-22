@@ -104,11 +104,52 @@ async def choose_power(message: Message):
 
 @vk_bot.message_handler(payload={"command": "power_active_start"})
 async def power_active_start(message: Message):
-    await message.answer(text=dialogs.power_active_up, keyboard=keyboards.power_active())
+    web_app = message.web_app
+    player = message.player
+    player.states.main_state = 10
+    player.states.power_stage = 0
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.power_active_down, keyboard=keyboards.power_active())
+
+
+@vk_bot.message_handler(payload={"command": "power_action"}, state={"main_state": 10})
+async def power_action(message: Message):
+    player = message.player
+    if message.payload["command"].split()[1] == "up":
+        if player.states.power_state % 2 != 0:
+            player.states.power_state += 1
+            text = dialogs.power_active_down
+            keyboard = keyboards.power_active()
+        else:
+            player.states.main_state = 1
+            player.states.power_state = 0
+            text = power_active_stop
+            keyboard = keyboards.choose_upgrade()
+    elif message.payload["command"].split()[1] == "down":
+        if player.states.power_state % 2 == 0:
+            player.states.power_state += 1
+            text = dialogs.power_active_up
+            keyboard = keyboards.power_active()
+        else:
+            player.states.main_state = 1
+            player.states.power_state = 0
+            text = power_active_stop
+            keyboard = keyboards.choose_upgrade()
+    else:
+        player.states.main_state = 1
+        player.states.power_state = 0
+        text = power_active_stop
+        keyboard = keyboards.choose_upgrade()
+
+    await message.web_app.add_player_to_redis(player)
+    await message.answer(text=text, keyboard=keyboard)
 
 
 @vk_bot.message_handler(payload={"command": "power_active_stop"})
 async def power_active_stop(message: Message):
+    message.player.states.main_state = 1
+    message.player.states.power_state = 0
+    await message.web_app.add_player_to_redis(message.player)
     await message.answer(text=dialogs.power_active_stop, keyboard=keyboards.choose_upgrade())
 
 
