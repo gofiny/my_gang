@@ -121,6 +121,9 @@ async def choose_power(message: Message):
     await message.answer(text=dialogs.power_active_start, reply_markup=keyboards.power_active_start())
 
 
+# ===================== Power active upgrade =====================
+
+
 @dp.message_handler(text=["\U0001F4AA Начать"])
 async def power_active_start(message: Message):
     web_app = message.conf["web_app"]
@@ -128,12 +131,90 @@ async def power_active_start(message: Message):
     player.states.main_state = 10
     player.states.power_stage = 0
     await web_app.add_player_to_redis(player)
-    await message.answer(text=dialogs.power_active_down, reply_markup=keyboards.power_active())
+    await message.answer(text=dialogs.power_active_down % 0, reply_markup=keyboards.power_active())
 
 
-@dp.message_handler(text=["\U0000270B Поставить штангу"])
+@dp.message_handler(text=["\U0001f446"], pl_state={"main_state": 10})
+async def power_action(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    if player.states.power_state % 2 != 0:
+        player.states.power_state += 1
+        reps = player.states.power_state // 2
+        if reps == 10:
+            text = dialogs.power_lets_finish
+        else:
+            text = dialogs.power_active_down % reps
+        keyboard = keyboards.power_active()
+    else:
+        player.states.main_state = 1
+        player.states.power_state = 0
+        text = dialogs.power_active_stuff
+        keyboard = keyboards.choose_upgrade()
+
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=text, reply_markup=keyboard)
+
+
+@dp.message_handler(text=["\U0001F447"], pl_state={"main_state": 10})
+async def power_action(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    if player.states.power_state % 2 == 0 and player.states.power_state < 20:
+        player.states.power_state += 1
+        text = dialogs.power_active_up
+        keyboard = keyboards.power_active()
+    elif player.states.power_state == 20:
+        player.health = player.health - 5 if player.health > 20 else player.health
+        player.states.main_state = 1
+        player.states.power_state = 0
+        text = dialogs.power_active_too_much
+        keyboard = keyboards.choose_upgrade()
+    else:
+        player.states.main_state = 1
+        player.states.power_state = 0
+        text = dialogs.power_active_stuff
+        keyboard = keyboards.choose_upgrade()
+
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=text, reply_markup=keyboard)
+
+
+@dp.message_handler(text=["\U0001F44F"], pl_state={"main_state": 10})
+async def power_action(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    player.power = player.power - 5 if player.power > 5 else player.power
+    player.states.main_state = 1
+    player.states.power_state = 0
+
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.power_active_stuff, reply_markup=keyboards.choose_upgrade())
+
+
+@dp.message_handler(text=["\U0000270B Поставить штангу"], pl_state={"main_state": 10})
 async def power_active_stop(message: Message):
-    await message.answer(text=dialogs.power_active_stop, reply_markup=keyboards.choose_upgrade())
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    if player.states.power_state < 10:  # if lower than 5 reps
+        power = 0
+    elif player.states.power_state <= 14:  # if lower than 7 reps
+        power = 5
+    else:
+        power = player.states.power_state // 2
+    player.states.main_state = 1
+    player.states.power_state = 0
+    player.power += power
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.power_active_stop % power, reply_markup=keyboards.choose_upgrade())
+
+
+@dp.message_handler(pl_state={"main_state": 10})
+async def power_active_stop(message: Message):
+    await message.answer(text=dialogs.touch_buttons)
+
+
+# ========================================================
 
 
 @dp.message_handler()

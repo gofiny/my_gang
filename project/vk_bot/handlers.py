@@ -170,7 +170,7 @@ async def power_action(message: Message):
     await message.answer(text=dialogs.power_active_stuff, keyboard=keyboards.choose_upgrade())
 
 
-@vk_bot.message_handler(payload={"command": "power_active_stop"})
+@vk_bot.message_handler(payload={"command": "power_active_stop"}, state={"main_state": 10})
 async def power_active_stop(message: Message):
     player = message.player
     if player.states.power_state < 10:  # if lower than 5 reps
