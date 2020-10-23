@@ -45,18 +45,14 @@ def home() -> Keyboard:
     return keyboard
 
 
-def street(level: Levels) -> Keyboard:
+def street() -> Keyboard:
     keyboard = Keyboard()
     keyboard.add_button(Button(label="\U0001F919 Движухи", payload={"command": "job"}))
     keyboard.add_button(Button(label="\U0001F199 Прокачка", payload={"command": "choose_upgrade"}))
     keyboard.add_empty_row()
 
     keyboard.add_button(Button(label="\U0001F575 Барыга", payload={"command": "seller"}))
-
-    if level.level < 3:
-        keyboard.add_button(Button(label="\U0001F44A Разборки", payload={"command": "lock 3"}))
-    else:
-        keyboard.add_button(Button(label="\U0001F44A Разборки", payload={"command": "fights"}))
+    keyboard.add_button(Button(label="\U0001F44A Разборки", payload={"command": "fights"}))
 
     keyboard.add_empty_row()
     keyboard.add_button(Button(label="\U0001F3E0 Домой", payload={"command": "home"}, color="primary"))
@@ -103,4 +99,25 @@ def power_active():
     keyboard.add_button(Button(label="\U0000270B Поставить штангу",
                                payload={"command": "power_active_stop"},
                                color="primary"))
+    return keyboard
+
+
+def health_active_start():
+    keyboard = Keyboard()
+    keyboard.add_button(Button(label="\U0001F3C3 Начать", payload={"command": "health_active_start"}, color="positive"))
+
+    keyboard.add_empty_row()
+    keyboard.add_button(Button(label="\U00002B05 Назад", payload={"command": "choose_upgrade"}, color="primary"))
+
+    return keyboard
+
+
+def health_active():
+    keyboard = Keyboard(default_width=3)
+    keyboard.add_buttons([
+        Button(label="\U00002199", payload={"command": "health_turn left"}),
+        Button(label="\U00002B06", payload={"command": "health_turn straight"}),
+        Button(label="\U000027A1", payload={"command": "health_turn right"}),
+        Button(label="\U00002B07", payload={"command": "health_turn back"}, color="primary")
+    ])
     return keyboard

@@ -1,5 +1,6 @@
 import json
 from typing import Union, Optional
+from time import time
 
 
 class Levels:
@@ -53,6 +54,11 @@ class Counters:
         self.daily_actions = data["daily_actions"]
         self.total_actions = data["total_actions"]
 
+    def plus_one(self):
+        self.lm_time = int(time())
+        self.daily_actions += 1
+        self.total_actions += 1
+
     @property
     def all_counters(self) -> dict:
         data = {
@@ -63,19 +69,20 @@ class Counters:
         return data
 
     def serialize(self) -> str:
+        self.plus_one()
         return json.dumps(self.all_counters)
 
 
 class States:
     def __init__(self, data: dict):
         self.main_state = data.get("main_state", 0)
-        self.power_state = data.get("power_state", 0)
+        self.upgrade_state = data.get("upgrade_state", 0)
 
     @property
     def all_states(self) -> dict:
         states = {
             "main_state": self.main_state,
-            "power_state": self.power_state
+            "upgrade_state": self.upgrade_state
         }
         return states
 

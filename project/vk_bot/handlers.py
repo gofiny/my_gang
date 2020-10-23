@@ -88,7 +88,7 @@ async def home(message: Message):
 
 @vk_bot.message_handler(payload={"command": "street"})
 async def street(message: Message):
-    keyboard = keyboards.street(level=message.player.level)
+    keyboard = keyboards.street()
     await message.answer(text=dialogs.street, keyboard=keyboard)
 
 
@@ -97,12 +97,10 @@ async def choose_upgrade(message: Message):
     await message.answer(text=dialogs.choose_upgrade, keyboard=keyboards.choose_upgrade())
 
 
+# ===================== Power active upgrade =====================
 @vk_bot.message_handler(payload={"command": "choose_power"})
 async def choose_power(message: Message):
     await message.answer(text=dialogs.power_active_start, keyboard=keyboards.power_active_start())
-
-
-# ===================== Power active upgrade =====================
 
 
 @vk_bot.message_handler(payload={"command": "power_active_start"})
@@ -110,7 +108,7 @@ async def power_active_start(message: Message):
     web_app = message.web_app
     player = message.player
     player.states.main_state = 10
-    player.states.power_stage = 0
+    player.states.upgrade_state = 0
     await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.power_active_down % 0, keyboard=keyboards.power_active())
 
@@ -118,9 +116,9 @@ async def power_active_start(message: Message):
 @vk_bot.message_handler(payload={"command": "power_action_up"}, state={"main_state": 10})
 async def power_action(message: Message):
     player = message.player
-    if player.states.power_state % 2 != 0:
-        player.states.power_state += 1
-        reps = player.states.power_state // 2
+    if player.states.upgrade_state % 2 != 0:
+        player.states.upgrade_state += 1
+        reps = player.states.upgrade_state // 2
         if reps == 10:
             text = dialogs.power_lets_finish
         else:
@@ -128,7 +126,7 @@ async def power_action(message: Message):
         keyboard = keyboards.power_active()
     else:
         player.states.main_state = 1
-        player.states.power_state = 0
+        player.states.upgrade_state = 0
         text = dialogs.power_active_stuff
         keyboard = keyboards.choose_upgrade()
 
@@ -139,19 +137,19 @@ async def power_action(message: Message):
 @vk_bot.message_handler(payload={"command": "power_action_down"}, state={"main_state": 10})
 async def power_action(message: Message):
     player = message.player
-    if player.states.power_state % 2 == 0 and player.states.power_state < 20:
-        player.states.power_state += 1
+    if player.states.upgrade_state % 2 == 0 and player.states.upgrade_state < 20:
+        player.states.upgrade_state += 1
         text = dialogs.power_active_up
         keyboard = keyboards.power_active()
-    elif player.states.power_state == 20:
+    elif player.states.upgrade_state == 20:
         player.health = player.health - 5 if player.health > 20 else player.health
         player.states.main_state = 1
-        player.states.power_state = 0
+        player.states.upgrade_state = 0
         text = dialogs.power_active_too_much
         keyboard = keyboards.choose_upgrade()
     else:
         player.states.main_state = 1
-        player.states.power_state = 0
+        player.states.upgrade_state = 0
         text = dialogs.power_active_stuff
         keyboard = keyboards.choose_upgrade()
 
@@ -164,7 +162,7 @@ async def power_action(message: Message):
     player = message.player
     player.power = player.power - 5 if player.power > 5 else player.power
     player.states.main_state = 1
-    player.states.power_state = 0
+    player.states.upgrade_state = 0
 
     await message.web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.power_active_stuff, keyboard=keyboards.choose_upgrade())
@@ -173,14 +171,14 @@ async def power_action(message: Message):
 @vk_bot.message_handler(payload={"command": "power_active_stop"}, state={"main_state": 10})
 async def power_active_stop(message: Message):
     player = message.player
-    if player.states.power_state < 10:  # if lower than 5 reps
+    if player.states.upgrade_state < 10:  # if lower than 5 reps
         power = 0
-    elif player.states.power_state <= 14:  # if lower than 7 reps
+    elif player.states.upgrade_state <= 14:  # if lower than 7 reps
         power = 5
     else:
-        power = player.states.power_state // 2
+        power = player.states.upgrade_state // 2
     player.states.main_state = 1
-    player.states.power_state = 0
+    player.states.upgrade_state = 0
     player.power += power
     await message.web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.power_active_stop % power, keyboard=keyboards.choose_upgrade())
@@ -191,7 +189,35 @@ async def power_active_stop(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
 
-# ========================================================
+# ================= health active upgrade ================
+@vk_bot.message_handler(payload={"command": "choose_health"})
+async def choose_power(message: Message):
+    await message.answer(text=dialogs.health_active_start, keyboard=keyboards.health_active())
+
+
+@vk_bot.message_handler(payload={"command": "health_active_start"})
+async def power_active_start(message: Message):
+    web_app = message.web_app
+    player = message.player
+    player.states.main_state = 11
+    player.states.upgrade_state = 0
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.health_active_start, keyboard=keyboards.health_active())
+
+
+@vk_bot.message_handler(payload={"command": "health_active_stop"})
+async def power_active_start(message: Message):
+    web_app = message.web_app
+    player = message.player
+    player.states.main_state = 1
+    player.states.upgrade_state = 0
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.health_active_stop, keyboard=keyboards.choose_upgrade())
+
+
+@vk_bot.message_handler(state={"main_state": 11})
+async def health_active_stop(message: Message):
+    await message.answer(text=dialogs.touch_buttons)
 
 
 @vk_bot.message_handler(text="*")

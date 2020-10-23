@@ -129,7 +129,7 @@ async def power_active_start(message: Message):
     web_app = message.conf["web_app"]
     player = message.conf["player"]
     player.states.main_state = 10
-    player.states.power_stage = 0
+    player.states.upgrade_state = 0
     await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.power_active_down % 0, reply_markup=keyboards.power_active())
 
@@ -138,9 +138,9 @@ async def power_active_start(message: Message):
 async def power_action(message: Message):
     player = message.conf["player"]
     web_app = message.conf["web_app"]
-    if player.states.power_state % 2 != 0:
-        player.states.power_state += 1
-        reps = player.states.power_state // 2
+    if player.states.upgrade_state % 2 != 0:
+        player.states.upgrade_state += 1
+        reps = player.states.upgrade_state // 2
         if reps == 10:
             text = dialogs.power_lets_finish
         else:
@@ -148,7 +148,7 @@ async def power_action(message: Message):
         keyboard = keyboards.power_active()
     else:
         player.states.main_state = 1
-        player.states.power_state = 0
+        player.states.upgrade_state = 0
         text = dialogs.power_active_stuff
         keyboard = keyboards.choose_upgrade()
 
@@ -160,19 +160,19 @@ async def power_action(message: Message):
 async def power_action(message: Message):
     player = message.conf["player"]
     web_app = message.conf["web_app"]
-    if player.states.power_state % 2 == 0 and player.states.power_state < 20:
-        player.states.power_state += 1
+    if player.states.upgrade_state % 2 == 0 and player.states.upgrade_state < 20:
+        player.states.upgrade_state += 1
         text = dialogs.power_active_up
         keyboard = keyboards.power_active()
-    elif player.states.power_state == 20:
+    elif player.states.upgrade_state == 20:
         player.health = player.health - 5 if player.health > 20 else player.health
         player.states.main_state = 1
-        player.states.power_state = 0
+        player.states.upgrade_state = 0
         text = dialogs.power_active_too_much
         keyboard = keyboards.choose_upgrade()
     else:
         player.states.main_state = 1
-        player.states.power_state = 0
+        player.states.upgrade_state = 0
         text = dialogs.power_active_stuff
         keyboard = keyboards.choose_upgrade()
 
@@ -186,7 +186,7 @@ async def power_action(message: Message):
     web_app = message.conf["web_app"]
     player.power = player.power - 5 if player.power > 5 else player.power
     player.states.main_state = 1
-    player.states.power_state = 0
+    player.states.upgrade_state = 0
 
     await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.power_active_stuff, reply_markup=keyboards.choose_upgrade())
@@ -196,14 +196,14 @@ async def power_action(message: Message):
 async def power_active_stop(message: Message):
     player = message.conf["player"]
     web_app = message.conf["web_app"]
-    if player.states.power_state < 10:  # if lower than 5 reps
+    if player.states.upgrade_state < 10:  # if lower than 5 reps
         power = 0
-    elif player.states.power_state <= 14:  # if lower than 7 reps
+    elif player.states.upgrade_state <= 14:  # if lower than 7 reps
         power = 5
     else:
-        power = player.states.power_state // 2
+        power = player.states.upgrade_state // 2
     player.states.main_state = 1
-    player.states.power_state = 0
+    player.states.upgrade_state = 0
     player.power += power
     await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.power_active_stop % power, reply_markup=keyboards.choose_upgrade())

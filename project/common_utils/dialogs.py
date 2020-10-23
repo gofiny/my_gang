@@ -19,6 +19,9 @@ power_active_stuff = '''Воу-воу братишка, ты походу пер
 power_active_too_much = '''Ты пошел на лишнее повторение и уронил штангу на грудь. \n\U00002764 Здоровье -5'''
 power_active_stop = '''Закончил упражнение. \n\U0001F4AA Сила +%s'''
 power_lets_finish = '''Ставь штангу! \U0001F501 Повторения: 10/10'''
+health_active_start = '''Тут будет описание прокачки'''
+health_active_choose_way = '''Куда бежать?'''
+health_active_stop = '''Стоп'''
 touch_buttons = '''Жми на кнопки'''
 
 
