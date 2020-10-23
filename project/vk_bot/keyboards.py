@@ -115,9 +115,9 @@ def health_active_start():
 def health_active():
     keyboard = Keyboard(default_width=3)
     keyboard.add_buttons([
-        Button(label="\U00002199", payload={"command": "health_turn left"}),
+        Button(label="\U00002B05", payload={"command": "health_turn left"}),
         Button(label="\U00002B06", payload={"command": "health_turn straight"}),
         Button(label="\U000027A1", payload={"command": "health_turn right"}),
-        Button(label="\U00002B07", payload={"command": "health_turn back"}, color="primary")
+        Button(label="\U0001F9B6", payload={"command": "health_turn_stop"}, color="primary")
     ])
     return keyboard
