@@ -192,7 +192,7 @@ async def power_active_stop(message: Message):
 # ================= health active upgrade ================
 @vk_bot.message_handler(payload={"command": "choose_health"})
 async def choose_power(message: Message):
-    await message.answer(text=dialogs.health_active_start, keyboard=keyboards.power_active_start())
+    await message.answer(text=dialogs.health_active_start, keyboard=keyboards.health_active())
 
 
 @vk_bot.message_handler(payload={"command": "health_active_start"})
