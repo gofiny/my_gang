@@ -122,7 +122,7 @@ async def power_action(message: Message):
     else:
         player.states.main_state = 1
         player.states.power_state = 0
-        text = power_active_stop
+        text = dialogs.power_active_stop
         keyboard = keyboards.choose_upgrade()
 
     await message.web_app.add_player_to_redis(player)
@@ -139,7 +139,7 @@ async def power_action(message: Message):
     else:
         player.states.main_state = 1
         player.states.power_state = 0
-        text = power_active_stop
+        text = dialogs.power_active_stop
         keyboard = keyboards.choose_upgrade()
 
     await message.web_app.add_player_to_redis(player)
