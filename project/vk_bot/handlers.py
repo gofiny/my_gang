@@ -112,7 +112,7 @@ async def power_active_start(message: Message):
     player.states.main_state = 10
     player.states.power_stage = 0
     await web_app.add_player_to_redis(player)
-    await message.answer(text=dialogs.power_active_down, keyboard=keyboards.power_active())
+    await message.answer(text=dialogs.power_active_down % 0, keyboard=keyboards.power_active())
 
 
 @vk_bot.message_handler(payload={"command": "power_action_up"}, state={"main_state": 10})
