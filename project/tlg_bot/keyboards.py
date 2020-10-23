@@ -71,7 +71,7 @@ def power_active_start():
 
 
 def power_active():
-    keyboard = ReplyKeyboardMarkup(row_width=4, resize_keyboard=True, one_time_keyboard=True)
+    keyboard = ReplyKeyboardMarkup(row_width=4, resize_keyboard=True)
     up = KeyboardButton("\U0001f446")
     down = KeyboardButton("\U0001F447")
     other_buttons = [KeyboardButton("\U0001F44F")] * 6

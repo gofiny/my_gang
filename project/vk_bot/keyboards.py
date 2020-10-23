@@ -93,7 +93,7 @@ def power_active_start():
 
 
 def power_active():
-    keyboard = Keyboard(one_time=True, default_width=4)
+    keyboard = Keyboard(default_width=4)
     up = Button(label="\U0001f446", payload={"command": "power_action_up"})
     down = Button(label="\U0001F447", payload={"command": "power_action_down"})
     other_buttons = [Button(label="\U0001F44F", payload={"command": "power_action_stuff"})] * 6
