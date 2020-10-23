@@ -121,7 +121,10 @@ async def power_action(message: Message):
     if player.states.power_state % 2 != 0:
         player.states.power_state += 1
         reps = player.states.power_state // 2
-        text = dialogs.power_active_down % reps
+        if reps == 10:
+            text = dialogs.power_lets_finish
+        else:
+            text = dialogs.power_active_down % reps
         keyboard = keyboards.power_active()
     else:
         player.states.main_state = 1
