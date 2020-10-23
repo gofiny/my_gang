@@ -170,9 +170,9 @@ async def power_action(message: Message):
 @vk_bot.message_handler(payload={"command": "power_active_stop"})
 async def power_active_stop(message: Message):
     player = message.player
-    if player.states.power_state < 5:
+    if player.states.power_state < 10:  # if lower than 5 reps
         power = 0
-    elif player.states.power_state <= 7:
+    elif player.states.power_state <= 14:  # if lower than 7 reps
         power = 5
     else:
         power = player.states.power_state // 2
