@@ -15,6 +15,7 @@ choose_upgrade = '''Выбирать что хочешь прокачать'''
 power_active_start = '''Тут будет описание прокачки'''
 power_active_up = '''Жмиии!!'''
 power_active_down = '''Опускай!'''
+power_active_stuff = '''Воу-воу братишка, ты походу переутомился!'''
 power_active_stop = '''Сдулся?'''
 
 

@@ -112,29 +112,13 @@ async def power_active_start(message: Message):
     await message.answer(text=dialogs.power_active_down, keyboard=keyboards.power_active())
 
 
-@vk_bot.message_handler(payload={"command": "power_action"}, state={"main_state": 10})
+@vk_bot.message_handler(payload={"command": "power_action_up"}, state={"main_state": 10})
 async def power_action(message: Message):
     player = message.player
-    if message.payload["command"].split()[1] == "up":
-        if player.states.power_state % 2 != 0:
-            player.states.power_state += 1
-            text = dialogs.power_active_down
-            keyboard = keyboards.power_active()
-        else:
-            player.states.main_state = 1
-            player.states.power_state = 0
-            text = power_active_stop
-            keyboard = keyboards.choose_upgrade()
-    elif message.payload["command"].split()[1] == "down":
-        if player.states.power_state % 2 == 0:
-            player.states.power_state += 1
-            text = dialogs.power_active_up
-            keyboard = keyboards.power_active()
-        else:
-            player.states.main_state = 1
-            player.states.power_state = 0
-            text = power_active_stop
-            keyboard = keyboards.choose_upgrade()
+    if player.states.power_state % 2 != 0:
+        player.states.power_state += 1
+        text = dialogs.power_active_down
+        keyboard = keyboards.power_active()
     else:
         player.states.main_state = 1
         player.states.power_state = 0
@@ -143,6 +127,33 @@ async def power_action(message: Message):
 
     await message.web_app.add_player_to_redis(player)
     await message.answer(text=text, keyboard=keyboard)
+
+
+@vk_bot.message_handler(payload={"command": "power_action_down"}, state={"main_state": 10})
+async def power_action(message: Message):
+    player = message.player
+    if player.states.power_state % 2 == 0:
+        player.states.power_state += 1
+        text = dialogs.power_active_up
+        keyboard = keyboards.power_active()
+    else:
+        player.states.main_state = 1
+        player.states.power_state = 0
+        text = power_active_stop
+        keyboard = keyboards.choose_upgrade()
+
+    await message.web_app.add_player_to_redis(player)
+    await message.answer(text=text, keyboard=keyboard)
+
+
+@vk_bot.message_handler(payload={"command": "power_action_stuff"}, state={"main_state": 10})
+async def power_action(message: Message):
+    player = message.player
+    player.states.main_state = 1
+    player.states.power_state = 0
+
+    await message.web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.power_active_stuff, keyboard=keyboards.choose_upgrade())
 
 
 @vk_bot.message_handler(payload={"command": "power_active_stop"})

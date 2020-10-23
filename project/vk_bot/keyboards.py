@@ -94,9 +94,9 @@ def power_active_start():
 
 def power_active():
     keyboard = Keyboard(one_time=True, default_width=4)
-    up = Button(label="\U0001f446", payload={"command": "power_action up"})
-    down = Button(label="\U0001F447", payload={"command": "power_action down"})
-    other_buttons = [Button(label="\U0001F44F", payload={"command": "power_action stuff"})] * 6
+    up = Button(label="\U0001f446", payload={"command": "power_action_up"})
+    down = Button(label="\U0001F447", payload={"command": "power_action_down"})
+    other_buttons = [Button(label="\U0001F44F", payload={"command": "power_action_stuff"})] * 6
     buttons = [*other_buttons, up, down]
     shuffle(buttons)
     keyboard.add_buttons(buttons=buttons)

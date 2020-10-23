@@ -68,14 +68,14 @@ class Counters:
 
 class States:
     def __init__(self, data: dict):
-        self.main_state = data["main_state"],
-        self.power_stage = data.get("power_state", 0)
+        self.main_state = data.get("main_state", 0)
+        self.power_state = data.get("power_state", 0)
 
     @property
     def all_states(self) -> dict:
         states = {
             "main_state": self.main_state,
-            "power_state": self.power_stage
+            "power_state": self.power_state
         }
         return states
 

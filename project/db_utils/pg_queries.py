@@ -51,7 +51,6 @@ async def get_player_uuid(connection: Connection, user_id: int, prefix: str) -> 
 async def get_player_with_stuff(connection: Connection, player_uuid: str) -> Player:
     player_data = await connection.fetchrow(sql.select_player_and_stuff, player_uuid)
     player_data = dict(player_data)
-    player_data["states"] = {"main_state": 0}
     player = Player(data=player_data)
     return player
 
