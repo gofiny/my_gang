@@ -177,7 +177,7 @@ class Player:
         self.mind = data["mind"]
         self.respect = data["respect"]
         self.level = Levels(level=data["level"], respect=self.respect)
-        self.states = States(data["states"])
+        self.states = States(data.get("states", {}))
 
     def add_respect(self, count: int) -> Optional[int]:
         self.respect += count
