@@ -137,7 +137,7 @@ async def power_action(message: Message):
     else:
         player.states.main_state = 1
         player.states.upgrade_state = 0
-        player.event_stuff.upgrade_block = time() + 60  # set 60 seconds block to upgrade
+        player.event_stuff.upgrade_block = int(time()) + 60  # set 60 seconds block to upgrade
         player.power = player.power - 5 if player.power > 10 else player.power
         text = dialogs.power_active_stuff
         keyboard = keyboards.choose_upgrade()
@@ -155,7 +155,7 @@ async def power_action(message: Message):
         keyboard = keyboards.power_active()
     elif player.states.upgrade_state == 20:
         player.health = player.health - 5 if player.health > 20 else player.health
-        player.event_stuff.upgrade_block = time() + 60  # set 60 seconds block to upgrade
+        player.event_stuff.upgrade_block = int(time()) + 60  # set 60 seconds block to upgrade
         player.states.main_state = 1
         player.states.upgrade_state = 0
         text = dialogs.power_active_too_much
@@ -164,7 +164,7 @@ async def power_action(message: Message):
         player.states.main_state = 1
         player.states.upgrade_state = 0
         player.health = player.health - 5 if player.health > 20 else player.health
-        player.event_stuff.upgrade_block = time() + 60  # set 60 seconds block to upgrade
+        player.event_stuff.upgrade_block = int(time()) + 60  # set 60 seconds block to upgrade
         text = dialogs.power_active_stuff
         keyboard = keyboards.choose_upgrade()
 
@@ -176,7 +176,7 @@ async def power_action(message: Message):
 async def power_action(message: Message):
     player = message.player
     player.power = player.power - 5 if player.power > 5 else player.power
-    player.event_stuff.upgrade_block = time() + 60  # set 60 seconds block to upgrade
+    player.event_stuff.upgrade_block = int(time()) + 60  # set 60 seconds block to upgrade
     player.states.main_state = 1
     player.states.upgrade_state = 0
 
@@ -195,7 +195,7 @@ async def power_active_stop(message: Message):
         power = player.states.upgrade_state // 2
     player.states.main_state = 1
     player.states.upgrade_state = 0
-    player.event_stuff.upgrade_block = time() + 180  # set 3 minutes block to upgrade
+    player.event_stuff.upgrade_block = int(time()) + 180  # set 3 minutes block to upgrade
     player.power += power
     await message.web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.power_active_stop % power, keyboard=keyboards.choose_upgrade())
