@@ -179,7 +179,7 @@ class WebApp:
     def get_other_message_handler(self) -> Optional[Callable]:
         _filter = self.vk_bot.handlers.get("text_*")
         if _filter:
-            return _filter["states"][None]
+            return _filter["states"]["null"]
         return None
 
     def get_handler_by_state(self, _filter: str, player: Player) -> Optional[Callable]:
