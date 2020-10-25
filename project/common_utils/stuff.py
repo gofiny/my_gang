@@ -49,11 +49,11 @@ def time_is_left(block_time: int) -> str:
     hours = minutes // 60
     days = hours // 24
     if days:
-        left_str = f"{days}:{hours - days * 24}:{minutes - hours * 60}:{seconds - minutes * 60}"
+        left_str = f"{days} дн. {hours - days * 24} час. {minutes - hours * 60} мин. {seconds - minutes * 60} сек."
     elif hours:
-        left_str = f"{hours}:{minutes - hours * 60}:{seconds - minutes * 60}"
+        left_str = f"{hours} час. {minutes - hours * 60} мин. {seconds - minutes * 60} сек."
     elif minutes:
-        left_str = f"{minutes}:{seconds - minutes * 60}"
+        left_str = f"{minutes} мин. {seconds - minutes * 60} сек."
     else:
         left_str = f"{seconds} сек."
 
