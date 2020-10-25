@@ -220,7 +220,7 @@ async def choose_power(message: Message):
     await message.answer(text=dialogs.health_active_start, reply_markup=keyboards.health_active_start())
 
 
-@dp.message_handler(text=["\U0001F4AA Начать"])
+@dp.message_handler(text=["\U0001F3C3 Начать"])
 async def power_active_start(message: Message):
     web_app = message.conf["web_app"]
     player = message.conf["player"]
