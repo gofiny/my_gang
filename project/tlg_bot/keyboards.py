@@ -80,3 +80,23 @@ def power_active():
     keyboard.add(*buttons)
     keyboard.add(KeyboardButton("\U0000270B Поставить штангу"))
     return keyboard
+
+
+def health_active_start():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.row(KeyboardButton("\U0001F3C3 Начать"))
+    keyboard.row(KeyboardButton("\U00002B05 Прокачка"))
+
+    return keyboard
+
+
+def health_active():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+    keyboard.add([
+        KeyboardButton("\U00002B05"),
+        KeyboardButton("\U00002B06"),
+        KeyboardButton("\U000027A1"),
+        KeyboardButton("\U0001F9B6 Остановиться")
+    ])
+
+    return keyboard

@@ -10,6 +10,15 @@ def name_validation(text):
     return True
 
 
+def get_way_by_emoji(emoji_code: str) -> str:
+    way = {
+        "\U00002B05": "left",
+        "\U000027A1": "right",
+        "\U00002B06": "straight"
+    }
+    return way[emoji_code]
+
+
 def get_random_picture() -> str:
     pictures = [
         "left_cops_band",

@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import BoundFilter
 from aiogram.types import Message
 from tlg_bot import keyboards
 from db_utils import pg_queries
-from common_utils import dialogs, exceptions
+from common_utils import dialogs, exceptions, stuff
 
 
 tlg_bot = Bot(TLG_API_KEY)
@@ -214,7 +214,84 @@ async def power_active_stop(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
 
-# ========================================================
+# ================= health active upgrade ================
+@dp.message_handler(text=["\U00002764 Здоровье"])
+async def choose_power(message: Message):
+    await message.answer(text=dialogs.health_active_start, reply_markup=keyboards.health_active_start())
+
+
+@dp.message_handler(text=["\U0001F4AA Начать"])
+async def power_active_start(message: Message):
+    web_app = message.conf["web_app"]
+    player = message.conf["player"]
+    way, picture = stuff.gen_random_way()
+    player.add_event(event_info=way)
+    player.states.main_state = 11
+    player.states.upgrade_state = 0
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.health_active_choose_way % (picture, 0), reply_markup=keyboards.health_active())
+
+
+@dp.message_handler(text=["\U00002B05", "\U00002B06", "\U000027A1"], pl_state={"main_state": 11})
+async def power_active_start(message: Message):
+    web_app = message.conf["web_app"]
+    player = message.conf["player"]
+    keyboard = keyboards.choose_upgrade()
+    if player.states.upgrade_state == 20:
+        player.states.main_state = 0
+        player.states.upgrade_state = 0
+        player.health = player.health - 5 if player.health > 20 else player.health
+        player.event_stuff = None
+        text = dialogs.health_active_too_much
+    else:
+        chosen_way = stuff.get_way_by_emoji(emoji_code=message.text)
+        right_way = player.event_stuff.info
+        if chosen_way == right_way:
+            player.states.upgrade_state += 1
+            way, picture = stuff.gen_random_way()
+            player.add_event(event_info=way)
+            if player.states.upgrade_state == 20:
+                text = dialogs.health_lets_finish % (picture, 2000)
+            else:
+                text = dialogs.health_active_choose_way % (picture, f"{player.states.upgrade_state}00")
+            keyboard = keyboards.health_active()
+        else:
+            text = dialogs.health_fail_way
+            player.states.main_state = 0
+            player.states.upgrade_state = 0
+            player.event_stuff = None
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=text, reply_markup=keyboard)
+
+
+@dp.message_handler(payload={"command": "health_active_stop"}, pl_state={"main_state": 11})
+async def power_active_start(message: Message):
+    web_app = message.conf["web_app"]
+    player = message.conf["player"]
+    distance = player.states.upgrade_state
+
+    if distance < 10:
+        new_health = 0
+    elif 10 < distance < 15:
+        new_health = distance - 2
+    else:
+        new_health = distance
+
+    player.health += new_health
+    player.states.main_state = 0
+    player.states.upgrade_state = 0
+    player.event_stuff = None
+
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.health_active_stop % new_health, reply_markup=keyboards.choose_upgrade())
+
+
+@dp.message_handler(text="*", state={"main_state": 11})
+async def health_active_stop(message: Message):
+    await message.answer(text=dialogs.touch_buttons)
+
+
+# ================= health active upgrade ================
 
 
 @dp.message_handler()
