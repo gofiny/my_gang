@@ -264,7 +264,7 @@ async def power_active_start(message: Message):
     await message.answer(text=text, reply_markup=keyboard)
 
 
-@dp.message_handler(payload={"command": "health_active_stop"}, pl_state={"main_state": 11})
+@dp.message_handler(text=["\U0001F9B6 Остановиться"], pl_state={"main_state": 11})
 async def power_active_start(message: Message):
     web_app = message.conf["web_app"]
     player = message.conf["player"]
@@ -286,7 +286,7 @@ async def power_active_start(message: Message):
     await message.answer(text=dialogs.health_active_stop % new_health, reply_markup=keyboards.choose_upgrade())
 
 
-@dp.message_handler(text="*", state={"main_state": 11})
+@dp.message_handler(pl_state={"main_state": 11})
 async def health_active_stop(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
