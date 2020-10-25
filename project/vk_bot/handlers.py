@@ -189,7 +189,7 @@ async def test(message: Message):
     await message.answer(text="на", keyboard=keyboards.power_active())
 
 
-@vk_bot.message_handler(state={"main_state": 10})
+@vk_bot.message_handler(text="*", state={"main_state": 10})
 async def power_active_stop(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
