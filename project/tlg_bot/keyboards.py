@@ -92,11 +92,11 @@ def health_active_start():
 
 def health_active():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
-    keyboard.add([
+    keyboard.add(
         KeyboardButton("\U00002B05"),
         KeyboardButton("\U00002B06"),
         KeyboardButton("\U000027A1"),
         KeyboardButton("\U0001F9B6 Остановиться")
-    ])
+    )
 
     return keyboard
