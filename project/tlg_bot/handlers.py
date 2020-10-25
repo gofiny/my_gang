@@ -238,7 +238,7 @@ async def power_active_start(message: Message):
     player = message.conf["player"]
     keyboard = keyboards.choose_upgrade()
     if player.states.upgrade_state == 20:
-        player.states.main_state = 0
+        player.states.main_state = 1
         player.states.upgrade_state = 0
         player.health = player.health - 5 if player.health > 20 else player.health
         player.event_stuff = None
@@ -257,7 +257,7 @@ async def power_active_start(message: Message):
             keyboard = keyboards.health_active()
         else:
             text = dialogs.health_fail_way
-            player.states.main_state = 0
+            player.states.main_state = 1
             player.states.upgrade_state = 0
             player.event_stuff = None
     await web_app.add_player_to_redis(player)
@@ -278,7 +278,7 @@ async def power_active_start(message: Message):
         new_health = distance
 
     player.health += new_health
-    player.states.main_state = 0
+    player.states.main_state = 1
     player.states.upgrade_state = 0
     player.event_stuff = None
 
