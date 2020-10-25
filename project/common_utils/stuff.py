@@ -48,6 +48,13 @@ def time_is_left(block_time: int) -> str:
     minutes = seconds // 60
     hours = minutes // 60
     days = hours // 24
-    left_str = f"{days}:{hours - days * 24}:{minutes - hours * 60}:{seconds - minutes * 60}"
+    if days:
+        left_str = f"{days}:{hours - days * 24}:{minutes - hours * 60}:{seconds - minutes * 60}"
+    elif hours:
+        left_str = f"{hours}:{minutes - hours * 60}:{seconds - minutes * 60}"
+    elif minutes:
+        left_str = f"{minutes}:{seconds - minutes * 60}"
+    else:
+        left_str = f"{seconds} сек."
 
     return left_str
