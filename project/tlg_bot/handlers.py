@@ -5,6 +5,7 @@ from aiogram.types import Message
 from tlg_bot import keyboards
 from db_utils import pg_queries
 from common_utils import dialogs, exceptions, stuff
+from time import time
 
 
 tlg_bot = Bot(TLG_API_KEY)
@@ -116,26 +117,40 @@ async def choose_upgrade(message: Message):
     await message.answer(text=dialogs.choose_upgrade, reply_markup=keyboards.choose_upgrade())
 
 
+# ===================== Power active upgrade =====================
 @dp.message_handler(text=["\U0001F4AA Сила"])
 async def choose_power(message: Message):
-    await message.answer(text=dialogs.power_active_start, reply_markup=keyboards.power_active_start())
-
-
-# ===================== Power active upgrade =====================
+    upgrade_block = message.conf["player"].event_stuff.upgrade_block
+    if upgrade_block and (upgrade_block > int(time())):
+        what_left = stuff.time_is_left(upgrade_block)
+        text = dialogs.action_is_blocked % what_left
+        keyboard = None
+    else:
+        text = dialogs.power_active_start
+        keyboard = keyboards.power_active_start()
+    await message.answer(text=text, reply_markup=keyboard)
 
 
 @dp.message_handler(text=["\U0001F4AA Начать"])
 async def power_active_start(message: Message):
     web_app = message.conf["web_app"]
     player = message.conf["player"]
-    player.states.main_state = 10
-    player.states.upgrade_state = 0
-    await web_app.add_player_to_redis(player)
-    await message.answer(text=dialogs.power_active_down % 0, reply_markup=keyboards.power_active())
+    upgrade_block = player.event_stuff.upgrade_block
+    if upgrade_block and (upgrade_block > int(time())):
+        what_left = stuff.time_is_left(upgrade_block)
+        text = dialogs.action_is_blocked % what_left
+        keyboard = None
+    else:
+        text = dialogs.power_active_down % 0
+        keyboard = keyboards.power_active()
+        player.states.main_state = 10
+        player.states.upgrade_state = 0
+        await web_app.add_player_to_redis(player)
+    await message.answer(text=text, reply_markup=keyboard)
 
 
 @dp.message_handler(text=["\U0001f446"], pl_state={"main_state": 10})
-async def power_action(message: Message):
+async def power_action_up(message: Message):
     player = message.conf["player"]
     web_app = message.conf["web_app"]
     if player.states.upgrade_state % 2 != 0:
@@ -147,6 +162,8 @@ async def power_action(message: Message):
             text = dialogs.power_active_down % reps
         keyboard = keyboards.power_active()
     else:
+        player.event_stuff.upgrade_block = int(time()) + 60  # set 60 seconds block to upgrade
+        player.power = player.power - 5 if player.power > 10 else player.power
         player.states.main_state = 1
         player.states.upgrade_state = 0
         text = dialogs.power_active_stuff
@@ -157,7 +174,7 @@ async def power_action(message: Message):
 
 
 @dp.message_handler(text=["\U0001F447"], pl_state={"main_state": 10})
-async def power_action(message: Message):
+async def power_action_down(message: Message):
     player = message.conf["player"]
     web_app = message.conf["web_app"]
     if player.states.upgrade_state % 2 == 0 and player.states.upgrade_state < 20:
@@ -166,11 +183,14 @@ async def power_action(message: Message):
         keyboard = keyboards.power_active()
     elif player.states.upgrade_state == 20:
         player.health = player.health - 5 if player.health > 20 else player.health
+        player.event_stuff.upgrade_block = int(time()) + 60  # set 60 seconds block to upgrade
         player.states.main_state = 1
         player.states.upgrade_state = 0
         text = dialogs.power_active_too_much
         keyboard = keyboards.choose_upgrade()
     else:
+        player.health = player.health - 5 if player.health > 20 else player.health
+        player.event_stuff.upgrade_block = int(time()) + 60  # set 60 seconds block to upgrade
         player.states.main_state = 1
         player.states.upgrade_state = 0
         text = dialogs.power_active_stuff
@@ -181,10 +201,11 @@ async def power_action(message: Message):
 
 
 @dp.message_handler(text=["\U0001F44F"], pl_state={"main_state": 10})
-async def power_action(message: Message):
+async def power_action_stuff(message: Message):
     player = message.conf["player"]
     web_app = message.conf["web_app"]
     player.power = player.power - 5 if player.power > 5 else player.power
+    player.event_stuff.upgrade_block = int(time()) + 60  # set 60 seconds block to upgrade
     player.states.main_state = 1
     player.states.upgrade_state = 0
 
@@ -204,6 +225,7 @@ async def power_active_stop(message: Message):
         power = player.states.upgrade_state // 2
     player.states.main_state = 1
     player.states.upgrade_state = 0
+    player.event_stuff.upgrade_block = int(time()) + 180  # set 3 minutes block to upgrade
     player.power += power
     await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.power_active_stop % power, reply_markup=keyboards.choose_upgrade())
@@ -216,24 +238,40 @@ async def power_active_stop(message: Message):
 
 # ================= health active upgrade ================
 @dp.message_handler(text=["\U00002764 Здоровье"])
-async def choose_power(message: Message):
-    await message.answer(text=dialogs.health_active_start, reply_markup=keyboards.health_active_start())
+async def choose_health(message: Message):
+    upgrade_block = message.conf["player"].event_stuff.upgrade_block
+    if upgrade_block and (upgrade_block > int(time())):
+        what_left = stuff.time_is_left(upgrade_block)
+        text = dialogs.action_is_blocked % what_left
+        keyboard = None
+    else:
+        text = dialogs.health_active_start
+        keyboard = keyboards.health_active_start()
+    await message.answer(text=text, reply_markup=keyboard)
 
 
 @dp.message_handler(text=["\U0001F3C3 Начать"])
-async def power_active_start(message: Message):
+async def health_active_start(message: Message):
     web_app = message.conf["web_app"]
     player = message.conf["player"]
-    way, picture = stuff.gen_random_way()
-    player.add_event(event_info=way)
-    player.states.main_state = 11
-    player.states.upgrade_state = 0
-    await web_app.add_player_to_redis(player)
-    await message.answer(text=dialogs.health_active_choose_way % (picture, 0), reply_markup=keyboards.health_active())
+    upgrade_block = player.event_stuff.upgrade_block
+    if upgrade_block and (upgrade_block > int(time())):
+        what_left = stuff.time_is_left(upgrade_block)
+        text = dialogs.action_is_blocked % what_left
+        keyboard = None
+    else:
+        way, picture = stuff.gen_random_way()
+        player.add_event(event_info=way)
+        player.states.main_state = 11
+        player.states.upgrade_state = 0
+        text = dialogs.health_active_choose_way % (picture, 0)
+        keyboard = keyboards.health_active()
+        await web_app.add_player_to_redis(player)
+    await message.answer(text=text, reply_markup=keyboard)
 
 
 @dp.message_handler(text=["\U00002B05", "\U00002B06", "\U000027A1"], pl_state={"main_state": 11})
-async def power_active_start(message: Message):
+async def health_active_turn(message: Message):
     web_app = message.conf["web_app"]
     player = message.conf["player"]
     keyboard = keyboards.choose_upgrade()
@@ -259,6 +297,7 @@ async def power_active_start(message: Message):
             text = dialogs.health_fail_way
             player.states.main_state = 1
             player.states.upgrade_state = 0
+            player.event_stuff.upgrade_block = int(time()) + 60  # set 1 minute block to upgrade
             player.health = player.health - 5 if player.health > 20 else player.health
             player.event_stuff = None
     await web_app.add_player_to_redis(player)
@@ -266,7 +305,7 @@ async def power_active_start(message: Message):
 
 
 @dp.message_handler(text=["\U0001F9B6 Остановиться"], pl_state={"main_state": 11})
-async def power_active_start(message: Message):
+async def health_active_stop(message: Message):
     web_app = message.conf["web_app"]
     player = message.conf["player"]
     distance = player.states.upgrade_state
@@ -278,6 +317,7 @@ async def power_active_start(message: Message):
     else:
         new_health = distance
 
+    player.event_stuff.upgrade_block = int(time()) + 180  # set 3 minutes block to upgrade
     player.health += new_health
     player.states.main_state = 1
     player.states.upgrade_state = 0
@@ -288,7 +328,7 @@ async def power_active_start(message: Message):
 
 
 @dp.message_handler(pl_state={"main_state": 11})
-async def health_active_stop(message: Message):
+async def health_active_other(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
 
