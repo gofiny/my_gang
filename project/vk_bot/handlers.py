@@ -227,9 +227,9 @@ async def power_active_start(message: Message):
             way, picture = stuff.gen_random_way()
             player.add_event(event_info=way)
             if player.states.upgrade_state == 20:
-                text = dialogs.health_lets_finish % (way, 2000)
+                text = dialogs.health_lets_finish % (picture, 2000)
             else:
-                text = dialogs.health_active_choose_way % (way, f"{player.states.upgrade_state}00")
+                text = dialogs.health_active_choose_way % (picture, f"{player.states.upgrade_state}00")
             keyboard = keyboards.health_active()
         else:
             text = dialogs.health_fail_way
@@ -244,9 +244,6 @@ async def power_active_start(message: Message):
 async def power_active_start(message: Message):
     web_app = message.web_app
     player = message.player
-    player.states.main_state = 0
-    player.states.upgrade_state = 0
-    player.event_stuff = None
     distance = player.states.upgrade_state
 
     if distance < 10:
@@ -257,6 +254,9 @@ async def power_active_start(message: Message):
         new_health = distance
 
     player.health += new_health
+    player.states.main_state = 0
+    player.states.upgrade_state = 0
+    player.event_stuff = None
 
     await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.health_active_stop % new_health, keyboard=keyboards.choose_upgrade())
