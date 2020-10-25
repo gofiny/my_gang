@@ -1,5 +1,5 @@
 import json
-from typing import Union, Optional
+from typing import Union, Optional, Any
 from time import time
 
 
@@ -203,8 +203,8 @@ class Player:
         self.level = Levels(level=data["level"], respect=self.respect)
         self.states = States(data.get("states", {}))
 
-    def add_event(self, event: EventStuff) -> None:
-        self.event_stuff = event
+    def add_event(self, event_info: Any) -> None:
+        self.event_stuff = EventStuff(data={"info": event_info})
 
     def add_respect(self, count: int) -> Optional[int]:
         self.respect += count

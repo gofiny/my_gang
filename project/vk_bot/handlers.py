@@ -1,8 +1,9 @@
 from vk_api.vk import Message, VK
 from config import VK_API_KEY, VK_API_VER
 from vk_bot import keyboards
-from common_utils import dialogs, exceptions
+from common_utils import dialogs, exceptions, stuff
 from db_utils import pg_queries
+
 
 vk_bot = VK(VK_API_KEY, VK_API_VER)
 
@@ -184,11 +185,6 @@ async def power_active_stop(message: Message):
     await message.answer(text=dialogs.power_active_stop % power, keyboard=keyboards.choose_upgrade())
 
 
-@vk_bot.message_handler(text="test")
-async def test(message: Message):
-    await message.answer(text="на", keyboard=keyboards.power_active())
-
-
 @vk_bot.message_handler(text="*", state={"main_state": 10})
 async def power_active_stop(message: Message):
     await message.answer(text=dialogs.touch_buttons)
@@ -204,20 +200,66 @@ async def choose_power(message: Message):
 async def power_active_start(message: Message):
     web_app = message.web_app
     player = message.player
+    way, picture = stuff.gen_random_way()
+    player.add_event(event_info=way)
     player.states.main_state = 11
     player.states.upgrade_state = 0
     await web_app.add_player_to_redis(player)
-    await message.answer(text=dialogs.health_active_start, keyboard=keyboards.health_active())
+    await message.answer(text=dialogs.health_active_choose_way % (picture, 0), keyboard=keyboards.health_active())
+
+
+@vk_bot.message_handler(payload={"command": "health_turn"})
+async def power_active_start(message: Message):
+    web_app = message.web_app
+    player = message.player
+    keyboard = keyboards.choose_upgrade()
+    if player.states.upgrade_state == 20:
+        player.states.main_state = 0
+        player.states.upgrade_state = 0
+        player.health = player.health - 5 if player.health > 20 else player.health
+        player.event_stuff = None
+        text = dialogs.health_active_too_much
+    else:
+        chosen_way = message.payload["command"].split()[1]
+        right_way = player.event_stuff.info
+        if chosen_way == right_way:
+            player.states.upgrade_state += 1
+            way, picture = stuff.gen_random_way()
+            player.add_event(event_info=way)
+            if player.states.upgrade_state == 20:
+                text = dialogs.health_lets_finish % (way, 2000)
+            else:
+                text = dialogs.health_active_choose_way % (way, f"{player.states.upgrade_state}00")
+            keyboard = keyboards.health_active()
+        else:
+            text = dialogs.health_fail_way
+            player.states.main_state = 0
+            player.states.upgrade_state = 0
+            player.event_stuff = None
+    await web_app.add_player_to_redis(player)
+    await message.answer(text=text, keyboard=keyboard)
 
 
 @vk_bot.message_handler(payload={"command": "health_active_stop"}, state={"main_state": 11})
 async def power_active_start(message: Message):
     web_app = message.web_app
     player = message.player
-    player.states.main_state = 1
+    player.states.main_state = 0
     player.states.upgrade_state = 0
+    player.event_stuff = None
+    distance = player.states.upgrade_state
+
+    if distance < 10:
+        new_health = 0
+    elif 10 < distance < 15:
+        new_health = distance - 2
+    else:
+        new_health = distance
+
+    player.health += new_health
+
     await web_app.add_player_to_redis(player)
-    await message.answer(text=dialogs.health_active_stop, keyboard=keyboards.choose_upgrade())
+    await message.answer(text=dialogs.health_active_stop % new_health, keyboard=keyboards.choose_upgrade())
 
 
 @vk_bot.message_handler(text="*", state={"main_state": 11})
