@@ -2,11 +2,12 @@ select_pl_uuid_by_user_id = 'SELECT uuid FROM players WHERE %s_id=$1'
 
 select_player_and_stuff = '''SELECT pl.uuid as player_uuid, pl.*,
                                 co.*, w.uuid as wallet_uuid, w.*,
-                                s.uuid as storage_uuid, s.*
+                                s.uuid as storage_uuid, s.*, ev.*
                              FROM players pl
                                  LEFT JOIN counters co ON pl.uuid=co.player
                                  LEFT JOIN wallets w ON pl.uuid=w.player
                                  LEFT JOIN storage s ON pl.uuid=s.player
+                                 LEFT JOIN events ev ON pl.uuid=ev.player
                              WHERE pl.uuid=$1'''
 
 create_players_table = '''CREATE TABLE IF NOT EXISTS players
@@ -60,6 +61,13 @@ create_goods_table = '''CREATE TABLE IF NOT EXISTS goods
                             "price" int NOT NULL
                         )'''
 
+create_event_table = '''CREATE TABLE IF NOT EXISTS events
+                        (
+                            "uuid" uuid NOT NULL PRIMARY KEY,
+                            "player" uuid REFERENCES "players" ("uuid") ON DELETE CASCADE,
+                            "upgrade_block" int
+                        )'''
+
 create_new_player = '''INSERT INTO players
                     (
                         "uuid",
@@ -92,7 +100,12 @@ create_new_player_with_stuff = '''WITH player as (
                                     INSERT INTO storage
                                     (
                                         uuid, player
-                                    ) VALUES ($6, $1)
+                                    ) VALUES ($6, $1)),
+                                  event as (
+                                    INSERT INTO events
+                                    (
+                                        uuid
+                                    ) VALUES ($7)
                                   )
                                   SELECT uuid FROM player'''
 

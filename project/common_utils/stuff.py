@@ -1,5 +1,6 @@
 import re
 from random import choice, shuffle
+from time import time
 
 
 def name_validation(text):
@@ -40,3 +41,20 @@ def gen_random_way() -> tuple:
         if element in {"left", "right", "straight"}:
             way = element
     return way, picture
+
+
+def time_is_left(block_time: int) -> str:
+    seconds = block_time - int(time())
+    minutes = seconds // 60
+    hours = minutes // 60
+    days = hours // 24
+    if days:
+        left_str = f"{days} дней {hours - days * 24} часов {minutes - hours * 60} минут {seconds - minutes * 60} секунд"
+    elif hours:
+        left_str = f"{hours} часов {minutes - hours * 60} минут {seconds - minutes * 60} секунд"
+    elif minutes:
+        left_str = f"{minutes} минут {seconds - minutes * 60} секунд"
+    else:
+        left_str = f"{seconds} секунд"
+
+    return left_str

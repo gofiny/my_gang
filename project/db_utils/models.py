@@ -6,11 +6,13 @@ from time import time
 class EventStuff:
     def __init__(self, data: dict):
         self.info = data.get("info")
+        self.upgrade_block = data.get("upgrade_block", 0)
 
     @property
     def all_stuff(self) -> dict:
         data = {
             "info": self.info,
+            "upgrade_block": self.upgrade_block
         }
         return data
 
@@ -186,12 +188,12 @@ class Player:
             self.counters = Counters(data["counters"])
             self.wallet = Wallet(data["wallet"])
             self.storage = Storage(data["storage"])
-            self.event_stuff = EventStuff(data.get("event_stuff")) if data.get("event_stuff") else None
+            self.event_stuff = EventStuff(data["event_stuff"])
         else:
             self.counters = Counters(data)
             self.wallet = Wallet(data)
             self.storage = Storage(data)
-            self.event_stuff = None
+            self.event_stuff = EventStuff(data)
         self.uuid = str(data["player_uuid"])
         self.vk_id = data["vk_id"]
         self.tlg_id = data["tlg_id"]
@@ -229,7 +231,7 @@ class Player:
             "counters": self.counters.all_counters,
             "wallet": self.wallet.data_to_serialize,
             "storage": self.storage.data_to_serialize,
-            "event_stuff": self.event_stuff.all_stuff if self.event_stuff else None
+            "event_stuff": self.event_stuff.all_stuff
         }
         return data
 

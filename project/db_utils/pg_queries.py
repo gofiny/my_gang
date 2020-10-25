@@ -25,6 +25,7 @@ async def preparing_db(connection: Connection) -> None:
     await connection.execute(sql.create_wallets_table)
     await connection.execute(sql.create_storage_table)
     await connection.execute(sql.create_goods_table)
+    await connection.execute(sql.create_event_table)
     is_created = await connection.fetchval(sql.check_goods, "watch")
     if not is_created:
         goods = [
