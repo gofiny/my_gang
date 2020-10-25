@@ -220,9 +220,12 @@ async def power_active_start(message: Message):
     await message.answer(text=dialogs.health_active_stop, keyboard=keyboards.choose_upgrade())
 
 
-@vk_bot.message_handler(state={"main_state": 11})
+@vk_bot.message_handler(text="*", state={"main_state": 11})
 async def health_active_stop(message: Message):
     await message.answer(text=dialogs.touch_buttons)
+
+
+# ================= health active upgrade ================
 
 
 @vk_bot.message_handler(text="*")

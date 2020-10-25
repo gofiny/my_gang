@@ -3,6 +3,21 @@ from typing import Union, Optional
 from time import time
 
 
+class EventStuff:
+    def __init__(self, data: dict):
+        self.info = data.get("info")
+
+    @property
+    def all_stuff(self) -> dict:
+        data = {
+            "info": self.info,
+        }
+        return data
+
+    def serialize(self) -> str:
+        return json.dumps(self.all_stuff)
+
+
 class Levels:
     LEVELS = {
         1: {"min": 0, "max": 200},
@@ -171,10 +186,12 @@ class Player:
             self.counters = Counters(data["counters"])
             self.wallet = Wallet(data["wallet"])
             self.storage = Storage(data["storage"])
+            self.event_stuff = EventStuff(data.get("event_stuff")) if data.get("event_stuff") else None
         else:
             self.counters = Counters(data)
             self.wallet = Wallet(data)
             self.storage = Storage(data)
+            self.event_stuff = None
         self.uuid = str(data["player_uuid"])
         self.vk_id = data["vk_id"]
         self.tlg_id = data["tlg_id"]
@@ -185,6 +202,9 @@ class Player:
         self.respect = data["respect"]
         self.level = Levels(level=data["level"], respect=self.respect)
         self.states = States(data.get("states", {}))
+
+    def add_event(self, event: EventStuff) -> None:
+        self.event_stuff = event
 
     def add_respect(self, count: int) -> Optional[int]:
         self.respect += count
@@ -208,7 +228,8 @@ class Player:
             "states": self.states.all_states,
             "counters": self.counters.all_counters,
             "wallet": self.wallet.data_to_serialize,
-            "storage": self.storage.data_to_serialize
+            "storage": self.storage.data_to_serialize,
+            "event_stuff": self.event_stuff.all_stuff if self.event_stuff else None
         }
         return data
 
