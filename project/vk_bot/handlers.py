@@ -195,15 +195,19 @@ async def power_action_stuff(message: Message):
 @vk_bot.message_handler(payload={"command": "power_active_stop"}, state={"main_state": 10})
 async def power_active_stop(message: Message):
     player = message.player
-    if player.states.upgrade_state < 10:  # if lower than 5 reps
+    upgrade_state = player.states.upgrade_state
+
+    if upgrade_state < 10:  # if lower than 5 reps
         power = 0
-    elif player.states.upgrade_state <= 14:  # if lower than 7 reps
+    elif upgrade_state <= 14:  # if lower than 7 reps
         power = 5
     else:
         power = player.states.upgrade_state // 2
+
+    if upgrade_state > 3:
+        player.event_stuff.upgrade_block = int(time()) + 180  # set 3 minutes block to upgrade
     player.states.main_state = 1
     player.states.upgrade_state = 0
-    player.event_stuff.upgrade_block = int(time()) + 180  # set 3 minutes block to upgrade
     player.power += power
     await message.web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.power_active_stop % power, keyboard=keyboards.choose_upgrade())
@@ -295,7 +299,8 @@ async def health_active_stop(message: Message):
     else:
         new_health = distance
 
-    player.event_stuff.upgrade_block = int(time()) + 180  # set 3 minutes block to upgrade
+    if distance > 3:
+        player.event_stuff.upgrade_block = int(time()) + 180  # set 3 minutes block to upgrade
     player.health += new_health
     player.states.main_state = 1
     player.states.upgrade_state = 0
