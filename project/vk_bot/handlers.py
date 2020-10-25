@@ -235,6 +235,7 @@ async def power_active_start(message: Message):
             text = dialogs.health_fail_way
             player.states.main_state = 1
             player.states.upgrade_state = 0
+            player.health = player.health - 5 if player.health > 20 else player.health
             player.event_stuff = None
     await web_app.add_player_to_redis(player)
     await message.answer(text=text, keyboard=keyboard)
