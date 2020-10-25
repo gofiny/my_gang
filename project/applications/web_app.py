@@ -176,6 +176,12 @@ class WebApp:
             _filter = f'text_{message.text}'
         return _filter
 
+    def get_other_message_handler(self) -> Optional[Callable]:
+        _filter = self.vk_bot.handlers.get("text_*")
+        if _filter:
+            return _filter["states"][None]
+        return None
+
     def get_handler_by_state(self, _filter: str, player: Player) -> Optional[Callable]:
         exists_filter = self.vk_bot.handlers.get(_filter, self.vk_bot.handlers.get("text_*"))
         player_states = player.states
@@ -188,7 +194,7 @@ class WebApp:
                 state_name = list(state.keys())[0]
                 if player_states.is_that_state(state_name=state_name, value=state[state_name]):
                     return func
-        return None
+        return self.get_other_message_handler()
 
     @staticmethod
     def _get_message_object(request_object: dict) -> dict:
