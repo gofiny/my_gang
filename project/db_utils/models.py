@@ -208,6 +208,9 @@ class Player:
     def add_event(self, event_info: Any) -> None:
         self.event_stuff = EventStuff(data={"info": event_info})
 
+    def clear_event_info(self):
+        self.event_stuff.info = None
+
     def add_respect(self, count: int) -> Optional[int]:
         self.respect += count
         new_level = self.level.add_respect(count)
