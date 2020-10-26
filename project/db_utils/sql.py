@@ -104,8 +104,8 @@ create_new_player_with_stuff = '''WITH player as (
                                   event as (
                                     INSERT INTO events
                                     (
-                                        uuid
-                                    ) VALUES ($7)
+                                        uuid, player
+                                    ) VALUES ($7, $1)
                                   )
                                   SELECT uuid FROM player'''
 
