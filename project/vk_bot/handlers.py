@@ -261,6 +261,7 @@ async def health_active_turn(message: Message):
         player.states.main_state = 1
         player.states.upgrade_state = 0
         player.health = player.health - 5 if player.health > 20 else player.health
+        player.event_stuff.upgrade_block = int(time()) + 60  # set 1 minute block to upgrade
         player.clear_event_info()
         text = dialogs.health_active_too_much
     else:
