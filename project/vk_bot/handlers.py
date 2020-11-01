@@ -339,7 +339,7 @@ async def search_fight(message: Message):
         keyboard = keyboards.deny_search_fight()
     player.states.main_state = 20
 
-    await redis_queries.add_player(pool=web_app.pool, player=player)
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await redis_queries.add_await_fight(pool=pool, fight=fight)
     await message.answer(text=text, keyboard=keyboard)
 
