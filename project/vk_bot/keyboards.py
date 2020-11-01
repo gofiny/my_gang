@@ -121,3 +121,28 @@ def health_active():
         Button(label="\U0001F9B6 Остановиться", payload={"command": "health_active_stop"}, color="primary")
     ])
     return keyboard
+
+
+def fights_menu():
+    keyboard = Keyboard(default_width=1)
+    keyboard.add_buttons([
+        Button(label="\U0001F50D Зарубиться", paylaod={"command": "search_fight"}),
+        Button(label="\U00002B05 Назад", payload={"command": "street"})
+    ])
+    return keyboard
+
+
+def deny_search_fight():
+    keyboard = Keyboard()
+    keyboard.add_button(
+        Button(label="\U00002B05 Назад", payload={"command": "stop_search_fight"})
+    )
+    return keyboard
+
+
+def fight_keyboard():
+    keyboard = Keyboard()
+    keyboard.add_buttons([
+        Button(label="\U0001F4A9 Сдаться", payload={"command": "give_up"})
+    ])
+    return keyboard

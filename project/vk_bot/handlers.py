@@ -2,7 +2,8 @@ from vk_api.vk import Message, VK
 from config import VK_API_KEY, VK_API_VER
 from vk_bot import keyboards
 from common_utils import dialogs, exceptions, stuff
-from db_utils import pg_queries
+from db_utils import pg_queries, redis_queries
+from db_utils.models import Fight
 from time import time
 
 
@@ -316,7 +317,51 @@ async def health_active_other(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
 
-# ================= health active upgrade ================
+# ================= fights ================
+@vk_bot.message_handler(payload={"command": "search_fight"})
+async def search_fight(message: Message):
+    player = message.player
+    web_app = message.web_app
+    pool = web_app.redis_pool
+    fight = redis_queries.get_await_fight(pool)
+    if fight:
+        fight = None
+        text = dialogs.start_fight
+        keyboard = keyboards.fight_keyboard()
+    else:
+        fight = Fight(player=player)
+        text = dialogs.start_search_fight
+        keyboard = keyboards.deny_search_fight()
+    player.states.main_state = 20
+
+    await redis_queries.add_player(pool=web_app.pool, player=player)
+    await redis_queries.add_await_fight(pool=pool, fight=fight)
+    await message.answer(text=text, keyboard=keyboard)
+
+
+@vk_bot.message_handler(payload={"command": "stop_search_fight"}, state={"main_state": 20})
+async def stop_search_fight(message: Message):
+    player = message.player
+    web_app = message.web_app
+    player.states.main_state = 1
+    player.states.upgrade_state = 0
+    web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.scared, keyboard=keyboards.street())
+
+
+@vk_bot.message_handler(payload={"command": "give_up"}, state={"main_state": 20})
+async def give_up(message: Message):
+    player = message.player
+    web_app = message.web_app
+    player.states.main_state = 1
+    player.states.upgrade_state = 0
+    web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.street, keyboard=keyboards.street())
+
+
+@vk_bot.message_handler(text="*", state={"main_state": 20})
+async def other(message: Message):
+    await message.answer(text=dialogs.touch_buttons)
 
 
 @vk_bot.message_handler(text="*")

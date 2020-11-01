@@ -1,5 +1,6 @@
 import json
 from typing import Union, Optional, Any
+from uuid import uuid4
 from time import time
 
 
@@ -181,6 +182,48 @@ class Wallet:
         return json.dumps(self.data_to_serialize)
 
 
+class Fight:
+    def __init__(self, player: Optional["Player"] = None, data: Optional[dict] = None):
+        if data:
+            self.player = Player(data=data["player"], from_redis=True)
+        else:
+            self.player = player
+
+    @property
+    def all_params(self):
+        data = {
+            "player": self.player.all_params
+        }
+        return data
+
+    def serialize(self) -> str:
+        return json.dumps(self.all_params)
+
+
+class FightSide:
+    def __init__(self, enemy: Optional["Player"] = None, health: Optional[int] = None, data: Optional[dict] = None):
+        if not data:
+            self.enemy = data["enemy"]
+            self.health = data["health"]
+            self.damage = data["damage"]
+        else:
+            self.enemy = enemy
+            self.health = health
+            self.damage = 0
+
+    @property
+    def all_params(self):
+        data = {
+            "enemy": self.enemy.all_params,
+            "health": self.health,
+            "damage": self.damage
+        }
+        return data
+
+    def serialize(self) -> str:
+        return json.dumps(self.all_params)
+
+
 class Player:
     def __init__(self, data: Union[dict, str], from_redis: bool = False):
         if from_redis:
@@ -189,11 +232,13 @@ class Player:
             self.wallet = Wallet(data["wallet"])
             self.storage = Storage(data["storage"])
             self.event_stuff = EventStuff(data["event_stuff"])
+            self.fight_side = FightSide(data["fight_side"])
         else:
             self.counters = Counters(data)
             self.wallet = Wallet(data)
             self.storage = Storage(data)
             self.event_stuff = EventStuff(data)
+            self.fight_side = None
         self.uuid = str(data["player_uuid"])
         self.vk_id = data["vk_id"]
         self.tlg_id = data["tlg_id"]
@@ -218,6 +263,9 @@ class Player:
             self.level = new_level
             return new_level
 
+    def add_fight_side(self, enemy: "Player"):
+        self.fight_side = FightSide(enemy=enemy, health=self.health)
+
     @property
     def all_params(self) -> dict:
         data = {
@@ -234,7 +282,8 @@ class Player:
             "counters": self.counters.all_counters,
             "wallet": self.wallet.data_to_serialize,
             "storage": self.storage.data_to_serialize,
-            "event_stuff": self.event_stuff.all_stuff
+            "event_stuff": self.event_stuff.all_stuff,
+            "fight_side": self.fight_side.all_params if self.fight_side else None
         }
         return data
 
