@@ -318,6 +318,11 @@ async def health_active_other(message: Message):
 
 
 # ================= fights ================
+@vk_bot.message_handler(payload={"command": "fights"})
+async def fights(message: Message):
+    await message.answer(text=dialogs.start_search_fight, keyboard=keyboards.fights_menu())
+
+
 @vk_bot.message_handler(payload={"command": "search_fight"})
 async def search_fight(message: Message):
     player = message.player
