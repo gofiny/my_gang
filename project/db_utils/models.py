@@ -202,7 +202,7 @@ class Fight:
 
 class FightSide:
     def __init__(self, enemy: Optional["Player"] = None, health: Optional[int] = None, data: Optional[dict] = None):
-        if not data:
+        if data:
             self.enemy = data["enemy"]
             self.health = data["health"]
             self.damage = data["damage"]
