@@ -365,7 +365,7 @@ async def give_up(message: Message):
 
 
 @vk_bot.message_handler(text="*", state={"main_state": 20})
-async def other(message: Message):
+async def fight_other(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
 

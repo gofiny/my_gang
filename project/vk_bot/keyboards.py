@@ -126,7 +126,7 @@ def health_active():
 def fights_menu():
     keyboard = Keyboard(default_width=1)
     keyboard.add_buttons([
-        Button(label="\U0001F50D Зарубиться", paylaod={"command": "search_fight"}),
+        Button(label="\U0001F50D Зарубиться", payload={"command": "search_fight"}),
         Button(label="\U00002B05 Назад", payload={"command": "street"}, color="primary")
     ])
     return keyboard
