@@ -283,7 +283,7 @@ class Player:
             "wallet": self.wallet.data_to_serialize,
             "storage": self.storage.data_to_serialize,
             "event_stuff": self.event_stuff.all_stuff,
-            "fight_side": self.fight_side.all_params if self.fight_side else None
+            "fight_side": None if not self.fight_side else self.fight_side.all_params
         }
         return data
 
