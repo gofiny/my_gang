@@ -1,6 +1,5 @@
 import json
 from typing import Union, Optional, Any
-from uuid import uuid4
 from time import time
 
 
@@ -266,6 +265,9 @@ class Player:
     def add_fight_side(self, enemy: "Player"):
         self.fight_side = FightSide(enemy=enemy, health=self.health)
 
+    def clear_fight_side(self):
+        self.fight_side = None
+
     @property
     def all_params(self) -> dict:
         data = {
@@ -283,8 +285,9 @@ class Player:
             "wallet": self.wallet.data_to_serialize,
             "storage": self.storage.data_to_serialize,
             "event_stuff": self.event_stuff.all_stuff,
-            "fight_side": None if not self.fight_side else self.fight_side.all_params
         }
+        if self.fight_side:
+            data["fight_side"] = self.fight_side.all_params
         return data
 
     def serialize(self) -> str:
