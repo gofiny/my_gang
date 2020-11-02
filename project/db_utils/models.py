@@ -232,7 +232,7 @@ class Player:
             self.wallet = Wallet(data["wallet"])
             self.storage = Storage(data["storage"])
             self.event_stuff = EventStuff(data["event_stuff"])
-            self.fight_side = FightSide(data.get("fight_side") if data.get("fight_side") else None)
+            self.fight_side = FightSide(data.get("fight_side")) if data.get("fight_side") else None
         else:
             self.counters = Counters(data)
             self.wallet = Wallet(data)
@@ -288,7 +288,6 @@ class Player:
             "event_stuff": self.event_stuff.all_stuff,
         }
         if self.fight_side:
-            logger.debug(f"{self.fight_side}")
             data["fight_side"] = self.fight_side.all_params
         return data
 
