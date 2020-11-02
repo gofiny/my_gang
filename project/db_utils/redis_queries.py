@@ -8,7 +8,10 @@ async def add_player(pool: Redis, player: Player) -> None:
 
 
 async def get_await_fight(pool: Redis) -> Optional[str]:
-    return await pool.getset(key="fight", value="", encoding="utf-8")
+    fight = await pool.getset(key="fight", value="", encoding="utf-8")
+    if fight == "":
+        return None
+    return fight
 
 
 async def add_await_fight(pool: Redis, fight: Optional[Fight]) -> None:
