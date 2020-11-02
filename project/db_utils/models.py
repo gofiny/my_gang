@@ -1,6 +1,7 @@
 import json
 from typing import Union, Optional, Any
 from time import time
+from loguru import logger
 
 
 class EventStuff:
@@ -287,6 +288,7 @@ class Player:
             "event_stuff": self.event_stuff.all_stuff,
         }
         if self.fight_side:
+            logger.debug(f"{self.fight_side}")
             data["fight_side"] = self.fight_side.all_params
         return data
 
