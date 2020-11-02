@@ -1,7 +1,6 @@
 import json
 from typing import Union, Optional, Any
 from time import time
-from loguru import logger
 
 
 class EventStuff:
