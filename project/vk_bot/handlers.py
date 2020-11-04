@@ -328,7 +328,7 @@ async def search_fight(message: Message):
     player = message.player
     web_app = message.web_app
     pool = web_app.redis_pool
-    fight = redis_queries.get_await_fight(pool)
+    fight = await redis_queries.get_await_fight(pool)
     if fight:
         fight = None
         text = dialogs.start_fight
