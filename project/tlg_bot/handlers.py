@@ -3,8 +3,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.dispatcher.filters import BoundFilter
 from aiogram.types import Message
 from tlg_bot import keyboards
-from db_utils import pg_queries
+from db_utils import pg_queries, redis_queries
 from common_utils import dialogs, exceptions, stuff
+from db_utils.models import Fight
 from time import time
 
 
@@ -338,7 +339,56 @@ async def health_active_other(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
 
-# ================= health active upgrade ================
+# ======================== fights ========================
+@dp.message_handler(text=["\U0001F44A Разборки"])
+async def fights(message: Message):
+    await message.answer(text=dialogs.fight_menu, reply_markup=keyboards.fights_menu())
+
+
+@dp.message_handler(text=["\U0001F50D Зарубиться"])
+async def search_fight(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    pool = web_app.redis_pool
+    fight = await redis_queries.get_await_fight(pool)
+    if fight:
+        text = dialogs.start_fight
+        keyboard = keyboards.fight_keyboard()
+    else:
+        fight = Fight(player=player)
+        await redis_queries.add_await_fight(pool=pool, fight=fight)
+        text = dialogs.start_search_fight
+        keyboard = keyboards.deny_search_fight()
+    player.states.main_state = 20
+
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
+    await message.answer(text=text, reply_markup=keyboard)
+
+
+@dp.message_handler(text=["\U0001F6AB Отмена"], pl_state={"main_state": 20})
+async def stop_search_fight(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    player.states.main_state = 1
+    player.states.upgrade_state = 0
+    web_app.add_player_to_redis(player)
+    await redis_queries.add_await_fight(pool=web_app.redis_pool, fight=None)
+    await message.answer(text=dialogs.scared, reply_markup=keyboards.street())
+
+
+@dp.message_handler(text=["\U0001F4A9 Сдаться"], pl_state={"main_state": 20})
+async def give_up(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    player.states.main_state = 1
+    player.states.upgrade_state = 0
+    web_app.add_player_to_redis(player)
+    await message.answer(text=dialogs.street, reply_markup=keyboards.street())
+
+
+@dp.message_handler(pl_state={"main_state": 20})
+async def fight_other(message: Message):
+    await message.answer(text=dialogs.touch_buttons)
 
 
 @dp.message_handler()

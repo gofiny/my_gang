@@ -135,7 +135,7 @@ def fights_menu():
 def deny_search_fight():
     keyboard = Keyboard()
     keyboard.add_button(
-        Button(label="\U00002B05 Назад", payload={"command": "stop_search_fight"})
+        Button(label="\U0001F6AB Отмена", payload={"command": "stop_search_fight"})
     )
     return keyboard
 

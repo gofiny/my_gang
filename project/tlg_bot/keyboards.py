@@ -100,3 +100,26 @@ def health_active():
     )
 
     return keyboard
+
+
+def fights_menu():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    keyboard.add(
+        KeyboardButton("\U0001F50D Зарубиться"),
+        KeyboardButton("\U00002B05 На улицу")
+    )
+    return keyboard
+
+
+def deny_search_fight():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add(KeyboardButton("\U0001F6AB Отмена"))
+    return keyboard
+
+
+def fight_keyboard():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add(
+        KeyboardButton("\U0001F4A9 Сдаться")
+    )
+    return keyboard

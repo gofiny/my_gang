@@ -1,18 +1,17 @@
 from aioredis import Redis
 from db_utils.models import Player, Fight
 from typing import Optional
-from loguru import logger
 
 
 async def add_player(pool: Redis, player: Player) -> None:
     await pool.set(f"player:{player.uuid}", player.serialize())
 
 
-async def get_await_fight(pool: Redis) -> Optional[str]:
+async def get_await_fight(pool: Redis) -> Optional[Fight]:
     fight = await pool.getset(key="fight", value="", encoding="utf-8")
     if fight == "":
         return None
-    return fight
+    return Fight(data=fight)
 
 
 async def add_await_fight(pool: Redis, fight: Optional[Fight]) -> None:
