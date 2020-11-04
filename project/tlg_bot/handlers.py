@@ -371,7 +371,7 @@ async def stop_search_fight(message: Message):
     web_app = message.conf["web_app"]
     player.states.main_state = 1
     player.states.upgrade_state = 0
-    web_app.add_player_to_redis(player)
+    await web_app.add_player_to_redis(player)
     await redis_queries.add_await_fight(pool=web_app.redis_pool, fight=None)
     await message.answer(text=dialogs.scared, reply_markup=keyboards.street())
 
@@ -382,7 +382,7 @@ async def give_up(message: Message):
     web_app = message.conf["web_app"]
     player.states.main_state = 1
     player.states.upgrade_state = 0
-    web_app.add_player_to_redis(player)
+    await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.street, reply_markup=keyboards.street())
 
 
