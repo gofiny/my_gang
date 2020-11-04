@@ -1,6 +1,7 @@
 from aioredis import Redis
 from db_utils.models import Player, Fight
 from typing import Optional
+from loguru import logger
 
 
 async def add_player(pool: Redis, player: Player) -> None:
@@ -9,6 +10,7 @@ async def add_player(pool: Redis, player: Player) -> None:
 
 async def get_await_fight(pool: Redis) -> Optional[str]:
     fight = await pool.getset(key="fight", value="", encoding="utf-8")
+    logger.debug(f"{fight}")
     if fight == "":
         return None
     return fight
