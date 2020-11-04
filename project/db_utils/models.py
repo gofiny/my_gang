@@ -182,8 +182,9 @@ class Wallet:
 
 
 class Fight:
-    def __init__(self, player: Optional["Player"] = None, data: Optional[dict] = None):
+    def __init__(self, player: Optional["Player"] = None, data: Optional[str] = None):
         if data:
+            data = json.loads(data)
             self.player = Player(data=data["player"], from_redis=True)
         else:
             self.player = player
