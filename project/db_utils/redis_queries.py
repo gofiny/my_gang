@@ -21,5 +21,5 @@ async def add_await_fight(pool: Redis, fight: Optional[Fight]) -> None:
 async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
     data = await pool.get(key=f"player:{player_uuid}", encoding="utf-8")
     if data:
-        return Player(data=data, from_redis=True)
+        return Player(data=data, from_redis=True, need_deserialize=True)
     return data

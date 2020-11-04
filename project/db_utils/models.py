@@ -185,7 +185,7 @@ class Fight:
     def __init__(self, player: Optional["Player"] = None, data: Optional[str] = None):
         if data:
             data = json.loads(data)
-            self.player = Player(data=data["player"])
+            self.player = Player(data=data["player"], from_redis=True)
         else:
             self.player = player
 
@@ -225,9 +225,10 @@ class FightSide:
 
 
 class Player:
-    def __init__(self, data: Union[dict, str], from_redis: bool = False):
-        if from_redis:
+    def __init__(self, data: Union[dict, str], from_redis: bool = False, need_deserialize: bool = False):
+        if need_deserialize:
             data = json.loads(data)
+        if from_redis:
             self.counters = Counters(data["counters"])
             self.wallet = Wallet(data["wallet"])
             self.storage = Storage(data["storage"])
