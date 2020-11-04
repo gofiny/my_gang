@@ -330,17 +330,16 @@ async def search_fight(message: Message):
     pool = web_app.redis_pool
     fight = await redis_queries.get_await_fight(pool)
     if fight:
-        fight = None
         text = dialogs.start_fight
         keyboard = keyboards.fight_keyboard()
     else:
         fight = Fight(player=player)
+        await redis_queries.add_await_fight(pool=pool, fight=fight)
         text = dialogs.start_search_fight
         keyboard = keyboards.deny_search_fight()
     player.states.main_state = 20
 
     await redis_queries.add_player(pool=web_app.redis_pool, player=player)
-    await redis_queries.add_await_fight(pool=pool, fight=fight)
     await message.answer(text=text, keyboard=keyboard)
 
 
@@ -351,6 +350,7 @@ async def stop_search_fight(message: Message):
     player.states.main_state = 1
     player.states.upgrade_state = 0
     web_app.add_player_to_redis(player)
+    await redis_queries.add_await_fight(pool=web_app.redis_pool, fight=None)
     await message.answer(text=dialogs.scared, keyboard=keyboards.street())
 
 
