@@ -213,18 +213,19 @@ class WebApp:
         return await pg_queries.create_new_player(connection=connection, user_id=user_id, prefix=prefix)
 
     @staticmethod
-    async def get_player_from_pg(connection: Connection, player_uuid: str) -> Player:
-        return await pg_queries.get_player_with_stuff(connection=connection, player_uuid=player_uuid)
+    async def get_player_from_pg(connection: Connection, player_uuid: str, prefix: str) -> Player:
+        return await pg_queries.get_player_with_stuff(
+            connection=connection, player_uuid=player_uuid, current_platform=prefix)
 
     async def add_player_to_redis(self, player: Player):
         await redis_queries.add_player(pool=self.redis_pool, player=player)
 
-    async def check_player(self, user_id: int, prefix):
+    async def check_player(self, user_id: int, prefix: str):
         async with self.pg_pool.acquire() as connection:
             user_uuid = await pg_queries.get_player_uuid(connection=connection, user_id=user_id, prefix=prefix)
             if not user_uuid:
                 player_uuid = await self.register_player(connection=connection, user_id=user_id, prefix=prefix)
-                player = await self.get_player_from_pg(connection=connection, player_uuid=player_uuid)
+                player = await self.get_player_from_pg(connection=connection, player_uuid=player_uuid, prefix=prefix)
                 await self.add_player_to_redis(player=player)
                 raise exceptions.PlayerNotRegistered
             return user_uuid

@@ -352,7 +352,15 @@ async def search_fight(message: Message):
     pool = web_app.redis_pool
     fight = await redis_queries.get_await_fight(pool)
     if fight:
-        text = dialogs.start_fight
+        enemy = fight.player
+        enemy.add_fight_side(enemy=player)
+        player.add_fight_side(enemy=enemy)
+        await redis_queries.add_player(pool=pool, player=enemy)
+        await stuff.send_message_to_right_platform(
+            player=enemy, web_app=web_app, keyboard_name="fight_keyboard",
+            text=dialogs.start_fight % (player.name, player.health)
+        )
+        text = dialogs.start_fight % (enemy.name, enemy.health)
         keyboard = keyboards.fight_keyboard()
     else:
         fight = Fight(player=player)
@@ -380,10 +388,23 @@ async def stop_search_fight(message: Message):
 async def give_up(message: Message):
     player = message.conf["player"]
     web_app = message.conf["web_app"]
+    pool = web_app.redis_pool
+
+    enemy = player.fight_side.enemy
+    enemy.states.main_state = 1
+    enemy.states.upgrade_state = 0
+    enemy.clear_fight_side()
+    await redis_queries.add_player(pool=pool, player=enemy)
+    await stuff.send_message_to_right_platform(
+            player=enemy, web_app=web_app, keyboard_name="street",
+            text=dialogs.enemy_give_up
+        )
+
+    player.clear_fight_side()
     player.states.main_state = 1
     player.states.upgrade_state = 0
     await web_app.add_player_to_redis(player)
-    await message.answer(text=dialogs.street, reply_markup=keyboards.street())
+    await message.answer(text=dialogs.you_give_up, reply_markup=keyboards.street())
 
 
 @dp.message_handler(pl_state={"main_state": 20})

@@ -49,9 +49,10 @@ async def get_player_uuid(connection: Connection, user_id: int, prefix: str) -> 
 
 
 @transaction
-async def get_player_with_stuff(connection: Connection, player_uuid: str) -> Player:
+async def get_player_with_stuff(connection: Connection, player_uuid: str, current_platform: str) -> Player:
     player_data = await connection.fetchrow(sql.select_player_and_stuff, player_uuid)
     player_data = dict(player_data)
+    player_data["current_platform"] = current_platform
     player = Player(data=player_data)
     return player
 

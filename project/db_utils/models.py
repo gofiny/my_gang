@@ -250,6 +250,7 @@ class Player:
         self.respect = data["respect"]
         self.level = Levels(level=data["level"], respect=self.respect)
         self.states = States(data.get("states", {}))
+        self.current_platform = data["current_platform"]
 
     def add_event(self, event_info: Any) -> None:
         self.event_stuff = EventStuff(data={"info": event_info})
@@ -287,6 +288,7 @@ class Player:
             "wallet": self.wallet.data_to_serialize,
             "storage": self.storage.data_to_serialize,
             "event_stuff": self.event_stuff.all_stuff,
+            "current_platform": self.current_platform
         }
         if self.fight_side:
             data["fight_side"] = self.fight_side.all_params
