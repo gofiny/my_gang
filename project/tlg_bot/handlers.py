@@ -39,7 +39,7 @@ async def register_request(message: Message):
 async def connect(message: Message, player_uuid: str):
     web_app = message.conf["web_app"]
     async with web_app.pg_pool.acquire() as connection:
-        player = await web_app.get_player_from_pg(connection=connection, player_uuid=player_uuid)
+        player = await web_app.get_player_from_pg(connection=connection, player_uuid=player_uuid, prefix="tlg")
         player.states.main_state = 1
     await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.home, reply_markup=keyboards.home())
