@@ -213,7 +213,7 @@ class WebApp:
         return await pg_queries.create_new_player(connection=connection, user_id=user_id, prefix=prefix)
 
     @staticmethod
-    async def get_player_from_pg(connection: Connection, player_uuid: str, prefix: str) -> Player:
+    async def get_player_from_pg(connection: Connection, player_uuid: str, prefix: str = "vk") -> Player:
         return await pg_queries.get_player_with_stuff(
             connection=connection, player_uuid=player_uuid, current_platform=prefix)
 
