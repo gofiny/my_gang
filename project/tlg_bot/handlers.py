@@ -421,7 +421,7 @@ async def fight_process(message: Message):
 
             if player.fight_side.health <= 0:
                 text = dialogs.you_lose_fight
-                enemy_text = dialogs.you_lose_fight
+                enemy_text = dialogs.you_win_fight
                 player.states.main_state = 1
                 enemy.states.main_state = 1
                 keyboard = keyboards.street()
