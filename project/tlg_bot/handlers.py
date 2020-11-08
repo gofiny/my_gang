@@ -361,9 +361,9 @@ async def search_fight(message: Message):
         await redis_queries.add_player(pool=pool, player=enemy)
         await stuff.send_message_to_right_platform(
             player=enemy, web_app=web_app, keyboard_name="fight_keyboard",
-            text=dialogs.start_fight_enemy % (player.name, player.health)
+            text=dialogs.start_fight_you % (player.name, player.health)
         )
-        text = dialogs.start_fight_you % (enemy.name, enemy.health)
+        text = dialogs.start_fight_enemy % (enemy.name, enemy.health)
         keyboard = keyboards.fight_keyboard()
     else:
         player.states.main_state = 20
