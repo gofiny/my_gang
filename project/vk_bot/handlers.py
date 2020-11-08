@@ -335,12 +335,13 @@ async def search_fight(message: Message):
         enemy.add_fight_side(enemy=player)
         player.add_fight_side(enemy=enemy)
         enemy.states.main_state = 20
+        enemy.states.upgrade_state = 31
         await redis_queries.add_player(pool=pool, player=enemy)
         await stuff.send_message_to_right_platform(
             player=enemy, web_app=web_app, keyboard_name="fight_keyboard",
-            text=dialogs.start_fight % (player.name, player.health)
+            text=dialogs.start_fight_enemy % (player.name, player.health)
         )
-        text = dialogs.start_fight % (enemy.name, enemy.health)
+        text = dialogs.start_fight_you % (enemy.name, enemy.health)
         keyboard = keyboards.fight_keyboard()
     else:
         fight = Fight(player=player)
@@ -348,9 +349,79 @@ async def search_fight(message: Message):
         text = dialogs.start_search_fight
         keyboard = keyboards.deny_search_fight()
     player.states.main_state = 20
+    player.states.upgrade_state = 30
 
     await redis_queries.add_player(pool=pool, player=player)
     await message.answer(text=text, keyboard=keyboard)
+
+
+@vk_bot.message_handler(payload={"command": "fight"}, state={"main_state": 20})
+async def fight_process(message: Message):
+    player = message.player
+    web_app = message.web_app
+    pool = web_app.redis_pool
+    enemy = await redis_queries.get_player(pool=pool, player_uuid=player.fight_side.enemy)
+
+    enemy_text = None
+    enemy_keyboard = None
+
+    enemy_choice = enemy.event_stuff.info
+    player_choice = message.payload["command"].split()[1]
+    if enemy_choice:
+        if player.states.upgrade_state == 30:  # if player is hitting
+            hit_name = stuff.get_rus_hit_name(player_choice)
+            hit_status, damage = stuff.calc_damage(player=player, hit_choice=player_choice, guard_choice=enemy_choice)
+            enemy.fight_side.health -= damage
+            enemy.states.upgrade_state = 30
+            player.fight_side.damage += damage
+            player.states.upgrade_state = 31
+            if enemy.fight_side.health <= 0:
+                text = dialogs.you_win_fight
+                enemy_text = dialogs.you_lose_fight
+                player.states.main_state = 1
+                enemy.states.main_state = 1
+                keyboard = keyboards.street()
+                enemy_keyboard = "street"
+            else:
+                keyboard = keyboards.fight_keyboard()
+                enemy_keyboard = "fight_keyboard"
+                text = dialogs.get_damage_message(True, hit_status, hit_name, damage, player, enemy)
+                enemy_text = dialogs.get_damage_message(False, hit_status, hit_name, damage, enemy, player)
+        else:  # if player is guarding
+            hit_name = stuff.get_rus_hit_name(enemy_choice)
+            hit_status, damage = stuff.calc_damage(player=enemy, hit_choice=enemy_choice, guard_choice=player_choice)
+            player.fight_side.health -= damage
+            player.states.upgrade_state = 30
+            enemy.fight_side.damage += damage
+            enemy.states.upgrade_state = 31
+
+            if player.fight_side.health <= 0:
+                text = dialogs.you_lose_fight
+                enemy_text = dialogs.you_lose_fight
+                player.states.main_state = 1
+                enemy.states.main_state = 1
+                keyboard = keyboards.street()
+                enemy_keyboard = "street"
+            else:
+                keyboard = keyboards.fight_keyboard()
+                enemy_keyboard = "fight_keyboard"
+                text = dialogs.get_damage_message(False, hit_status, hit_name, damage, player, enemy)
+                enemy_text = dialogs.get_damage_message(False, hit_status, hit_name, damage, enemy, player)
+
+        player.clear_event_info()
+        enemy.clear_event_info()
+
+    else:
+        player.event_stuff.info = player_choice
+        text = dialogs.wait_the_enemy
+        keyboard = keyboards.fight_keyboard(hide_buttons=True)
+
+    await redis_queries.add_player(pool=pool, player=enemy)
+    await redis_queries.add_player(pool=pool, player=player)
+
+    await message.answer(text=text, keyboard=keyboard)
+    if enemy_text:
+        await stuff.send_message_to_right_platform(enemy, web_app, enemy_text, enemy_keyboard)
 
 
 @vk_bot.message_handler(payload={"command": "stop_search_fight"}, state={"main_state": 20})

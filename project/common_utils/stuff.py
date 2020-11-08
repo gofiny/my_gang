@@ -5,6 +5,7 @@ from db_utils.models import Player
 from applications.web_app import WebApp
 from vk_bot import keyboards as vk_keyboards
 from tlg_bot import keyboards as tlg_keyboards
+from typing import Optional
 
 
 def name_validation(text):
@@ -72,11 +73,60 @@ get_keyboard = {
 }
 
 
-async def send_message_to_right_platform(player: Player, web_app: WebApp, text: str, keyboard_name: str = None) -> None:
+async def send_message_to_right_platform(
+        player: Player, web_app: WebApp, text: str,
+        keyboard_name: str = None,
+        keyboard_args: Optional[dict] = None) -> None:
     if player.current_platform == "vk":
-        keyboard = get_keyboard[f"vk_{keyboard_name}"]() if keyboard_name else None
+        keyboard = get_keyboard.get(f"vk_{keyboard_name}")
+        if keyboard_name and keyboard_args:
+            keyboard = keyboard(**keyboard_args)
+        elif keyboard_name:
+            keyboard = keyboard()
         await web_app.vk_bot.send_message(user_ids=player.vk_id, text=text, keyboard=keyboard)
     else:
         bot = web_app.tlg_dp.bot
-        keyboard = get_keyboard[f"tlg_{keyboard_name}"]() if keyboard_name else None
+        keyboard = get_keyboard.get(f"tlg_{keyboard_name}")
+        if keyboard_name and keyboard_args:
+            keyboard = keyboard(**keyboard_args)
+        elif keyboard_name:
+            keyboard = keyboard()
         await bot.send_message(chat_id=player.tlg_id, text=text, reply_markup=keyboard)
+
+
+def calc_damage(player: Player, hit_choice: str, guard_choice: str) -> tuple:
+    ratio = {
+        "head": 1,
+        "chest": 0.75,
+        "abdomen": 0.8,
+        "legs": 0.5
+    }
+    if hit_choice == guard_choice:
+        damage_ratio = 0.1
+        hit_status = False
+    else:
+        damage_ratio = ratio[hit_choice]
+        hit_status = True
+    damage = int(player.power * damage_ratio)
+
+    return hit_status, damage
+
+
+def get_rus_hit_name(hit_name: str) -> str:
+    translate = {
+        "head": "голову",
+        "chest": "грудь",
+        "abdomen": "живот",
+        "legs": "ноги"
+    }
+    return translate[hit_name]
+
+
+def get_eng_hit_name(hit_name: str) -> str:
+    translate = {
+        "голову": "head",
+        "грудь": "chest",
+        "живот": "abdomen",
+        "ноги": "legs"
+    }
+    return translate[hit_name]

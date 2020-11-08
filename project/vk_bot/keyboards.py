@@ -140,8 +140,17 @@ def deny_search_fight():
     return keyboard
 
 
-def fight_keyboard():
-    keyboard = Keyboard()
+def fight_keyboard(hide_buttons: bool = False):
+    keyboard = Keyboard(default_width=2)
+    buttons = [
+        Button(label="голову", paylaod={"command": "fight head"}),
+        Button(label="грудь", payload={"command": "fight chest"}),
+        Button(label="живот", payload={"command": "fight abdomen"}),
+        Button(label="ноги", payload={"command": "fight legs"})
+    ]
+    if not hide_buttons:
+        keyboard.add_buttons(buttons)
+
     keyboard.add_buttons([
         Button(label="\U0001F4A9 Сдаться", payload={"command": "give_up"})
     ])

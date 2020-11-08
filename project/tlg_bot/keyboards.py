@@ -117,8 +117,17 @@ def deny_search_fight():
     return keyboard
 
 
-def fight_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+def fight_keyboard(hide_buttons: bool = False):
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    buttons = [
+        KeyboardButton("голову"),
+        KeyboardButton("грудь"),
+        KeyboardButton("живот"),
+        KeyboardButton("ноги")
+    ]
+    if not hide_buttons:
+        keyboard.add(*buttons)
+
     keyboard.add(
         KeyboardButton("\U0001F4A9 Сдаться")
     )
