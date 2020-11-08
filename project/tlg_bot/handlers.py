@@ -388,7 +388,7 @@ async def fight_process(message: Message):
     enemy_keyboard = None
 
     enemy_choice = enemy.event_stuff.info
-    player_choice = message.payload["command"].split()[1]
+    player_choice = stuff.get_eng_hit_name(message.text)
     if enemy_choice:
         if player.states.upgrade_state == 30:  # if player is hitting
             hit_name = stuff.get_rus_hit_name(player_choice)
