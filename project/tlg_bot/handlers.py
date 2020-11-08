@@ -355,6 +355,7 @@ async def search_fight(message: Message):
         enemy = fight.player
         enemy.add_fight_side(enemy=player)
         player.add_fight_side(enemy=enemy)
+        enemy.states.main_state = 20
         await redis_queries.add_player(pool=pool, player=enemy)
         await stuff.send_message_to_right_platform(
             player=enemy, web_app=web_app, keyboard_name="fight_keyboard",
@@ -390,15 +391,15 @@ async def give_up(message: Message):
     web_app = message.conf["web_app"]
     pool = web_app.redis_pool
 
-    enemy = player.fight_side.enemy
+    enemy = await redis_queries.get_player(pool=pool, player_uuid=player.fight_side.enemy)
     enemy.states.main_state = 1
     enemy.states.upgrade_state = 0
     enemy.clear_fight_side()
     await redis_queries.add_player(pool=pool, player=enemy)
     await stuff.send_message_to_right_platform(
-            player=enemy, web_app=web_app, keyboard_name="street",
-            text=dialogs.enemy_give_up
-        )
+        player=enemy, web_app=web_app, keyboard_name="street",
+        text=dialogs.enemy_give_up
+    )
 
     player.clear_fight_side()
     player.states.main_state = 1
