@@ -4,6 +4,7 @@ from vk_bot import keyboards
 from common_utils import dialogs, exceptions, stuff
 from db_utils import pg_queries, redis_queries
 from db_utils.models import Fight
+from loguru import logger
 from time import time
 
 
@@ -369,6 +370,8 @@ async def give_up(message: Message):
     web_app = message.web_app
     pool = web_app.redis_pool
 
+    enemy = player.fight_side.enemy
+    logger.debug(f"{enemy}")
     enemy = await redis_queries.get_player(pool=pool, player_uuid=player.fight_side.enemy)
     enemy.states.main_state = 1
     enemy.states.upgrade_state = 0
