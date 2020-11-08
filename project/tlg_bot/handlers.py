@@ -350,13 +350,14 @@ async def search_fight(message: Message):
     player = message.conf["player"]
     web_app = message.conf["web_app"]
     pool = web_app.redis_pool
+
     fight = await redis_queries.get_await_fight(pool)
     if fight:
         enemy = fight.player
         enemy.add_fight_side(enemy=player)
         player.add_fight_side(enemy=enemy)
-        enemy.states.main_state = 20
-        enemy.states.upgrade_state = 31
+        player.states.main_state = 20
+        player.states.upgrade_state = 31
         await redis_queries.add_player(pool=pool, player=enemy)
         await stuff.send_message_to_right_platform(
             player=enemy, web_app=web_app, keyboard_name="fight_keyboard",
@@ -365,12 +366,12 @@ async def search_fight(message: Message):
         text = dialogs.start_fight_you % (enemy.name, enemy.health)
         keyboard = keyboards.fight_keyboard()
     else:
+        player.states.main_state = 20
+        player.states.upgrade_state = 30
         fight = Fight(player=player)
         await redis_queries.add_await_fight(pool=pool, fight=fight)
         text = dialogs.start_search_fight
         keyboard = keyboards.deny_search_fight()
-    player.states.main_state = 20
-    player.states.upgrade_state = 30
 
     await redis_queries.add_player(pool=pool, player=player)
     await message.answer(text=text, reply_markup=keyboard)
@@ -387,7 +388,7 @@ async def fight_process(message: Message):
     enemy_keyboard = None
 
     enemy_choice = enemy.event_stuff.info
-    player_choice = stuff.get_eng_hit_name(message.text)
+    player_choice = message.payload["command"].split()[1]
     if enemy_choice:
         if player.states.upgrade_state == 30:  # if player is hitting
             hit_name = stuff.get_rus_hit_name(player_choice)
@@ -407,7 +408,9 @@ async def fight_process(message: Message):
                 keyboard = keyboards.fight_keyboard()
                 enemy_keyboard = "fight_keyboard"
                 text = dialogs.get_damage_message(True, hit_status, hit_name, damage, player, enemy)
+                text += dialogs.choice_guard
                 enemy_text = dialogs.get_damage_message(False, hit_status, hit_name, damage, enemy, player)
+                enemy_text += dialogs.choice_hit
         else:  # if player is guarding
             hit_name = stuff.get_rus_hit_name(enemy_choice)
             hit_status, damage = stuff.calc_damage(player=enemy, hit_choice=enemy_choice, guard_choice=player_choice)
@@ -427,7 +430,9 @@ async def fight_process(message: Message):
                 keyboard = keyboards.fight_keyboard()
                 enemy_keyboard = "fight_keyboard"
                 text = dialogs.get_damage_message(False, hit_status, hit_name, damage, player, enemy)
+                text += dialogs.choice_hit
                 enemy_text = dialogs.get_damage_message(False, hit_status, hit_name, damage, enemy, player)
+                enemy_text += dialogs.choice_guard
 
         player.clear_event_info()
         enemy.clear_event_info()
