@@ -201,11 +201,7 @@ class Fight:
 
 
 class FightSide:
-    def __init__(self,
-                 enemy: Optional["Player"] = None,
-                 health: Optional[int] = None,
-                 data: Optional[dict] = None,
-                 need_enemy: bool = True):
+    def __init__(self, enemy: Optional[str] = None, health: Optional[int] = None, data: Optional[dict] = None):
         if data:
             self.enemy = data["enemy"]
             self.health = data["health"]
@@ -215,13 +211,10 @@ class FightSide:
             self.health = health
             self.damage = 0
 
-        if not need_enemy:
-            self.enemy = None
-
     @property
     def all_params(self):
         data = {
-            "enemy": self.enemy.all_params if self.enemy else None,
+            "enemy": self.enemy,
             "health": self.health,
             "damage": self.damage
         }
@@ -272,8 +265,8 @@ class Player:
             self.level = new_level
             return new_level
 
-    def add_fight_side(self, enemy: "Player", need_sub_enemy: bool = True):
-        self.fight_side = FightSide(enemy=enemy, health=self.health, need_enemy=need_sub_enemy)
+    def add_fight_side(self, enemy: "Player"):
+        self.fight_side = FightSide(enemy=enemy.uuid, health=self.health)
 
     def clear_fight_side(self):
         self.fight_side = None
