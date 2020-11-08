@@ -80,6 +80,18 @@ async def get_player_wallet(connection: Connection, player_uuid: str) -> Wallet:
     return Wallet(dict(wallet))
 
 
+@transaction
+async def update_player(connection: Connection, player: Player) -> None:
+    await connection.execute(sql.update_player,
+                             player.level, player.health, player.power, player.mind, player.respect, player.uuid,
+                             player.counters.lm_time, player.counters.daily_actions, player.counters.total_actions,
+                             player.storage.watch, player.storage.phone, player.storage.headphones,
+                             player.storage.credit_card, player.storage.glasses, player.storage.cap,
+                             player.storage.gloves,
+                             player.event_stuff.upgrade_block,
+                             player.wallet.dollars)
+
+
 async def open_connection(pool: Pool, func: Callable, *args, **kwargs) -> Optional[Any]:
     async with pool.acquire() as connection:
         val = await func(connection=connection, *args, **kwargs)

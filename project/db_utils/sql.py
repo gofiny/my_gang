@@ -113,19 +113,28 @@ select_name_from_players = '''SELECT name FROM players WHERE LOWER(name)=LOWER($
 
 set_name_to_player = '''UPDATE players SET name=$1 WHERE uuid=$2'''
 
-update_player = '''WITH players as (
+update_player = '''WITH pl as (
                    UPDATE players SET 
                         level=$1,
                         health=$2,
                         power=$3,
                         mind=$4,
                         respect=$5
-                    WHERE uuid=$6), 
+                    WHERE uuid=$6), count as (
                     UPDATE counters SET
                         lm_time=$7,
                         daily_actions=$8,
                         total_actions=$9
-                    WHERE player=$6'''
+                    WHERE player=$6), store as (
+                    UPDATE storage SET
+                        watch=$10, phone=$11, headphones=$12, credit_card=$13, glasses=$14, cap=$15, gloves=$16
+                    WHERE player=$6), event as (
+                    UPDATE events SET
+                        upgrade_block=$17
+                    WHERE player=$6), wallet as (
+                    UPDATE wallets SET
+                        dollars=$18
+                    WHERE player=$6)'''
 
 check_seller = '''SELECT uuid FROM players WHERE name=$1'''
 

@@ -23,3 +23,7 @@ async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
     if data:
         return Player(data=data, from_redis=True, need_deserialize=True)
     return data
+
+
+async def get_all_players(pool: Redis) -> list:
+    return await pool.keys("players:*")
