@@ -69,7 +69,9 @@ get_keyboard = {
     "vk_fight_keyboard": vk_keyboards.fight_keyboard,
     "tlg_fight_keyboard": tlg_keyboards.fight_keyboard,
     "vk_street": vk_keyboards.street,
-    "tlg_street": tlg_keyboards.street
+    "tlg_street": tlg_keyboards.street,
+    "vk_connect": vk_keyboards.connect,
+    "tlg_connect": tlg_keyboards.connect
 }
 
 

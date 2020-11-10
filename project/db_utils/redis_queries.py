@@ -7,6 +7,10 @@ async def add_player(pool: Redis, player: Player) -> None:
     await pool.set(f"player:{player.uuid}", player.serialize())
 
 
+async def remove_player(pool: Redis, player: Player) -> None:
+    await pool.delete(f"player:{player.uuid}")
+
+
 async def get_await_fight(pool: Redis) -> Optional[Fight]:
     fight = await pool.getset(key="fight", value="", encoding="utf-8")
     if fight == "":

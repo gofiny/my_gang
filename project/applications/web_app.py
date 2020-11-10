@@ -17,6 +17,8 @@ from db_utils import redis_queries, pg_queries
 from aiohttp.web import Application, Response, Request, post, run_app, View
 from vk_api.vk import VK, Message
 from typing import Optional, Callable
+from common_utils import dialogs
+from common_utils.stuff import send_message_to_right_platform
 
 
 class WebhookRequestHandler(View):
@@ -150,6 +152,7 @@ class WebApp:
     def _set_base_handlers(self, tlg_address_prefix: str, vk_address_prefix: str):
         self.app.add_routes([post(f"/{vk_address_prefix}/", self._vk_base_handler)])
         self.app.add_routes([post(f"/{tlg_address_prefix}/", WebhookRequestHandler)])
+        self.app.add_routes([post("/events/", self._events_handler)])
 
     async def _vk_base_handler(self, request: Request) -> Response:
         request_json = await request.json()
@@ -161,6 +164,15 @@ class WebApp:
             await self._process_new_message(message_object)
         elif request_type == "confirmation":
             return Response(body=self.returning_callback_str)
+        return Response(body="ok")
+
+    async def _events_handler(self, request: Request) -> Response:
+        events = {"afk_disconnect": {"text": dialogs.you_disconnected, "keyboard": "connect"}}
+        data = await request.json()
+        request_event = data["event"]
+        text = events[request_event]["text"]
+        keyboard = events[request_event]["keyboard"]
+        await send_message_to_right_platform(player=data["player"], web_app=self, text=text, keyboard_name=keyboard)
         return Response(body="ok")
 
     @staticmethod
