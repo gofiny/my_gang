@@ -2,7 +2,6 @@ import re
 from random import choice, shuffle
 from time import time
 from db_utils.models import Player
-from applications.web_app import WebApp
 from vk_bot import keyboards as vk_keyboards
 from tlg_bot import keyboards as tlg_keyboards
 from typing import Optional
@@ -76,7 +75,7 @@ get_keyboard = {
 
 
 async def send_message_to_right_platform(
-        player: Player, web_app: WebApp, text: str,
+        player: Player, web_app, text: str,
         keyboard_name: str = None,
         keyboard_args: Optional[dict] = None) -> None:
     if player.current_platform == "vk":
