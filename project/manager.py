@@ -50,6 +50,7 @@ class Manager:
             async for player in self.get_player(players):
                 logger.debug(f"{player.uuid} is checking")
                 if (player.counters.lm_time + 1200) < time():
+                    logger.debug("im here")
                     await redis_queries.remove_player(pool=self.redis, player=player)
                     await pg_queries.update_player(connection=connection, player=player)
                     await self.send_event(event_name="afk_disconnect", player=player)
@@ -64,6 +65,9 @@ class Manager:
 
 
 if __name__ == "__main__":
+    logger.add(f"{config.LOGS_DIR}/mgr_info.log", format="{time:YYYY-MM-DD at HH:mm:ss} | {message}", level="INFO")
+    logger.add(f"{config.LOGS_DIR}/mgr_debug.log", format="{time:YYYY-MM-DD at HH:mm:ss} | {message}", level="DEBUG")
+    logger.add(f"{config.LOGS_DIR}/mgr.error.log", format="{time:YYYY-MM-DD at HH:mm:ss} | {message}", level="ERROR")
     loop = asyncio.get_event_loop()
     manager = Manager()
     try:
