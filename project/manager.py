@@ -61,6 +61,7 @@ class Manager:
         try:
             while True:
                 await self.find_afk()
+                logger.info("loop again")
         except KeyboardInterrupt:
             await self.on_shutdown()
 
