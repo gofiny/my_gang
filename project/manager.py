@@ -1,7 +1,7 @@
 import asyncio
 import asyncpg
 from aiohttp import ClientSession
-from asyncpg import Connection
+from loguru import logger
 from asyncpg.pool import Pool
 import aioredis
 from aioredis import Redis
@@ -17,7 +17,7 @@ class Manager:
         self.storage = {}
 
     async def prepare(self):
-        self.storage["pg_pool"] = await asyncpg.create_pool(dsn=config.PG_DESTINATION)
+        self.storage["pg_pool"] = await asyncpg.create_pool(dsn=config.PG_DESTINATION, max_size=2)
         self.storage["redis"] = await aioredis.create_redis_pool(config.REDIS_ADDRESS)
 
     async def on_shutdown(self):
@@ -48,6 +48,7 @@ class Manager:
         players = await redis_queries.get_all_players(pool=self.redis)
         async with self.pg_pool.acquire() as connection:
             async for player in self.get_player(players):
+                logger.debug(f"{player.uuid} is checking")
                 if (player.counters.lm_time + 1200) > time():
                     await redis_queries.remove_player(pool=self.redis, player=player)
                     await pg_queries.update_player(connection=connection, player=player)
