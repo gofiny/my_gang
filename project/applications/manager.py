@@ -20,6 +20,11 @@ class Manager:
         self.storage["pg_pool"] = await asyncpg.create_pool(dsn=config.PG_DESTINATION)
         self.storage["redis"] = await aioredis.create_redis_pool(config.REDIS_ADDRESS)
 
+    async def on_shutdown(self):
+        self.redis.close()
+        await self.redis.wait_closed()
+        await self.pg_pool.close()
+
     @property
     def pg_pool(self) -> Pool:
         return self.storage["pg_pool"]
@@ -47,3 +52,22 @@ class Manager:
                     await redis_queries.remove_player(pool=self.redis, player=player)
                     await pg_queries.update_player(connection=connection, player=player)
                     await self.send_event(event_name="afk_disconnect", player=player)
+        await asyncio.sleep(10)
+
+    async def main(self):
+        try:
+            while True:
+                await self.find_afk()
+        except KeyboardInterrupt:
+            await self.on_shutdown()
+
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    manager = Manager()
+    try:
+        loop.run_until_complete(manager.prepare())
+        asyncio.ensure_future(manager.main())
+        loop.run_forever()
+    finally:
+        loop.close()
