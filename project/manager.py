@@ -46,12 +46,12 @@ class Manager:
 
     @staticmethod
     async def test():
-        logger.info("test")
+        logger.debug("test")
         await asyncio.sleep(1)
 
     async def find_afk(self):
         players = await redis_queries.get_all_players(pool=self.redis)
-        logger.info(f"{players}")
+        logger.debug(f"{players}")
         async with self.pg_pool.acquire() as connection:
             async for player in self.get_player(players):
                 logger.debug(f"{player.uuid} is checking")
