@@ -78,6 +78,7 @@ class Counters:
 
     @property
     def all_counters(self) -> dict:
+        self.plus_one()
         data = {
             "lm_time": self.lm_time,
             "daily_actions": self.daily_actions,
