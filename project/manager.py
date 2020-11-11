@@ -44,6 +44,11 @@ class Manager:
         for player in players:
             yield Player(data=player, from_redis=True)
 
+    @staticmethod
+    async def test():
+        logger.info("test")
+        await asyncio.sleep(1)
+
     async def find_afk(self):
         players = await redis_queries.get_all_players(pool=self.redis)
         logger.info(f"{players}")
@@ -61,7 +66,7 @@ class Manager:
         try:
             while True:
                 await self.find_afk()
-                logger.info("loop again")
+                await self.test()
         except KeyboardInterrupt:
             await self.on_shutdown()
 

@@ -30,4 +30,4 @@ async def get_player(pool: Redis, player_uuid: str) -> Optional[Player]:
 
 
 async def get_all_players(pool: Redis) -> list:
-    return await pool.keys(pattern="players:*", encoding="utf-8")
+    return await pool.keys(pattern="player:*", encoding="utf-8")
