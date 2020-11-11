@@ -42,7 +42,7 @@ class Manager:
     @staticmethod
     async def get_player(players: list):
         for player in players:
-            yield Player(data=player, from_redis=True)
+            yield Player(data=player, from_redis=True, need_deserialize=True)
 
     @staticmethod
     async def test():
