@@ -5,8 +5,8 @@ from asyncpg import Connection
 from asyncpg.pool import Pool
 import aioredis
 from aioredis import Redis
-from ..db_utils import pg_queries, redis_queries
-from ..db_utils.models import Player
+from db_utils import pg_queries, redis_queries
+from db_utils.models import Player
 from time import time
 import config
 import json
