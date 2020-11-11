@@ -83,7 +83,7 @@ async def get_player_wallet(connection: Connection, player_uuid: str) -> Wallet:
 @transaction
 async def update_player(connection: Connection, player: Player) -> None:
     await connection.execute(sql.update_player,
-                             player.level, player.health, player.power, player.mind, player.respect, player.uuid,
+                             player.level.level, player.health, player.power, player.mind, player.respect, player.uuid,
                              player.counters.lm_time, player.counters.daily_actions, player.counters.total_actions,
                              player.storage.watch, player.storage.phone, player.storage.headphones,
                              player.storage.credit_card, player.storage.glasses, player.storage.cap,
