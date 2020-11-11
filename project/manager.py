@@ -51,9 +51,9 @@ class Manager:
 
     async def find_afk(self):
         players = await redis_queries.get_all_players(pool=self.redis)
+        logger.debug("finding afk...")
         async with self.pg_pool.acquire() as connection:
             async for player in self.get_player(players):
-                logger.debug(f"{player.uuid} is checking")
                 if (player.counters.lm_time + 1200) < time():
                     await redis_queries.remove_player(pool=self.redis, player=player)
                     await pg_queries.update_player(connection=connection, player=player)
