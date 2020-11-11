@@ -131,10 +131,10 @@ update_player = '''WITH pl as (
                     WHERE player=$6), event as (
                     UPDATE events SET
                         upgrade_block=$17
-                    WHERE player=$6), wallet as (
+                    WHERE player=$6)
                     UPDATE wallets SET
                         dollars=$18
-                    WHERE player=$6)'''
+                    WHERE player=$6'''
 
 check_seller = '''SELECT uuid FROM players WHERE name=$1'''
 
