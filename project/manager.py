@@ -17,7 +17,7 @@ class Manager:
         self.storage = {}
 
     async def prepare(self):
-        self.storage["pg_pool"] = await asyncpg.create_pool(dsn=config.PG_DESTINATION, max_size=2)
+        self.storage["pg_pool"] = await asyncpg.create_pool(dsn=config.PG_DESTINATION, min_size=1, max_size=2)
         self.storage["redis"] = await aioredis.create_redis_pool(config.REDIS_ADDRESS)
 
     async def on_shutdown(self):
