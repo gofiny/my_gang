@@ -35,7 +35,7 @@ class Manager:
 
     @staticmethod
     async def send_event(event_name: str, player: Player) -> None:
-        data = {"event_name": event_name, "player": player}
+        data = {"event_name": event_name, "player": player.serialize()}
         async with ClientSession() as session:
             await session.post(config.EVENTS_ADDR, data=json.dumps(data))
 
