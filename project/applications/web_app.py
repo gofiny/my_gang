@@ -169,7 +169,7 @@ class WebApp:
     async def _events_handler(self, request: Request) -> Response:
         events = {"afk_disconnect": {"text": dialogs.you_disconnected, "keyboard": "connect"}}
         data = await request.json()
-        request_event = data["event"]
+        request_event = data["event_name"]
         text = events[request_event]["text"]
         keyboard = events[request_event]["keyboard"]
         await send_message_to_right_platform(player=data["player"], web_app=self, text=text, keyboard_name=keyboard)
