@@ -167,14 +167,19 @@ class WebApp:
         return Response(body="ok")
 
     async def _events_handler(self, request: Request) -> Response:
-        events = {"afk_disconnect": {"text": dialogs.you_disconnected, "keyboard": "connect"}}
+        events = {
+            "afk_disconnect": {"text": dialogs.you_disconnected, "keyboard": "connect"},
+            "enemy_give_up": {"text": dialogs.enemy_give_up, "keyboard": "street"}
+        }
         data = await request.json()
-        request_event = data["event_name"]
-        text = events[request_event]["text"]
-        keyboard = events[request_event]["keyboard"]
-        await send_message_to_right_platform(
-            player=Player(data["player"], from_redis=True, need_deserialize=True),
-            web_app=self, text=text, keyboard_name=keyboard)
+        request_events = data["events"]
+        for event in request_events:
+            request_event = event["event_name"]
+            text = events[request_event]["text"]
+            keyboard = events[request_event]["keyboard"]
+            await send_message_to_right_platform(
+                player=Player(event["player"], from_redis=True, need_deserialize=True),
+                web_app=self, text=text, keyboard_name=keyboard)
         return Response(body="ok")
 
     @staticmethod

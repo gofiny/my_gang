@@ -1,7 +1,11 @@
 import re
+from aioredis import Redis
+from asyncpg import Connection
 from random import choice, shuffle
 from time import time
 from db_utils.models import Player
+from db_utils import redis_queries, pg_queries
+from common_utils import dialogs
 from vk_bot import keyboards as vk_keyboards
 from tlg_bot import keyboards as tlg_keyboards
 from typing import Optional
@@ -131,3 +135,35 @@ def get_eng_hit_name(hit_name: str) -> str:
         "ноги": "legs"
     }
     return translate[hit_name]
+
+
+def close_fight(winner: Player, loser: Player):
+    for player in (winner, loser):
+        player.states.main_state = 1
+        player.states.upgrade_state = 0
+        player.clear_event_info()
+        player.clear_fight_side()
+
+
+def create_event(event_name: str, player: Player) -> dict:
+    return {"event_name": event_name, "player": player.serialize()}
+
+
+async def check_dependencies(redis: Redis, player: Player) -> list:
+    events = []
+    if player.fight_side:
+        enemy = player.fight_side.enemy
+        close_fight(winner=enemy, loser=player)
+        event = create_event(event_name="enemy_give_up", player=enemy)
+        events.append(event)
+        await redis_queries.add_player(pool=redis, player=enemy)
+
+    return events
+
+
+async def disconnect_player(pg_conn: Connection, redis: Redis, player: Player) -> list:
+    events = await check_dependencies(redis=redis, player=player)
+    await redis_queries.remove_player(pool=redis, player=player)
+    await pg_queries.update_player(connection=pg_conn, player=player)
+
+    return events

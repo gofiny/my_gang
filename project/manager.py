@@ -5,6 +5,7 @@ from loguru import logger
 from asyncpg.pool import Pool
 import aioredis
 from aioredis import Redis
+from common_utils import stuff
 from db_utils import pg_queries, redis_queries
 from db_utils.models import Player
 from time import time
@@ -34,8 +35,8 @@ class Manager:
         return self.storage["redis"]
 
     @staticmethod
-    async def send_event(event_name: str, player: Player) -> None:
-        data = {"event_name": event_name, "player": player.serialize()}
+    async def send_events(events: list) -> None:
+        data = {"events": events}
         async with ClientSession() as session:
             await session.post(config.EVENTS_ADDR, data=json.dumps(data))
 
@@ -44,27 +45,21 @@ class Manager:
         for player in players:
             yield Player(data=player, from_redis=True, need_deserialize=True)
 
-    @staticmethod
-    async def test():
-        logger.debug("test")
-        await asyncio.sleep(1)
-
     async def find_afk(self):
         players = await redis_queries.get_all_players(pool=self.redis)
-        logger.debug("finding afk...")
         async with self.pg_pool.acquire() as connection:
             async for player in self.get_player(players):
                 if (player.counters.lm_time + 60) < time():
-                    await redis_queries.remove_player(pool=self.redis, player=player)
-                    await pg_queries.update_player(connection=connection, player=player)
-                    await self.send_event(event_name="afk_disconnect", player=player)
+                    events = await stuff.disconnect_player(pg_conn=connection, redis=self.redis, player=player)
+                    event = stuff.create_event(event_name="afk_disconnect", player=player)
+                    events.append(event)
+                    await self.send_events(events)
         await asyncio.sleep(10)
 
     async def main(self):
         try:
             while True:
                 await self.find_afk()
-                await self.test()
         except KeyboardInterrupt:
             await self.on_shutdown()
 
