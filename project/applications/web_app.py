@@ -172,7 +172,9 @@ class WebApp:
         request_event = data["event_name"]
         text = events[request_event]["text"]
         keyboard = events[request_event]["keyboard"]
-        await send_message_to_right_platform(player=data["player"], web_app=self, text=text, keyboard_name=keyboard)
+        await send_message_to_right_platform(
+            player=Player(data["player"], from_redis=True, need_deserialize=True),
+            web_app=self, text=text, keyboard_name=keyboard)
         return Response(body="ok")
 
     @staticmethod
