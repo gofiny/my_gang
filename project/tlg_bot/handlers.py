@@ -82,46 +82,62 @@ async def register_name(message: Message):
 @dp.message_handler(text=["\U0001F464 Профиль"])
 async def my_profile(message: Message):
     player = message.conf["player"]
+    web_app = message.conf["web_app"]
     text = dialogs.my_profile % (player.name, player.level.level, player.respect,
                                  player.level.level_max, player.power, player.health, player.mind)
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=text)
 
 
 @dp.message_handler(text=["\U0001F4B0 Кошелек"])
 async def wallet(message: Message):
     player = message.conf["player"]
+    web_app = message.conf["web_app"]
     text = dialogs.wallet % player.wallet.dollars
 
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=text)
 
 
 @dp.message_handler(text=["\U0001F4E6 Хранилище"])
 async def storage(message: Message):
     player = message.conf["player"]
+    web_app = message.conf["web_app"]
     text = dialogs.storage(player)
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=text)
 
 
 @dp.message_handler(text=["\U0001F3E0 Домой"])
 async def home(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=dialogs.home, reply_markup=keyboards.home())
 
 
 @dp.message_handler(text=["\U0001F6AA На улицу", "\U00002B05 На улицу"])
 async def street(message: Message):
-    keyboard = keyboards.street()
-    await message.answer(text=dialogs.street, reply_markup=keyboard)
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
+    await message.answer(text=dialogs.street, reply_markup=keyboards.street())
 
 
 @dp.message_handler(text=["\U0001F199 Прокачка", "\U00002B05 Прокачка"])
 async def choose_upgrade(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=dialogs.choose_upgrade, reply_markup=keyboards.choose_upgrade())
 
 
 # ===================== Power active upgrade =====================
 @dp.message_handler(text=["\U0001F4AA Сила"])
 async def choose_power(message: Message):
-    upgrade_block = message.conf["player"].event_stuff.upgrade_block
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    upgrade_block = player.event_stuff.upgrade_block
     if upgrade_block and (upgrade_block > int(time())):
         what_left = stuff.time_is_left(upgrade_block)
         text = dialogs.action_is_blocked % what_left
@@ -129,6 +145,8 @@ async def choose_power(message: Message):
     else:
         text = dialogs.power_active_start
         keyboard = keyboards.power_active_start()
+
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=text, reply_markup=keyboard)
 
 
@@ -146,7 +164,7 @@ async def power_active_start(message: Message):
         keyboard = keyboards.power_active()
         player.states.main_state = 10
         player.states.upgrade_state = 0
-        await web_app.add_player_to_redis(player)
+    await web_app.add_player_to_redis(player)
     await message.answer(text=text, reply_markup=keyboard)
 
 
@@ -244,7 +262,9 @@ async def power_active_stop(message: Message):
 # ================= health active upgrade ================
 @dp.message_handler(text=["\U00002764 Здоровье"])
 async def choose_health(message: Message):
-    upgrade_block = message.conf["player"].event_stuff.upgrade_block
+    web_app = message.conf["web_app"]
+    player = message.conf["player"]
+    upgrade_block = player.event_stuff.upgrade_block
     if upgrade_block and (upgrade_block > int(time())):
         what_left = stuff.time_is_left(upgrade_block)
         text = dialogs.action_is_blocked % what_left
@@ -252,6 +272,8 @@ async def choose_health(message: Message):
     else:
         text = dialogs.health_active_start
         keyboard = keyboards.health_active_start()
+
+    await web_app.add_player_to_redis(player)
     await message.answer(text=text, reply_markup=keyboard)
 
 
@@ -271,7 +293,8 @@ async def health_active_start(message: Message):
         player.states.upgrade_state = 0
         text = dialogs.health_active_choose_way % (picture, 0)
         keyboard = keyboards.health_active()
-        await web_app.add_player_to_redis(player)
+
+    await web_app.add_player_to_redis(player)
     await message.answer(text=text, reply_markup=keyboard)
 
 
@@ -342,6 +365,9 @@ async def health_active_other(message: Message):
 # ======================== fights ========================
 @dp.message_handler(text=["\U0001F44A Разборки"])
 async def fights(message: Message):
+    player = message.conf["player"]
+    web_app = message.conf["web_app"]
+    await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.fight_menu, reply_markup=keyboards.fights_menu())
 
 

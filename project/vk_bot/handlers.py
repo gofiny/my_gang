@@ -65,46 +65,63 @@ async def register_name(message: Message):
 @vk_bot.message_handler(payload={"command": "my_profile"})
 async def my_profile(message: Message):
     player = message.player
+    web_app = message.web_app
     text = dialogs.my_profile % (player.name, player.level.level, player.respect,
                                  player.level.level_max, player.power, player.health, player.mind)
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=text)
 
 
 @vk_bot.message_handler(payload={"command": "wallet"})
 async def wallet(message: Message):
     player = message.player
+    web_app = message.web_app
     text = dialogs.wallet % player.wallet.dollars
 
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=text)
 
 
 @vk_bot.message_handler(payload={"command": "storage"})
 async def storage(message: Message):
     player = message.player
+    web_app = message.web_app
     text = dialogs.storage(player)
+
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=text)
 
 
 @vk_bot.message_handler(payload={"command": "home"})
 async def home(message: Message):
+    player = message.player
+    web_app = message.web_app
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=dialogs.home, keyboard=keyboards.home())
 
 
 @vk_bot.message_handler(payload={"command": "street"})
 async def street(message: Message):
-    keyboard = keyboards.street()
-    await message.answer(text=dialogs.street, keyboard=keyboard)
+    player = message.player
+    web_app = message.web_app
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
+    await message.answer(text=dialogs.street, keyboard=keyboards.street())
 
 
 @vk_bot.message_handler(payload={"command": "choose_upgrade"})
 async def choose_upgrade(message: Message):
+    player = message.player
+    web_app = message.web_app
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=dialogs.choose_upgrade, keyboard=keyboards.choose_upgrade())
 
 
 # ===================== Power active upgrade =====================
 @vk_bot.message_handler(payload={"command": "choose_power"})
 async def choose_power(message: Message):
-    upgrade_block = message.player.event_stuff.upgrade_block
+    web_app = message.web_app
+    player = message.player
+    upgrade_block = player.event_stuff.upgrade_block
     if upgrade_block and (upgrade_block > int(time())):
         what_left = stuff.time_is_left(upgrade_block)
         text = dialogs.action_is_blocked % what_left
@@ -112,6 +129,8 @@ async def choose_power(message: Message):
     else:
         text = dialogs.power_active_start
         keyboard = keyboards.power_active_start()
+
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
     await message.answer(text=text, keyboard=keyboard)
 
 
@@ -129,7 +148,7 @@ async def power_active_start(message: Message):
         keyboard = keyboards.power_active()
         player.states.main_state = 10
         player.states.upgrade_state = 0
-        await web_app.add_player_to_redis(player)
+    await web_app.add_player_to_redis(player)
     await message.answer(text=text, keyboard=keyboard)
 
 
@@ -223,7 +242,9 @@ async def power_active_other(message: Message):
 # ================= health active upgrade ================
 @vk_bot.message_handler(payload={"command": "choose_health"})
 async def choose_health(message: Message):
-    upgrade_block = message.player.event_stuff.upgrade_block
+    web_app = message.web_app
+    player = message.player
+    upgrade_block = player.event_stuff.upgrade_block
     if upgrade_block and (upgrade_block > int(time())):
         what_left = stuff.time_is_left(upgrade_block)
         text = dialogs.action_is_blocked % what_left
@@ -231,6 +252,8 @@ async def choose_health(message: Message):
     else:
         text = dialogs.health_active_start
         keyboard = keyboards.health_active_start()
+
+    await web_app.add_player_to_redis(player)
     await message.answer(text=text, keyboard=keyboard)
 
 
@@ -250,7 +273,8 @@ async def health_active_start(message: Message):
         player.states.upgrade_state = 0
         text = dialogs.health_active_choose_way % (picture, 0)
         keyboard = keyboards.health_active()
-        await web_app.add_player_to_redis(player)
+
+    await web_app.add_player_to_redis(player)
     await message.answer(text=text, keyboard=keyboard)
 
 
@@ -321,6 +345,9 @@ async def health_active_other(message: Message):
 # ================= fights ================
 @vk_bot.message_handler(payload={"command": "fights"})
 async def fights(message: Message):
+    web_app = message.web_app
+    player = message.player
+    await web_app.add_player_to_redis(player)
     await message.answer(text=dialogs.fight_menu, keyboard=keyboards.fights_menu())
 
 
