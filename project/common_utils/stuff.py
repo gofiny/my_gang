@@ -138,9 +138,7 @@ def get_eng_hit_name(hit_name: str) -> str:
 
 
 def close_fight(winner: Player, loser: Player):
-    logger.debug(f"{type(winner)}")
     for player in (winner, loser):
-        logger.debug(f"{type(player)}")
         player.states.main_state = 1
         player.states.upgrade_state = 0
         player.clear_event_info()
@@ -154,7 +152,7 @@ def create_event(event_name: str, player: Player) -> dict:
 async def check_dependencies(redis: Redis, player: Player) -> list:
     events = []
     if player.fight_side:
-        enemy = player.fight_side.enemy
+        enemy = await redis_queries.get_player(pool=redis, player_uuid=player.fight_side.enemy)
         close_fight(winner=enemy, loser=player)
         event = create_event(event_name="enemy_give_up", player=enemy)
         events.append(event)
