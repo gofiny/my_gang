@@ -5,10 +5,10 @@ from random import choice, shuffle
 from time import time
 from db_utils.models import Player
 from db_utils import redis_queries, pg_queries
-from common_utils import dialogs
 from vk_bot import keyboards as vk_keyboards
 from tlg_bot import keyboards as tlg_keyboards
 from typing import Optional
+from loguru import logger
 
 
 def name_validation(text):
@@ -139,6 +139,7 @@ def get_eng_hit_name(hit_name: str) -> str:
 
 def close_fight(winner: Player, loser: Player):
     for player in (winner, loser):
+        logger.debug(f"{player}")
         player.states.main_state = 1
         player.states.upgrade_state = 0
         player.clear_event_info()
