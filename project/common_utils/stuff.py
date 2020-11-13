@@ -138,8 +138,9 @@ def get_eng_hit_name(hit_name: str) -> str:
 
 
 def close_fight(winner: Player, loser: Player):
+    logger.debug(f"{type(winner)}")
     for player in (winner, loser):
-        logger.debug(f"{player}")
+        logger.debug(f"{type(player)}")
         player.states.main_state = 1
         player.states.upgrade_state = 0
         player.clear_event_info()
