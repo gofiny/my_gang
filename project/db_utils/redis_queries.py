@@ -18,7 +18,14 @@ async def get_await_fight(pool: Redis) -> Optional[Fight]:
     return Fight(data=fight)
 
 
-async def add_await_fight(pool: Redis, fight: Optional[Fight]) -> None:
+async def check_fight(pool: Redis) -> Optional[Fight]:
+    fight = await pool.get(key="fight", encoding="utf-8")
+    if fight == "":
+        return None
+    return Fight(data=fight)
+
+
+async def add_await_fight(pool: Redis, fight: Optional[Fight] = None) -> None:
     await pool.set("fight", fight.serialize() if fight else "")
 
 

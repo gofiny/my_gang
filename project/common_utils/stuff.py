@@ -158,6 +158,11 @@ async def check_dependencies(redis: Redis, player: Player) -> list:
         events.append(event)
         await redis_queries.add_player(pool=redis, player=enemy)
 
+    fight = await redis_queries.check_fight(pool=redis)
+    if fight:
+        if fight.player is player:
+            await redis_queries.add_await_fight(pool=redis)
+
     return events
 
 
