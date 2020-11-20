@@ -297,3 +297,9 @@ class Player:
 
     def serialize(self) -> str:
         return json.dumps(self.all_params)
+
+    def __eq__(self, other):
+        if isinstance(other, Player):
+            return other.uuid == self.uuid
+        else:
+            return False
