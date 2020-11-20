@@ -49,7 +49,7 @@ class Manager:
         players = await redis_queries.get_all_players(pool=self.redis)
         async with self.pg_pool.acquire() as connection:
             async for player in self.get_player(players):
-                if (player.counters.lm_time + 60) < time():
+                if (player.counters.lm_time + 1200) < time():
                     events = await stuff.disconnect_player(pg_conn=connection, redis=self.redis, player=player)
                     event = stuff.create_event(event_name="afk_disconnect", player=player)
                     events.append(event)
