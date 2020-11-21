@@ -515,6 +515,11 @@ async def fight_other(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
 
+@dp.message_handler(text=["меню"], pl_state={"main_state": 1})
+async def fight_other(message: Message):
+    await message.answer(text=dialogs.home, reply_markup=keyboards.home())
+
+
 @dp.message_handler()
 async def other_messages(message: Message):
     await message.answer(text="It`s work!")

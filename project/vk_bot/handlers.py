@@ -495,6 +495,11 @@ async def fight_other(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
 
+@vk_bot.message_handler(text="меню", state={"main_state": 1})
+async def fight_other(message: Message):
+    await message.answer(text=dialogs.home, keyboard=keyboards.home())
+
+
 @vk_bot.message_handler(text="*")
 async def other(message: Message):
     await vk_bot.send_message(user_ids=message.from_id, text="Не знаю что ответить")
