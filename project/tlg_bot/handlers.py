@@ -457,7 +457,7 @@ async def fight_process(message: Message):
                 enemy_keyboard = "fight_keyboard"
                 text = dialogs.get_damage_message(False, hit_status, hit_name, damage, player, enemy)
                 text += dialogs.choice_hit
-                enemy_text = dialogs.get_damage_message(False, hit_status, hit_name, damage, enemy, player)
+                enemy_text = dialogs.get_damage_message(True, hit_status, hit_name, damage, enemy, player)
                 enemy_text += dialogs.choice_guard
 
         player.clear_event_info()
