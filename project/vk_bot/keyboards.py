@@ -40,6 +40,7 @@ def home() -> Keyboard:
 
     keyboard.add_empty_row()
     keyboard.add_button(Button(label="\U0001F6AA На улицу", payload={"command": "street"}, color="primary"))
+    keyboard.add_button(Button(label="\U00002699 Настройки", payload={"command": "settings"}, color="primary"))
 
     return keyboard
 
@@ -56,7 +57,6 @@ def street() -> Keyboard:
     keyboard.add_empty_row()
     keyboard.add_button(Button(label="\U0001F3E0 Домой", payload={"command": "home"}, color="primary"))
     keyboard.add_button(Button(label="\U0001F5FA Карта", payload={"command": "map"}, color="primary"))
-    keyboard.add_button(Button(label="\U00002699 Настройки", payload={"command": "settings"}, color="primary"))
 
     return keyboard
 
@@ -166,7 +166,7 @@ def settings():
 
 
 def link_account():
-    keyboard = Keyboard()
+    keyboard = Keyboard(default_width=1)
     keyboard.add_buttons([
         Button(label="Привязать", payload={"command": "link_tlg"}),
         Button(label="\U00002B05 Назад", payload={"command": "settings"})
