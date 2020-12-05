@@ -177,6 +177,6 @@ async def disconnect_player(pg_conn: Connection, redis: Redis, player: Player) -
 async def self_disconnect_player(web_app, player: Player) -> None:
     pg_pool = web_app.pg_pool
     redis = web_app.redis_pool
-    async with pg_pool.acuire() as conn:
+    async with pg_pool.acquire() as conn:
         await pg_queries.update_player(connection=conn, player=player)
         await redis_queries.remove_player(pool=redis, player=player)
