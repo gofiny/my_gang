@@ -516,7 +516,7 @@ async def link_account(message: Message):
     web_app = message.web_app
     player.states.main_state = 2
     await redis_queries.add_player(pool=web_app.redis_pool, player=player)
-    await message.answer(text=dialogs.send_link_token, keyboard=keyboards.link_account())
+    await message.answer(text=dialogs.send_link_token, keyboard=keyboards.cancel_link())
 
 
 @vk_bot.message_handler(state={"main_state": 2})
@@ -524,8 +524,8 @@ async def process_link(message: Message):
     pass
 
 
-@vk_bot.message_handler(payload={"command": "cancel_link"})
-async def link_account(message: Message):
+@vk_bot.message_handler(payload={"command": "cancel_link"}, state={"main_state": 2})
+async def cancel_link(message: Message):
     player = message.player
     web_app = message.web_app
     player.states.main_state = 1
