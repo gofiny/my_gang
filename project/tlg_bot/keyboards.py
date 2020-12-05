@@ -46,7 +46,6 @@ def street():
     keyboard.row(
         KeyboardButton("\U0001F3E0 Домой"),
         KeyboardButton("\U0001F5FA Карта"),
-        KeyboardButton("\U00002699 Настройки")
     )
     return keyboard
 

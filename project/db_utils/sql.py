@@ -20,7 +20,8 @@ create_players_table = '''CREATE TABLE IF NOT EXISTS players
                         "health" int NOT NULL DEFAULT 100,
                         "power" int NOT NULL DEFAULT 10,
                         "mind" int NOT NULL DEFAULT 5,
-                        "respect" int NOT NULL DEFAULT 0
+                        "respect" int NOT NULL DEFAULT 0,
+                        "token" uuid not null
                     )'''
 
 create_counters_table = '''CREATE TABLE IF NOT EXISTS counters
@@ -84,8 +85,8 @@ create_new_player = '''INSERT INTO players
 create_new_player_with_stuff = '''WITH player as (
                                     INSERT INTO players
                                     (
-                                        uuid, %s_id
-                                    ) VALUES ($1, $2) RETURNING uuid), 
+                                        uuid, %s_id, token
+                                    ) VALUES ($1, $2, $8) RETURNING uuid), 
                                   wallet as (
                                     INSERT INTO wallets
                                     (

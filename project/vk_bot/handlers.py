@@ -495,9 +495,58 @@ async def fight_other(message: Message):
     await message.answer(text=dialogs.touch_buttons)
 
 
+# =================================
+
+
 @vk_bot.message_handler(text="меню", state={"main_state": 1})
 async def fight_other(message: Message):
     await message.answer(text=dialogs.home, keyboard=keyboards.home())
+
+
+@vk_bot.message_handler(payload={"command": "link_account"})
+async def link_account(message: Message):
+    player = message.player
+    await message.answer(
+        text=dialogs.link_account % (player.token, "telegram", "telegram"),
+        keyboard=keyboards.link_account()
+    )
+
+
+@vk_bot.message_handler(payload={"command": "link_tlg"})
+async def link_account(message: Message):
+    player = message.player
+    web_app = message.web_app
+    player.states.main_state = 2
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
+    await message.answer(text=dialogs.send_link_token, keyboard=keyboards.link_account())
+
+
+@vk_bot.message_handler(state={"main_state": 2})
+async def process_link(message: Message):
+    pass
+
+
+@vk_bot.message_handler(text="отключиться")
+async def disconnect(message: Message):
+    player = message.player
+    web_app = message.web_app
+    if player.states.main_state != 1:
+        text = dialogs.finish_actions
+        keyboard = None
+    else:
+        text = dialogs.disconnected
+        await stuff.self_disconnect_player(web_app=web_app, player=player)
+        keyboard = keyboards.connect()
+    await message.answer(text=text, keyboard=keyboard)
+
+
+@vk_bot.message_handler(payload={"command": "cancel_link"})
+async def link_account(message: Message):
+    player = message.player
+    web_app = message.web_app
+    player.states.main_state = 1
+    await redis_queries.add_player(pool=web_app.redis_pool, player=player)
+    await message.answer(text=dialogs.settings, keyboard=keyboards.settings())
 
 
 @vk_bot.message_handler(text="*")

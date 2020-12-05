@@ -40,7 +40,6 @@ def home() -> Keyboard:
 
     keyboard.add_empty_row()
     keyboard.add_button(Button(label="\U0001F6AA На улицу", payload={"command": "street"}, color="primary"))
-    keyboard.add_button(Button(label="\U00002699 Настройки", payload={"command": "settings"}, color="primary"))
 
     return keyboard
 
@@ -154,4 +153,42 @@ def fight_keyboard(hide_buttons: bool = False):
     keyboard.add_buttons([
         Button(label="\U0001F4A9 Сдаться", payload={"command": "give_up"})
     ])
+    return keyboard
+
+
+def settings():
+    keyboard = Keyboard()
+    keyboard.add_buttons([
+        Button(label="Привязать telegram аккаунт", payload={"command": "link_account"}),
+        Button(label="\U00002B05 Назад", payload={"command": "home"})
+    ])
+    return keyboard
+
+
+def link_account():
+    keyboard = Keyboard()
+    keyboard.add_buttons([
+        Button(label="Привязать", payload={"command": "link_tlg"}),
+        Button(label="\U00002B05 Назад", payload={"command": "settings"})
+    ])
+
+    return keyboard
+
+
+def sure_to_link():
+    keyboard = Keyboard()
+    keyboard.add_buttons([
+        Button(label="Да", payload={"command": "link_tlg_yes"}, color="positive"),
+        Button(label="Нет", payload={"command": "settings"}, color="negative")
+    ])
+
+    return keyboard
+
+
+def cancel_link():
+    keyboard = Keyboard()
+    keyboard.add_buttons([
+        Button(label="Отмена", payload={"command": "cancel_link"})
+    ])
+
     return keyboard

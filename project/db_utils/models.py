@@ -249,6 +249,7 @@ class Player:
         self.power = data["power"]
         self.mind = data["mind"]
         self.respect = data["respect"]
+        self.token = data["token"]
         self.level = Levels(level=data["level"], respect=self.respect)
         self.states = States(data.get("states", {}))
         self.current_platform = data["current_platform"]
@@ -284,6 +285,7 @@ class Player:
             "power": self.power,
             "mind": self.mind,
             "respect": self.respect,
+            "token": self.token,
             "states": self.states.all_states,
             "counters": self.counters.all_counters,
             "wallet": self.wallet.data_to_serialize,
