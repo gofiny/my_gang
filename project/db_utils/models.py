@@ -249,7 +249,7 @@ class Player:
         self.power = data["power"]
         self.mind = data["mind"]
         self.respect = data["respect"]
-        self.token = data["token"]
+        self.token = str(data["token"])
         self.level = Levels(level=data["level"], respect=self.respect)
         self.states = States(data.get("states", {}))
         self.current_platform = data["current_platform"]
